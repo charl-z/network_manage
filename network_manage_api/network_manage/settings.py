@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'device_query',
         'USER': 'root',
         'PASSWORD': '251493584wdy',
-        'HOST': '47.96.156.191',
+        'HOST': '127.0.0.1',
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
         },
