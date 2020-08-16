@@ -89,8 +89,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'device_query',
         'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': '127.0.0.1',
+        'PASSWORD': '251493584wdy',
+        'HOST': '47.96.156.191',
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
         },
