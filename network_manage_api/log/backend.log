@@ -1,0 +1,229 @@
+2020-05-16 22:47:11,178 [Thread-3: 14332]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 22:47:53,533 [Dummy-1: 13276]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.061) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 22:47:53,620 [Dummy-1: 13276]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.086) SELECT VERSION(); args=None
+2020-05-16 22:47:55,146 [Dummy-1: 13276]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.077) SHOW FULL TABLES; args=None
+2020-05-16 22:47:55,215 [Dummy-1: 13276]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.064) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 22:47:56,313 [Thread-2: 13172]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 33
+2020-05-16 22:59:34,637 [Thread-3: 3000]G:\workspace\django_auto_test\apps\device_query\views.py:add_device_query_task:64 ERROR - 探测任务启动失败：Error while reading from socket: (10060, '由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败。', None, 10060, None)
+2020-05-16 22:59:34,638 [Thread-3: 3000]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 22:59:34,645 [Thread-3: 3000]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 ERROR - "POST /api/start_device_query_task/ HTTP/1.1" 500 59
+2020-05-16 22:59:36,577 [Thread-4: 5160]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:00:06,434 [Thread-5: 8108]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 33
+2020-05-16 23:00:07,839 [Thread-6: 11152]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 33
+2020-05-16 23:00:08,868 [Thread-7: 4600]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 33
+2020-05-16 23:02:45,444 [Dummy-1: 13744]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:02:45,487 [Dummy-1: 13744]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.043) SELECT VERSION(); args=None
+2020-05-16 23:02:46,062 [Dummy-1: 13744]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SHOW FULL TABLES; args=None
+2020-05-16 23:02:46,111 [Dummy-1: 13744]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:02:46,564 [Thread-2: 9672]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:02:49,471 [Thread-3: 13532]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:02:52,423 [Thread-4: 1496]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:02:52,886 [Thread-5: 9320]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:02:56,852 [Thread-6: 9608]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:02:58,843 [Thread-7: 12444]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:03:01,529 [Thread-8: 5364]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:03:33,894 [Dummy-1: 4964]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.051) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:03:33,951 [Dummy-1: 4964]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.057) SELECT VERSION(); args=None
+2020-05-16 23:03:34,529 [Dummy-1: 4964]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SHOW FULL TABLES; args=None
+2020-05-16 23:03:34,581 [Dummy-1: 4964]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:03:51,282 [Dummy-1: 10000]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.051) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:03:51,352 [Dummy-1: 10000]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.069) SELECT VERSION(); args=None
+2020-05-16 23:03:52,240 [Dummy-1: 10000]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.053) SHOW FULL TABLES; args=None
+2020-05-16 23:03:52,295 [Dummy-1: 10000]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.052) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:03:52,773 [Thread-2: 12596]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:04:09,342 [Dummy-1: 13468]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.057) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:04:09,440 [Dummy-1: 13468]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.098) SELECT VERSION(); args=None
+2020-05-16 23:04:10,090 [Dummy-1: 13468]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.065) SHOW FULL TABLES; args=None
+2020-05-16 23:04:10,146 [Dummy-1: 13468]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.053) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:04:10,677 [Thread-2: 13880]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:05:05,686 [Dummy-1: 3000]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:05:05,730 [Dummy-1: 3000]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT VERSION(); args=None
+2020-05-16 23:05:19,382 [Dummy-1: 3260]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:05:19,427 [Dummy-1: 3260]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT VERSION(); args=None
+2020-05-16 23:05:20,027 [Dummy-1: 3260]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SHOW FULL TABLES; args=None
+2020-05-16 23:05:20,080 [Dummy-1: 3260]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:05:20,839 [Thread-2: 14088]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:05:32,403 [Dummy-1: 2608]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:05:32,449 [Dummy-1: 2608]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT VERSION(); args=None
+2020-05-16 23:05:33,105 [Dummy-1: 2608]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SHOW FULL TABLES; args=None
+2020-05-16 23:05:33,153 [Dummy-1: 2608]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:05:40,538 [Thread-2: 12708]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:06:12,269 [Dummy-1: 876]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.224) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:06:12,507 [Dummy-1: 876]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.238) SELECT VERSION(); args=None
+2020-05-16 23:06:13,703 [Dummy-1: 876]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.225) SHOW FULL TABLES; args=None
+2020-05-16 23:06:14,591 [Dummy-1: 876]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.886) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:06:28,500 [Thread-2: 11744]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:07:34,160 [Dummy-1: 12292]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.920) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:07:34,547 [Dummy-1: 12292]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.386) SELECT VERSION(); args=None
+2020-05-16 23:07:35,688 [Dummy-1: 12292]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SHOW FULL TABLES; args=None
+2020-05-16 23:07:35,743 [Dummy-1: 12292]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.052) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:07:37,238 [Thread-2: 8696]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:07:40,867 [Thread-3: 11432]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:07:48,402 [Thread-4: 9956]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 33
+2020-05-16 23:08:02,184 [Dummy-1: 6480]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:08:02,232 [Dummy-1: 6480]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.049) SELECT VERSION(); args=None
+2020-05-16 23:08:02,822 [Dummy-1: 6480]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.054) SHOW FULL TABLES; args=None
+2020-05-16 23:08:02,875 [Dummy-1: 6480]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:08:06,230 [Thread-2: 9636]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 33
+2020-05-16 23:08:38,399 [Dummy-1: 13648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:08:38,447 [Dummy-1: 13648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT VERSION(); args=None
+2020-05-16 23:08:39,010 [Dummy-1: 13648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SHOW FULL TABLES; args=None
+2020-05-16 23:08:39,064 [Dummy-1: 13648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:08:59,476 [Dummy-1: 6568]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:08:59,525 [Dummy-1: 6568]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.049) SELECT VERSION(); args=None
+2020-05-16 23:09:00,086 [Dummy-1: 6568]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SHOW FULL TABLES; args=None
+2020-05-16 23:09:00,141 [Dummy-1: 6568]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:09:30,266 [Dummy-1: 12112]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.598) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:09:30,885 [Dummy-1: 12112]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.618) SELECT VERSION(); args=None
+2020-05-16 23:09:31,545 [Dummy-1: 12112]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.066) SHOW FULL TABLES; args=None
+2020-05-16 23:09:31,612 [Dummy-1: 12112]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.064) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:10:58,444 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.357) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:10:59,827 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (1.383) SELECT VERSION(); args=None
+2020-05-16 23:11:11,299 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SHOW FULL TABLES; args=None
+2020-05-16 23:11:11,916 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.614) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:14:20,508 [Dummy-1: 8084]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:14:20,561 [Dummy-1: 8084]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.052) SELECT VERSION(); args=None
+2020-05-16 23:14:21,115 [Dummy-1: 8084]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.043) SHOW FULL TABLES; args=None
+2020-05-16 23:14:21,166 [Dummy-1: 8084]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:15:02,735 [Dummy-1: 7504]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:15:02,778 [Dummy-1: 7504]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.043) SELECT VERSION(); args=None
+2020-05-16 23:15:03,407 [Dummy-1: 7504]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SHOW FULL TABLES; args=None
+2020-05-16 23:15:03,458 [Dummy-1: 7504]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.049) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:16:07,914 [Dummy-1: 12960]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:16:07,960 [Dummy-1: 12960]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT VERSION(); args=None
+2020-05-16 23:16:08,521 [Dummy-1: 12960]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SHOW FULL TABLES; args=None
+2020-05-16 23:16:08,576 [Dummy-1: 12960]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:16:37,832 [Thread-2: 4288]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:16:39,983 [Thread-3: 13732]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:16:44,238 [Thread-4: 952]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:17:06,832 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:17:06,877 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT VERSION(); args=None
+2020-05-16 23:17:07,449 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.049) SHOW FULL TABLES; args=None
+2020-05-16 23:17:07,498 [Dummy-1: 13724]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:17:16,843 [Thread-2: 12304]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:18:00,581 [Dummy-1: 6356]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:18:00,629 [Dummy-1: 6356]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT VERSION(); args=None
+2020-05-16 23:18:01,997 [Dummy-1: 6356]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.073) SHOW FULL TABLES; args=None
+2020-05-16 23:18:02,509 [Dummy-1: 6356]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.503) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:18:04,262 [Thread-2: 7860]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:18:23,111 [Dummy-1: 5700]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:18:23,157 [Dummy-1: 5700]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT VERSION(); args=None
+2020-05-16 23:18:23,771 [Dummy-1: 5700]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.060) SHOW FULL TABLES; args=None
+2020-05-16 23:18:23,825 [Dummy-1: 5700]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.049) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:18:31,763 [Thread-2: 12040]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:18:58,699 [Dummy-1: 14144]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.147) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:18:58,747 [Dummy-1: 14144]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT VERSION(); args=None
+2020-05-16 23:18:59,411 [Dummy-1: 14144]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.051) SHOW FULL TABLES; args=None
+2020-05-16 23:18:59,460 [Dummy-1: 14144]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:19:01,057 [Thread-2: 6056]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:19:16,073 [Dummy-1: 676]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:19:16,118 [Dummy-1: 676]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT VERSION(); args=None
+2020-05-16 23:19:16,719 [Dummy-1: 676]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SHOW FULL TABLES; args=None
+2020-05-16 23:19:16,769 [Dummy-1: 676]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:19:22,762 [Thread-2: 11396]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:19:26,510 [Thread-3: 13304]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:19:29,703 [Thread-4: 1260]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:19:40,615 [Thread-5: 11412]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:20:30,188 [Dummy-1: 4072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.064) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:20:30,274 [Dummy-1: 4072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.086) SELECT VERSION(); args=None
+2020-05-16 23:20:31,357 [Dummy-1: 4072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.073) SHOW FULL TABLES; args=None
+2020-05-16 23:20:31,417 [Dummy-1: 4072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.057) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:21:55,282 [Thread-2: 11396]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:22:47,721 [Dummy-1: 11464]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:22:47,765 [Dummy-1: 11464]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT VERSION(); args=None
+2020-05-16 23:22:48,382 [Dummy-1: 11464]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SHOW FULL TABLES; args=None
+2020-05-16 23:22:48,430 [Dummy-1: 11464]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:22:55,694 [Thread-2: 676]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "GET /api/exec_device_query_task/ HTTP/1.1" 200 18
+2020-05-16 23:24:06,974 [Dummy-1: 6352]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:24:07,020 [Dummy-1: 6352]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT VERSION(); args=None
+2020-05-16 23:24:07,595 [Dummy-1: 6352]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SHOW FULL TABLES; args=None
+2020-05-16 23:24:07,646 [Dummy-1: 6352]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:24:18,017 [Thread-2: 8668]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:24:19,857 [Thread-3: 8024]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:24:22,434 [Thread-4: 14036]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 INFO - "POST /api/start_device_query_task/ HTTP/1.1" 200 21
+2020-05-16 23:24:29,194 [Thread-5: 2608]G:\virtualen\my_blog\lib\site-packages\django\core\handlers\exception.py:handle_uncaught_exception:135 ERROR - Internal Server Error: /api/exec_device_query_task/
+Traceback (most recent call last):
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\exception.py", line 41, in inner
+    response = get_response(request)
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "G:\workspace\django_auto_test\apps\device_query\views.py", line 81, in exec_device_query_task
+    result = device_query.deviceQuery(device_info[2], device_info[0], device_info[1]).get_all_infos()
+  File "G:\workspace\django_auto_test\utils\device_query.py", line 186, in get_all_infos
+    if_names = self.get_if_name()
+  File "G:\workspace\django_auto_test\utils\device_query.py", line 43, in get_if_name
+    port_descr = result[1].split(" ")[-1].strip()
+IndexError: list index out of range
+2020-05-16 23:24:29,230 [Thread-5: 2608]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 ERROR - "GET /api/exec_device_query_task/ HTTP/1.1" 500 79965
+2020-05-16 23:25:57,687 [Dummy-1: 3076]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:25:57,731 [Dummy-1: 3076]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT VERSION(); args=None
+2020-05-16 23:26:03,689 [Dummy-1: 9448]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.051) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:26:03,735 [Dummy-1: 9448]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT VERSION(); args=None
+2020-05-16 23:26:04,293 [Dummy-1: 9448]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SHOW FULL TABLES; args=None
+2020-05-16 23:26:04,342 [Dummy-1: 9448]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:26:12,335 [Dummy-1: 14072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:26:12,379 [Dummy-1: 14072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.044) SELECT VERSION(); args=None
+2020-05-16 23:26:12,988 [Dummy-1: 14072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SHOW FULL TABLES; args=None
+2020-05-16 23:26:13,043 [Dummy-1: 14072]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.049) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:26:28,879 [Thread-2: 7400]G:\virtualen\my_blog\lib\site-packages\django\core\handlers\exception.py:handle_uncaught_exception:135 ERROR - Internal Server Error: /api/exec_device_query_task/
+Traceback (most recent call last):
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\exception.py", line 41, in inner
+    response = get_response(request)
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "G:\workspace\django_auto_test\apps\device_query\views.py", line 81, in exec_device_query_task
+    result = device_query.deviceQuery(device_info[2], device_info[0], device_info[1]).get_all_infos()
+  File "G:\workspace\django_auto_test\utils\device_query.py", line 189, in get_all_infos
+    if_names = self.get_if_name()
+  File "G:\workspace\django_auto_test\utils\device_query.py", line 46, in get_if_name
+    port_descr = result[1].split(" ")[-1].strip()
+IndexError: list index out of range
+2020-05-16 23:26:28,916 [Thread-2: 7400]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 ERROR - "GET /api/exec_device_query_task/ HTTP/1.1" 500 79915
+2020-05-16 23:27:20,770 [Dummy-1: 1884]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:27:20,818 [Dummy-1: 1884]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT VERSION(); args=None
+2020-05-16 23:27:21,424 [Dummy-1: 1884]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SHOW FULL TABLES; args=None
+2020-05-16 23:27:21,480 [Dummy-1: 1884]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-16 23:27:28,190 [Thread-2: 9088]G:\virtualen\my_blog\lib\site-packages\django\core\handlers\exception.py:handle_uncaught_exception:135 ERROR - Internal Server Error: /api/exec_device_query_task/
+Traceback (most recent call last):
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\exception.py", line 41, in inner
+    response = get_response(request)
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "G:\virtualen\my_blog\lib\site-packages\django\core\handlers\base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "G:\workspace\django_auto_test\apps\device_query\views.py", line 81, in exec_device_query_task
+    result = device_query.deviceQuery(device_info[2], device_info[0], device_info[1]).get_all_infos()
+  File "G:\workspace\django_auto_test\utils\device_query.py", line 189, in get_all_infos
+    if_names = self.get_if_name()
+  File "G:\workspace\django_auto_test\utils\device_query.py", line 42, in get_if_name
+    logging.DEBUG(results)
+TypeError: 'int' object is not callable
+2020-05-16 23:27:28,226 [Thread-2: 9088]G:\virtualen\my_blog\lib\site-packages\django\core\servers\basehttp.py:log_message:124 ERROR - "GET /api/exec_device_query_task/ HTTP/1.1" 500 79422
+2020-05-16 23:28:15,725 [Dummy-1: 8336]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.053) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-16 23:28:15,772 [Dummy-1: 8336]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT VERSION(); args=None
+2020-05-16 23:28:16,330 [Dummy-1: 8336]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SHOW FULL TABLES; args=None
+2020-05-16 23:28:16,387 [Dummy-1: 8336]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-17 23:05:20,995 [Dummy-1: 19100]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-17 23:05:21,078 [Dummy-1: 19100]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.082) SELECT VERSION(); args=None
+2020-05-17 23:07:25,391 [Dummy-1: 19836]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-17 23:07:25,437 [Dummy-1: 19836]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SELECT VERSION(); args=None
+2020-05-17 23:07:49,603 [Dummy-1: 18600]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.051) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-17 23:07:49,713 [Dummy-1: 18600]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.110) SELECT VERSION(); args=None
+2020-05-17 23:08:11,293 [Dummy-1: 18848]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.048) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-17 23:08:11,347 [Dummy-1: 18848]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.054) SELECT VERSION(); args=None
+2020-05-17 23:08:30,188 [Dummy-1: 19648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.051) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-17 23:08:30,239 [Dummy-1: 19648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SELECT VERSION(); args=None
+2020-05-17 23:08:31,268 [Dummy-1: 19648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SHOW FULL TABLES; args=None
+2020-05-17 23:08:31,358 [Dummy-1: 19648]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.050) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-17 23:08:41,458 [Dummy-1: 16392]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.043) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-17 23:08:41,504 [Dummy-1: 16392]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.045) SELECT VERSION(); args=None
+2020-05-17 23:08:42,061 [Dummy-1: 16392]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.051) SHOW FULL TABLES; args=None
+2020-05-17 23:08:42,113 [Dummy-1: 16392]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
+2020-05-17 23:08:46,122 [Dummy-1: 18996]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.043) SELECT @@SQL_AUTO_IS_NULL; args=None
+2020-05-17 23:08:46,165 [Dummy-1: 18996]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.043) SELECT VERSION(); args=None
+2020-05-17 23:08:46,722 [Dummy-1: 18996]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.046) SHOW FULL TABLES; args=None
+2020-05-17 23:08:46,778 [Dummy-1: 18996]G:\virtualen\my_blog\lib\site-packages\django\db\backends\utils.py:execute:91 DEBUG - (0.047) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=()
