@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="32d634f9-1532-41dc-9e8a-7c1e7518d13b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/network_manage/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/network_manage/settings.py" afterDir="false" />
     </list>
@@ -87,8 +88,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/network_manage/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="471">
-              <caret line="92" column="26" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
+            <state relative-caret-position="329">
+              <caret line="188" column="57" selection-start-line="188" selection-start-column="57" selection-end-line="188" selection-end-column="57" />
               <folding>
                 <element signature="e#340#349#0" expanded="true" />
               </folding>
@@ -359,12 +360,12 @@
       <workItem from="1597323447151" duration="31000" />
       <workItem from="1597323507357" duration="34931000" />
       <workItem from="1597560083048" duration="2045000" />
-      <workItem from="1597582539235" duration="38000" />
+      <workItem from="1597582539235" duration="419000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="289421000" />
+    <option name="totallyTimeSpent" value="289802000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -704,8 +705,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/network_manage/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="471">
-          <caret line="92" column="26" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
+        <state relative-caret-position="329">
+          <caret line="188" column="57" selection-start-line="188" selection-start-column="57" selection-end-line="188" selection-end-column="57" />
           <folding>
             <element signature="e#340#349#0" expanded="true" />
           </folding>

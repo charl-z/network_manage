@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'device_query',
         'USER': 'root',
         'PASSWORD': '251493584wdy',
-        'HOST': '127.0.0.1',
+        'HOST': '127.0.0.10',
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
         },
@@ -174,10 +174,10 @@ LOGGING = {
 # CACHES = {
 #     "default": {
 #         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://47.96.156.191:4580/1",
+#         "LOCATION": "redis://127.0.01:4580/1",
 #         "OPTIONS": {
 #             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#             "PASSWORD": "251493584wdy"
+#             "PASSWORD": "123456789"
 #         }
 #     }
 # }
@@ -186,7 +186,7 @@ LOGGING = {
 #     "default": {
 #         "BACKEND": "channels_redis.core.RedisChannelLayer",
 #         "CONFIG": {
-#             "hosts": ["redis://:251493584wdy@47.96.156.191:4580/2"],
+#             "hosts": ["redis://:123456789@127.0.01:4580/2"],
 #             # "symmetric_encryption_keys": [SECRET_KEY],
 #         },
 #     },

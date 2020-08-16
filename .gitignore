@@ -10,4 +10,4 @@ dist
 build
 
 # django配置文件不提交
-settings.py
+settings.*
