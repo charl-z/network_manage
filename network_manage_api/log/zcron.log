@@ -1,0 +1,109 @@
+
+2020-08-14  11:33:06 urllib3.connectionpool DEBUG connectionpool.py 230   Starting new HTTP connection (1): 127.0.0.1:8000 
+2020-08-14  11:33:06 urllib3.connectionpool DEBUG connectionpool.py 442   http://127.0.0.1:8000 "GET /api/device_query_crontab_task/10.1.101.1/ HTTP/1.1" 200 126 
+2020-08-14  12:46:28 django.db.backends DEBUG utils.py 111   (0.041) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:46:28 django.db.backends DEBUG utils.py 111   (0.046) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:46:28 django.db.backends DEBUG utils.py 111   (0.043) SELECT VERSION(); args=None 
+2020-08-14  12:46:28 django.db.backends DEBUG utils.py 111   (0.036) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:46:28 django.db.backends DEBUG utils.py 111   (0.039) SHOW FULL TABLES; args=None 
+2020-08-14  12:46:28 django.db.backends DEBUG utils.py 111   (0.041) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:46:28 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:46:28 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:46:28 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:46:28 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:47:03 django.db.backends DEBUG utils.py 111   (0.037) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:47:03 django.db.backends DEBUG utils.py 111   (0.037) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:47:03 django.db.backends DEBUG utils.py 111   (0.036) SELECT VERSION(); args=None 
+2020-08-14  12:47:03 django.db.backends DEBUG utils.py 111   (0.040) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:47:03 django.db.backends DEBUG utils.py 111   (0.040) SHOW FULL TABLES; args=None 
+2020-08-14  12:47:04 django.db.backends DEBUG utils.py 111   (0.040) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:47:04 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:47:04 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:47:04 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:47:04 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:47:19 django.db.backends DEBUG utils.py 111   (0.038) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:47:19 django.db.backends DEBUG utils.py 111   (0.037) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:47:19 django.db.backends DEBUG utils.py 111   (0.037) SELECT VERSION(); args=None 
+2020-08-14  12:47:20 django.db.backends DEBUG utils.py 111   (0.036) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:47:20 django.db.backends DEBUG utils.py 111   (0.038) SHOW FULL TABLES; args=None 
+2020-08-14  12:47:20 django.db.backends DEBUG utils.py 111   (0.039) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:47:20 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:47:20 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:47:20 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:47:20 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:47:52 django.db.backends DEBUG utils.py 111   (0.035) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:47:52 django.db.backends DEBUG utils.py 111   (0.034) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:47:52 django.db.backends DEBUG utils.py 111   (0.036) SELECT VERSION(); args=None 
+2020-08-14  12:47:53 django.db.backends DEBUG utils.py 111   (0.040) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:47:53 django.db.backends DEBUG utils.py 111   (0.040) SHOW FULL TABLES; args=None 
+2020-08-14  12:47:53 django.db.backends DEBUG utils.py 111   (0.039) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:47:53 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:47:53 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:47:53 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:47:53 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:48:21 django.db.backends DEBUG utils.py 111   (0.037) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:48:21 django.db.backends DEBUG utils.py 111   (0.038) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:48:21 django.db.backends DEBUG utils.py 111   (0.039) SELECT VERSION(); args=None 
+2020-08-14  12:48:21 django.db.backends DEBUG utils.py 111   (0.036) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:48:21 django.db.backends DEBUG utils.py 111   (0.037) SHOW FULL TABLES; args=None 
+2020-08-14  12:48:22 django.db.backends DEBUG utils.py 111   (0.036) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:48:22 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:48:22 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:48:22 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:48:22 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:48:40 django.db.backends DEBUG utils.py 111   (0.036) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:48:40 django.db.backends DEBUG utils.py 111   (0.034) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:48:40 django.db.backends DEBUG utils.py 111   (0.036) SELECT VERSION(); args=None 
+2020-08-14  12:48:41 django.db.backends DEBUG utils.py 111   (0.041) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:48:41 django.db.backends DEBUG utils.py 111   (0.041) SHOW FULL TABLES; args=None 
+2020-08-14  12:48:41 django.db.backends DEBUG utils.py 111   (0.042) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:48:41 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:48:41 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:48:41 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:48:41 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:49:23 django.db.backends DEBUG utils.py 111   (0.036) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:49:23 django.db.backends DEBUG utils.py 111   (0.036) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:49:23 django.db.backends DEBUG utils.py 111   (0.036) SELECT VERSION(); args=None 
+2020-08-14  12:49:23 django.db.backends DEBUG utils.py 111   (0.036) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:49:23 django.db.backends DEBUG utils.py 111   (0.036) SHOW FULL TABLES; args=None 
+2020-08-14  12:49:23 django.db.backends DEBUG utils.py 111   (0.038) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:49:23 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:49:23 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:49:23 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:49:23 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:49:56 django.db.backends DEBUG utils.py 111   (0.041) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:49:56 django.db.backends DEBUG utils.py 111   (0.040) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:49:56 django.db.backends DEBUG utils.py 111   (0.040) SELECT VERSION(); args=None 
+2020-08-14  12:49:57 django.db.backends DEBUG utils.py 111   (0.036) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:49:57 django.db.backends DEBUG utils.py 111   (0.036) SHOW FULL TABLES; args=None 
+2020-08-14  12:49:57 django.db.backends DEBUG utils.py 111   (0.036) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:49:57 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:49:57 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:49:57 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:49:57 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:50:37 django.db.backends DEBUG utils.py 111   (0.040) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:50:37 django.db.backends DEBUG utils.py 111   (0.040) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:50:37 django.db.backends DEBUG utils.py 111   (0.040) SELECT VERSION(); args=None 
+2020-08-14  12:50:37 django.db.backends DEBUG utils.py 111   (0.040) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:50:37 django.db.backends DEBUG utils.py 111   (0.046) SHOW FULL TABLES; args=None 
+2020-08-14  12:50:37 django.db.backends DEBUG utils.py 111   (0.041) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:50:37 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:50:37 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:50:37 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:50:37 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:50:43 django.db.backends DEBUG utils.py 111   (0.036) SELECT @@SQL_AUTO_IS_NULL; args=None 
+2020-08-14  12:50:43 django.db.backends DEBUG utils.py 111   (0.036) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:50:43 django.db.backends DEBUG utils.py 111   (0.039) SELECT VERSION(); args=None 
+2020-08-14  12:50:43 django.db.backends DEBUG utils.py 111   (0.037) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None 
+2020-08-14  12:50:43 django.db.backends DEBUG utils.py 111   (0.038) SHOW FULL TABLES; args=None 
+2020-08-14  12:50:43 django.db.backends DEBUG utils.py 111   (0.038) SELECT `django_migrations`.`app`, `django_migrations`.`name` FROM `django_migrations`; args=() 
+2020-08-14  12:50:43 django.channels.server DEBUG runserver.py 95   Daphne running, listening on 0.0.0.0:8000 
+2020-08-14  12:50:43 daphne.server INFO server.py 111   HTTP/2 support not enabled (install the http2 and tls Twisted extras) 
+2020-08-14  12:50:43 daphne.server INFO server.py 119   Configuring endpoint tcp:port=8000:interface=0.0.0.0 
+2020-08-14  12:50:43 daphne.server INFO server.py 153   Listening on TCP address 0.0.0.0:8000 
+2020-08-14  12:56:49 urllib3.connectionpool DEBUG connectionpool.py 230   Starting new HTTP connection (1): 127.0.0.1:8000 
+2020-08-14  12:58:29 urllib3.connectionpool DEBUG connectionpool.py 230   Starting new HTTP connection (1): 127.0.0.1:8000 
+2020-08-14  13:00:21 urllib3.connectionpool DEBUG connectionpool.py 230   Starting new HTTP connection (1): 127.0.0.1:8000 
+2020-08-14  13:02:22 urllib3.connectionpool DEBUG connectionpool.py 230   Starting new HTTP connection (1): 127.0.0.1:8000 
+2020-08-14  13:05:14 urllib3.connectionpool DEBUG connectionpool.py 230   Starting new HTTP connection (1): 127.0.0.1:8000 
+2020-08-14  13:05:14 urllib3.connectionpool DEBUG connectionpool.py 442   http://127.0.0.1:8000 "GET /api/device_query_crontab_task/all/ HTTP/1.1" 200 232 
