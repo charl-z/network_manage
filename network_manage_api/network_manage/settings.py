@@ -89,8 +89,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'device_query',
         'USER': 'root',
-        'PASSWORD': '34334',
-        'HOST': '127.0.0.10',
+        'PASSWORD': '251493584wdy',
+        'HOST': '47.96.156.191',
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
         },
@@ -186,7 +186,7 @@ LOGGING = {
 #     "default": {
 #         "BACKEND": "channels_redis.core.RedisChannelLayer",
 #         "CONFIG": {
-#             "hosts": ["redis://:123456789@127.0.01:4580/2"],
+#             "hosts": ["redis://:123456789@47.96.156.191:4580/2"],
 #             # "symmetric_encryption_keys": [SECRET_KEY],
 #         },
 #     },
