@@ -1,7 +1,7 @@
 # redis对应得配置文件
 REDIS_CONF:
   host: 127.0.0.1
-  password: 251493584wdy
+  password: 123456789
   port: 4580
 # redis里面缓存设备探测信息得队列
 DEVICE_QUERY_QUEUE: "device:query:queue"

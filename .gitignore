@@ -1,0 +1,13 @@
+# log 不需要提交的任意包含后缀名为log的文件
+*.log
+
+# Python:
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# django配置文件不提交
+settings.py
