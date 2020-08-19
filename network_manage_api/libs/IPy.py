@@ -1,3 +1,4 @@
+# -*-coding:utf8-*-
 """
 IPy - class and tools for handling of IPv4 and IPv6 addresses and networks.
 See README file for learn how to use IPy.
@@ -796,6 +797,10 @@ class IPint(object):
 
 class IP(IPint):
     """Class for handling IP addresses and networks."""
+
+    def checkNetwork(self, ip, prefixlen, version=4):
+        """校验ip/mask得合法性"""
+        return _checkNetaddrWorksWithPrefixlen(ip, prefixlen, version)
 
     def net(self):
         """Return the base (first) address of a network as an IP object.
