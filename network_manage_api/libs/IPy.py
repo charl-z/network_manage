@@ -798,10 +798,6 @@ class IPint(object):
 class IP(IPint):
     """Class for handling IP addresses and networks."""
 
-    def checkNetwork(self, ip, prefixlen, version=4):
-        """校验ip/mask得合法性"""
-        return _checkNetaddrWorksWithPrefixlen(ip, prefixlen, version)
-
     def net(self):
         """Return the base (first) address of a network as an IP object.
 
@@ -1653,6 +1649,12 @@ def _remove_subprefix(prefix, subprefix):
     else:
         return IPSet([prefixes[0]]) + _remove_subprefix(prefixes[1], subprefix)
 
+def checkNetwork(network):
+    """校验ip/mask得合法性"""
+    network = network.split("/")
+    ip, prefixlen = network[0], network[1]
+    ip = parseAddress(ip)[0]
+    return _checkNetaddrWorksWithPrefixlen(ip, int(prefixlen), 4)
 
 if __name__ == "__main__":
     import doctest

@@ -23,7 +23,7 @@ r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
 def call_exec_device_query(device_info):
 	device_info = device_info.split(" ")
 	payload = {'ip': device_info[0], 'port': device_info[1], 'community': device_info[2]}
-	response = requests.post('http://127.0.0.1:8000/api/exec_device_query_task/', data=payload)
+	response = requests.post('http://127.0.0.1:8000/device_query/exec_device_query_task/', data=payload)
 	return response.json()
 
 

@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse
-# from django.core import serializers
-from utils import device_query_fun, parameter_verification
-from utils.command_fun import ipv4_to_num
 from libs.utils import add_crontab_task_to_redis
-# from django_redis import get_redis_connection
 from django.core.paginator import Paginator
 import datetime
 
 from libs.ssh import SSH
 from libs.utils import analysis_cron_time
+from libs.tool import check_ip, ipv4_to_num
+from libs import device_query_fun
 
 import json
 import nmap
@@ -18,7 +16,7 @@ import paramiko
 import logging
 import redis
 import socket
-from .models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable
+from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable
 logger = logging.getLogger('django')
 
 conf = open(r'./conf/config.yml')
@@ -27,47 +25,44 @@ conf_data = yaml.load(conf, Loader=yaml.FullLoader)
 r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 port=conf_data['REDIS_CONF']['port'],
                 password=conf_data['REDIS_CONF']['password'],
-                decode_responses=True, db=1
+                decode_responses=True,
+                db=conf_data['REDIS_CONF']['db']
                 )
 
 
 def get_device_query_info(request):
     """获取所有探测设备的信息"""
-    if request.method == "POST":
-        try:
-            post_data = json.loads(str(request.body, encoding='utf-8'))
-            page_size = post_data["page_size"]
-            current_page = post_data["current_page"]
-            if post_data.get("search_ip"):
-                all_device = QueryDevice.objects.filter(snmp_host__contains=post_data.get("search_ip"))
-            else:
-                all_device = QueryDevice.objects.all()
-            data = {}
-            result = []
-            paginator = Paginator(all_device, page_size)
-            total_device = all_device.count()
-            device_page = paginator.page(current_page)
-            for device in device_page:
-                tmp_data = dict()
-                tmp_data['key'] = device.id
-                tmp_data["ip_address"] = device.snmp_host
-                tmp_data["device_name"] = device.device_hostname
-                tmp_data["device_company"] = device.device_manufacturer_info
-                tmp_data["query_status"] = device.get_query_status_display()
-                tmp_data["snmp_port"] = device.snmp_port
-                tmp_data["snmp_community"] = device.snmp_group
-                tmp_data["auto_enable"] = device.auto_enable
-                tmp_data["crontab_task"] = device.crontab_time
-                tmp_data["query_time"] = (device.last_mod_time + datetime.timedelta(hours=8)).strftime(
-                    "%Y-%m-%d %H:%M:%S")
-                result.append(tmp_data)
-            data['data'] = result
-            data['total_device'] = total_device
-            data["status"] = "success"
-        except Exception as e:
-            logging.error(e)
-            data["status"] = "fail"
-        return HttpResponse(json.dumps(data), content_type="application/json")
+    page_size = request.GET.get("page_size")
+    current_page = request.GET.get("current_page")
+    search_ip = request.GET.get("search_ip")
+
+    if search_ip:
+        all_device = QueryDevice.objects.filter(snmp_host__contains=search_ip)
+    else:
+        all_device = QueryDevice.objects.all()
+    data = dict()
+    result = []
+    paginator = Paginator(all_device, page_size)
+    total_device = all_device.count()
+    device_page = paginator.page(current_page)
+    for device in device_page:
+        tmp_data = dict()
+        tmp_data['key'] = device.id
+        tmp_data["ip_address"] = device.snmp_host
+        tmp_data["device_name"] = device.device_hostname
+        tmp_data["device_company"] = device.device_manufacturer_info
+        tmp_data["query_status"] = device.get_query_status_display()
+        tmp_data["snmp_port"] = device.snmp_port
+        tmp_data["snmp_community"] = device.snmp_group
+        tmp_data["auto_enable"] = device.auto_enable
+        tmp_data["crontab_task"] = device.crontab_time
+        tmp_data["query_time"] = (device.last_mod_time + datetime.timedelta(hours=8)).strftime(
+            "%Y-%m-%d %H:%M:%S")
+        result.append(tmp_data)
+    data['data'] = result
+    data['total_device'] = total_device
+    data["status"] = "success"
+    return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def check_user_password(request):
@@ -122,11 +117,12 @@ def del_device_query(request):
     批量删除设备探测任务
     """
     if request.method == "POST":
-        # try:
         post_data = json.loads(str(request.body, encoding='utf-8'))
+        data = dict()
         delete_ids = post_data["ids"]
         if(isinstance(delete_ids, int)):
             delete_ids = [delete_ids]
+
         for id in delete_ids:
             device_info = QueryDevice.objects.get(id=id)
             device_ip = device_info.snmp_host
@@ -142,132 +138,101 @@ def del_device_query(request):
             r.hdel(conf_data['DEVICE_QUETY_CRONTAB_HASH'], device_infos)
 
             QueryDevice.objects.filter(id=id).delete()
-        data = {
-            "status": "success",
-        }
-            # return HttpResponse(json.dumps(data), content_type="application/json")
-        # except Exception as e:
-        #     logger.error(e)
-        #     data = {
-        #         "status": "fail",
-        #         "data": e
-        #     }
+        data["status"] = "success"
         return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def add_device_query(request):
     """批量添加设备探测任务，设备探测信息写入到数据库"""
     if request.method == "POST":
-        try:
-            post_data = json.loads(str(request.body, encoding='utf-8'))
-            print(post_data)
-            ips = post_data["device_ips"]
-            community = post_data["community"]
-            port = post_data["port"]
-            logger.info("ip:{0}, port:{1}, community:{2}".format(ips, port, community))
-            ips = ips.split(" ")
-            unvalid_ip = []
-            crontab_task = ''
-            auto_enable = False
-            if post_data["crontab_task"] == "on":
-                auto_enable = True
-                crontab_task = analysis_cron_time(post_data)
+        data = dict()
+        post_data = json.loads(str(request.body, encoding='utf-8'))
+        ips = post_data["device_ips"]
+        community = post_data["community"]
+        port = post_data["port"]
+        logger.info("ip:{0}, port:{1}, community:{2}".format(ips, port, community))
+        ips = ips.split(" ")
+        unvalid_ip = []
+        crontab_task = ''
+        auto_enable = False
+        if post_data["crontab_task"] == "on":
+            auto_enable = True
+            crontab_task = analysis_cron_time(post_data)
+        for ip in ips:
+            if not check_ip(ip):
+                unvalid_ip.append("{0} 无效地址".format(ip))
+            elif QueryDevice.objects.filter(snmp_host=ip):
+                unvalid_ip.append("{0} 地址已存在".format(ip))
+        if len(unvalid_ip) == 0:
             for ip in ips:
-                if not parameter_verification.check_ip(ip):
-                    unvalid_ip.append("{0} 无效地址".format(ip))
-                elif QueryDevice.objects.filter(snmp_host=ip):
-                    unvalid_ip.append("{0} 地址已存在".format(ip))
-            if len(unvalid_ip) == 0:
-                for ip in ips:
-                    QueryDevice.objects.create(
-                        snmp_host=ip,
-                        snmp_host_int=ipv4_to_num(ip),
-                        snmp_port=port,
-                        snmp_group=community,
-                        query_status=0,
-                        auto_enable=auto_enable,
-                        crontab_time=crontab_task.replace("'", '"')
-                    )
-                    if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
-                        crontab_task_dict = dict()
-                        crontab_task_dict["{0} {1} {2}".format(ip, port, community)] = crontab_task.replace("'", '"')
-                        add_crontab_task_to_redis(crontab_task_dict)
-                data = {
-                    "status": "success",
-                        }
-            else:
-                data = {
-                    "status": "fail",
-                    "data": unvalid_ip
-                    }
-        except Exception as e:
-            logger.error(e)
-            data = {
-                "status": "fail",
-                "data": e
-            }
+                QueryDevice.objects.create(
+                    snmp_host=ip,
+                    snmp_host_int=ipv4_to_num(ip),
+                    snmp_port=port,
+                    snmp_group=community,
+                    query_status=0,
+                    auto_enable=auto_enable,
+                    crontab_time=crontab_task.replace("'", '"')
+                )
+                if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
+                    crontab_task_dict = dict()
+                    crontab_task_dict["{0} {1} {2}".format(ip, port, community)] = crontab_task.replace("'", '"')
+                    add_crontab_task_to_redis(crontab_task_dict)
+            data["status"] = "success"
+        else:
+            data["status"] = "success"
+            data["data"] = unvalid_ip
         return HttpResponse(json.dumps(data), content_type="application/json")
     if request.method == "PUT":
         data = dict()
-        try:
-            post_data = json.loads(str(request.body, encoding='utf-8'))
-            device_ip = post_data["device_ips"]
-            community = post_data["community"]
-            port = post_data["port"]
-            crontab_task = ''
-            auto_enable = False
-            if post_data["crontab_task"] == "on":
-                auto_enable = True
-                crontab_task = analysis_cron_time(post_data)
+        post_data = json.loads(str(request.body, encoding='utf-8'))
+        device_ip = post_data["device_ips"]
+        community = post_data["community"]
+        port = post_data["port"]
+        crontab_task = ''
+        auto_enable = False
+        if post_data["crontab_task"] == "on":
+            auto_enable = True
+            crontab_task = analysis_cron_time(post_data)
 
-            QueryDevice.objects.filter(snmp_host=device_ip).update(
-                                snmp_port=port,
-                                snmp_group=community,
-                                query_status=0,
-                                auto_enable=auto_enable,
-                                crontab_time=crontab_task.replace("'", '"'),
-                                )
-            # todo 如果定时任务开启，则要更新redis哈希表中的定时任务数据
-            if auto_enable:
-                crontab_task_dict = dict()
-                crontab_task_dict["{0} {1} {2}".format(device_ip, port, community)] = crontab_task.replace("'", '"')
-                add_crontab_task_to_redis(crontab_task_dict)
-            data["status"] = "success"
-        except Exception as e:
-            logger.error(e)
-            data["status"] = "fail"
-            data["data"] = e
+        QueryDevice.objects.filter(snmp_host=device_ip).update(
+                            snmp_port=port,
+                            snmp_group=community,
+                            query_status=0,
+                            auto_enable=auto_enable,
+                            crontab_time=crontab_task.replace("'", '"'),
+                            )
+        # todo 如果定时任务开启，则要更新redis哈希表中的定时任务数据
+        if auto_enable:
+            crontab_task_dict = dict()
+            crontab_task_dict["{0} {1} {2}".format(device_ip, port, community)] = crontab_task.replace("'", '"')
+            add_crontab_task_to_redis(crontab_task_dict)
+        data["status"] = "success"
+
         return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def add_device_query_to_cache(request):
     """将设备探测信息加入到redis缓存队列"""
-    try:
-        if request.method == "POST":
-            post_data = json.loads(str(request.body, encoding='utf-8'))
-            start_ids = post_data["ids"]
-            # conn_redis = get_redis_connection()
-            for id in start_ids:
-                device_info = QueryDevice.objects.get(id=id)
-                device_ip = device_info.snmp_host
-                device_snmp_port = device_info.snmp_port
-                device_snmp_group = device_info.snmp_group
-                # todo 将任务添加到redis缓存
-                r.rpush(conf_data['DEVICE_QUERY_QUEUE'], "{0} {1} {2}".format(device_ip, device_snmp_port, device_snmp_group))
-                # 设置探测任务的状态为启动中
-                QueryDevice.objects.filter(snmp_host=device_ip).update(query_status=1, last_mod_time=datetime.datetime.now())
+    if request.method == "POST":
+        data = dict()
+        post_data = json.loads(str(request.body, encoding='utf-8'))
+        start_ids = post_data["ids"]
+        # conn_redis = get_redis_connection()
+        for id in start_ids:
+            device_info = QueryDevice.objects.get(id=id)
+            device_ip = device_info.snmp_host
+            device_snmp_port = device_info.snmp_port
+            device_snmp_group = device_info.snmp_group
+            # todo 将任务添加到redis缓存
+            r.rpush(conf_data['DEVICE_QUERY_QUEUE'], "{0} {1} {2}".format(device_ip, device_snmp_port, device_snmp_group))
+            logging.info("{0} {1} {2} 加入redis缓存队列".format(device_ip, device_snmp_port, device_snmp_group))
+            # 设置探测任务的状态为启动中
+            QueryDevice.objects.filter(snmp_host=device_ip).update(query_status=1, last_mod_time=datetime.datetime.now())
 
-            data = {
-                "status": "success",
-            }
-    except Exception as e:
-        logger.error("探测任务启动失败：{0}".format(e))
-        data = {
-            "status": "fail",
-        }
-    finally:
-        pass
-    return HttpResponse(json.dumps(data), content_type="application/json")
+        data["status"] = "success"
+
+        return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def exec_device_query_task(request):

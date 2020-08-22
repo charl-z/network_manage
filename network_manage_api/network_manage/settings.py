@@ -42,9 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'device_query',
     'apps.setting',
     'channels',
+    'device_query',
+    'network_query'
 ]
 
 MIDDLEWARE = [
@@ -84,16 +85,27 @@ ASGI_APPLICATION = 'network_manage.routing.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'device_query',
+#         'USER': 'root',
+#         'PASSWORD': '251493584wdy',
+#         'HOST': '47.96.156.191',
+#         'OPTIONS': {
+#             "init_command": "SET foreign_key_checks = 0;",
+#         },
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'device_query',
-        'USER': 'root',
-        'PASSWORD': '251493584wdy',
-        'HOST': '47.96.156.191',
-        'OPTIONS': {
-            "init_command": "SET foreign_key_checks = 0;",
-        },
+        'USER': 'postgres',
+        # 'PASSWORD': 'mypassword',
+        'HOST': '127.0.0.1',
+        'PORT': '5430',
     }
 }
 

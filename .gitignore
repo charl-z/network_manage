@@ -15,3 +15,5 @@ network_manage_api/network_manage/settings.py
 
 # pycharm临时文件
 network_manage_api/.idea/
+*/__pycache__
+*/migrations/

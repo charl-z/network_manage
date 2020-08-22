@@ -40,7 +40,7 @@ def get_device_query_crontab_task(ip="all"):
 	'10.1.101.4 161 public': '["45 * * * *"]'
 	}
 	"""
-	response = requests.get('http://127.0.0.1:8000/api/device_query_crontab_task/{0}/'.format(ip))
+	response = requests.get('http://127.0.0.1:8000/device_query/device_query_crontab_task/{0}/'.format(ip))
 	result = response.json()
 	return result['result']
 
