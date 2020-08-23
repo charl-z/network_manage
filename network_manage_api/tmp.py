@@ -1,6 +1,4 @@
-from libs.IPy import checkNetwork
+from libs.IPy import checkNetwork, IP
 
+print(IP("10.2.0.0/24").broadcast())
 
-
-
-print(checkNetwork("10.2.0.a/24"))
