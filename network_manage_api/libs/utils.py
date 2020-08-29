@@ -7,6 +7,7 @@ import json
 import redis
 import yaml
 import requests
+import psycopg2
 
 weeks = {
     "星期一": "1",
@@ -27,6 +28,26 @@ r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 decode_responses=True, db=1
                 )
 
+
+def connect_postgresql_db():
+	try:
+		conn = psycopg2.connect(
+							database=conf_data['PostgreSQL']['database'],
+							user=conf_data['PostgreSQL']['username'],
+							# password='**',
+							host=conf_data['PostgreSQL']['host'],
+							port=conf_data['PostgreSQL']['port']
+							)
+	except Exception as e:
+		print(e)
+	else:
+		return conn
+	return None
+
+
+def close_db_connection(conn):
+	conn.commit()
+	conn.close()
 
 
 def get_device_query_crontab_task(ip="all"):

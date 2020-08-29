@@ -3,7 +3,7 @@ import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
-import { Table, Button, Input,  Pagination, Layout, Space} from 'antd';
+import { Table, Button, Input,  Pagination, Layout, Tooltip } from 'antd';
 import BuildDiviceQueryForm from './BuildNetwrokQueryFrom'
 
 const { Content } = Layout;
@@ -15,17 +15,23 @@ class NetworkQueryList extends Component{
         title: '网络地址',
         dataIndex: 'network',
         key: 'network',
-        // render: (text, record) => <Link to={'/network/device_details/'+record.key}>{text}</Link> //record是对象
+        render: (text, record) => <Link to={'/network/network_details/'+record.key}>{text}</Link> //record是对象
       },
       {
-        title: '探测端口',
-        dataIndex: 'query_ports',
-        key: 'query_ports',
+        title: 'TCP探测端口',
+        dataIndex: 'tcp_query_ports',
+        key: 'tcp_query_ports',
+      },
+      {
+        title: 'UDP探测端口',
+        dataIndex: 'udp_query_ports',
+        key: 'udp_query_ports',
       },
       {
         title: '状态',
         dataIndex: 'query_status',
         key: 'query_status',
+        render: (text, record) => <Tooltip title="只支持windows探测主机名">{text}</Tooltip> 
       },
       {
         title: '在线地址数量',
@@ -52,9 +58,9 @@ class NetworkQueryList extends Component{
     networkQueryInfos,
     selectedRowKeys,
   } = this.props
-
+  // console.log("selectedRowKeys:", selectedRowKeys)
   const rowSelection = {
-    // selectedRowKeys,
+    selectedRowKeys,
     onChange: this.onSelectChange,
   };
 
@@ -147,6 +153,9 @@ const mapDispatch = (dispatch) =>({
   },
   handleDeleteNetworkQuery(selectedRowKeys){
     dispatch(actionCreators.handleDeleteNetworkQuery(selectedRowKeys))
+  },
+  handleStartNetworkQuery(selectedRowKeys){
+    dispatch(actionCreators.handleStartNetworkQuery(selectedRowKeys))
   },
   })
 

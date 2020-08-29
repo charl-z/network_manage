@@ -45,7 +45,8 @@ const  BuildDiviceQueryForm = (props) => {
         validateMessages={validateMessages}
         initialValues={{
           crontab_task: "off",
-          query_ports: ""
+          tcp_query_ports: "",
+          udp_query_ports: ""
         }}
       >
         {
@@ -67,9 +68,15 @@ const  BuildDiviceQueryForm = (props) => {
             autoSize={{ minRows: 3, maxRows: 5 }}
             />
         </Form.Item>
-        <Form.Item name="query_ports" label="探测端口">
+        <Form.Item name="tcp_query_ports" label="TCP探测端口">
           <Input.TextArea 
-            placeholder="输入需要探测的端口，用逗号分割，例如53,80,1024-65535"
+            placeholder="输入需要探测的端口，用逗号分割，不支持范围输入，例如80,1024,65535"
+            autoSize={{ minRows: 2, maxRows: 5 }}
+            />
+        </Form.Item>
+        <Form.Item name="udp_query_ports" label="UDP探测端口">
+          <Input.TextArea 
+            placeholder="输入需要探测的端口，用逗号分割，不支持范围输入，例如53,55"
             autoSize={{ minRows: 2, maxRows: 5 }}
             />
         </Form.Item>

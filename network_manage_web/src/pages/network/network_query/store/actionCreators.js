@@ -20,7 +20,8 @@ export const handleNetworkQuerySubmitData = (data) => ({
 })
 export const handleNetworkQuerySubmit = (form, values) => {
   values.networks = values.networks.replace(/\n/g, " ")
-  values.query_ports = values.query_ports.replace(/\n/g, ",")
+  values.tcp_query_ports = values.tcp_query_ports.replace(/\n/g, ",")
+  values.udp_query_ports = values.udp_query_ports.replace(/\n/g, ",")
   return (dispatch) => {
     http.post('/api/network_query/add_network_query/', values)
       .then((res) => {
@@ -68,3 +69,49 @@ export const handleDeleteNetworkQuery = (values) => {
   }
 }
 
+export const handleStartNetworkQuery = (values) => {
+  // 传递的values是一个数组类型
+  var delete_network_ids = new Object();
+  delete_network_ids["ids"] = values
+  return (dispatch) => {
+    http.post('/api/network_query/add_network_query_to_cache/', delete_network_ids)
+      .then((res) => {
+        dispatch(handleNetworkQuerySubmitData(res)) //删除设备探测后，需要刷新页面
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+}
+
+export const getNetworkDetails = (data) => ({
+  type: constant.GET_NETWORK_DETAIL_INFO,
+  value: data.result
+})
+
+
+export const getAllNetworkDetailsInfo = (id) => {
+  return (dispatch) => {
+    http.get('/api/network_query/get_network_details/' + id + '/')
+      .then((res) => {
+        // console.log("res:", res)
+        dispatch(getNetworkDetails(res)) 
+    })
+    .catch(function (error) {
+    console.log(error);
+    });
+  }
+}
+
+export const getTcpPortDetailInfo = (id) => {
+  return (dispatch) => {
+    http.get('/api/network_query/get_tcp_ports_details/' + id + '/')
+      .then((res) => {
+        // console.log(id, res)
+        // dispatch(handleDevicePortToARP(res.result)) 
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+}

@@ -7,10 +7,12 @@ const defaultState = fromJS({
   checkNetworkQueryInputIps: false,  //页面展示设备探测任务组件刷新标志符，如果为ture，就去自动刷新
   networkQueryInfos: [],
   getCheckNetworkQueryInputIpsInfo: [],
-  selectedRowKeys: List([]),
+  selectedRowKeys: [],
   totalNetworks: 0,
   NetworkQueryCurrentPage: 1,
   NetworkQueryPageSize: 30,  //要属于pageSizeOptions数据中的一个参数pageSizeOptions={['30', '50', '100']}
+  NetworkQueryDetailInfos: [],
+  TcpPortDetailInfos: []
 })
 
 const handleBuildNetworkQuery = (state, action) => {
@@ -34,6 +36,7 @@ const handleNetworkQuerySubmit  = (state, action) => {
     return state.merge({
       'BuildNetworkQueryVisible': false,
       'checkNetworkQueryInputIps': true,
+      'selectedRowKeys': []
     })
   }
   if(action.value.status === 'fail'){
@@ -61,6 +64,12 @@ const getDeviceQuerySelect = (state, action) => {
   })
 }; 
 
+const getNetworkDetailsInfos  = (state, action) => {
+  return state.merge({
+    'NetworkQueryDetailInfos': action.value,
+  })
+};
+
 export default (state = defaultState, action) => {
   switch (action.type) {
     case constant.HANDLE_NETWORK_QUERY_BUILD:
@@ -73,6 +82,8 @@ export default (state = defaultState, action) => {
       return getAllNetworkQueryInfos(state, action);
     case constant.SELECT_NETWORK_QUERY_LIST:
       return getDeviceQuerySelect(state, action);
+    case constant.GET_NETWORK_DETAIL_INFO:
+      return getNetworkDetailsInfos(state, action);
     default:
       return state
   }

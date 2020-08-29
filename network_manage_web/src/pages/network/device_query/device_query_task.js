@@ -105,7 +105,7 @@ class DeviceQueryList extends Component{
       },
     ];
     const rowSelection = {
-      // selectedRowKeys,
+      selectedRowKeys,
       onChange: this.onSelectChange,
     };
     

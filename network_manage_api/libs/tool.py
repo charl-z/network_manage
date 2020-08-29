@@ -2,6 +2,7 @@ from django.conf import settings
 import random
 import datetime
 import re
+import json
 try:
     session_exipry_time = settings.CUSTOM_SESSION_EXIPRY_TIME
 except Exception:
@@ -32,3 +33,11 @@ def check_ip(ip_addr):
         return True
     else:
         return False
+
+
+class json_encoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
+
+        return json.JSONEncoder.default(obj)

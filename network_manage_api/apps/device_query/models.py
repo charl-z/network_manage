@@ -33,6 +33,7 @@ class QueryDevice(models.Model):
         return self.snmp_host
 
     class Meta:
+        db_table = "device_query_task"
         verbose_name = u"设备探测信息"
         verbose_name_plural = verbose_name
 
@@ -56,6 +57,7 @@ class SnmpQueryResult(models.Model):
         return self.if_name
 
     class Meta:
+        db_table = "device_query_result"
         unique_together = ("snmp_host_int", "if_index")
         verbose_name = u"设备探测详情"
         verbose_name_plural = verbose_name
@@ -79,6 +81,7 @@ class SnmpQueryIpRouteTable(models.Model):
     last_mod_time = models.DateTimeField(verbose_name=u'修改时间', default=datetime.now())
 
     class Meta:
+        db_table = "ip_route_table"
         unique_together = ("snmp_host_int", "dest_ip")
         verbose_name = u"设备探测的路由表"
         verbose_name_plural = verbose_name
