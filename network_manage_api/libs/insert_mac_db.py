@@ -4,11 +4,9 @@
 
 import psycopg2
 import yaml
+from libs.utils import get_conf_handle
 
-
-conf = open(r'/opt/network_manage/conf/config.yml')
-conf_data = yaml.load(conf, Loader=yaml.FullLoader)
-
+conf_data = get_conf_handle()
 
 def connect_postgresql_db():
 	try:

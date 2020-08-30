@@ -1,4 +1,63 @@
 # 网络资产管理
+### Python安装
+
+```
+wget https://www.python.org/ftp/python/3.6.11/Python-3.6.11.tgz
+tar -xf Python-3.6.11.tgz
+cd Python-3.6.11
+./configure --prefix=/usr/local/python36
+make && make install
+ln -s /usr/local/python36/bin/python3 /usr/bin/python3
+ln -s /usr/local/python36/bin/pip3 /usr/bin/pip3
+```
+
+### Python虚拟环境安装
+
+- 安装virtualenv virtualenvwrapper
+
+```
+pip3 install virtualenv virtualenvwrapper
+ln -s /usr/local/python36/bin/virtualenvwrapper.sh /usr/bin/virtualenvwrapper.sh
+ln -s /usr/local/python36/bin/virtualenv /usr/bin/virtualenv
+```
+
+- 在~/.bashrc中添加行：
+
+```
+export WORKON_HOME=$HOME/.virtualenvs
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+source /usr/bin/virtualenvwrapper.sh
+```
+
+- 创建指定版本的虚拟环境
+
+```
+mkvirtualenv -p /usr/bin/python3 network_manage
+```
+
+- **退出虚拟环境**
+
+```
+deactivate
+```
+
+- **删除虚拟环境**
+
+```
+rmvirtualenv network_manage
+```
+
+### Postgres数据库初始化
+
+```
+# 新建数据库文件
+mkdir /usr/local/network_manage/
+# 修改文件所属组
+chown postgres:postgres /usr/local/network_manage/
+# 初始化数据库文件
+su - postgres -c "initdb -D /usr/local/network_manage/"
+```
+
 基于网络探测和交换机探测网络，管理IP资产
 
 ### 环境部署

@@ -5,15 +5,14 @@
 import sys
 import os
 import time
-import yaml
 import redis
 import logging
 import datetime
 import json
+from libs.utils import get_conf_handle, get_device_query_crontab_task, add_crontab_task_to_redis
 
-conf = open(r'/opt/network_manage/conf/config.yml')
-conf_data = yaml.load(conf, Loader=yaml.FullLoader)
 
+conf_data = get_conf_handle()
 logging.basicConfig(
 					level=logging.DEBUG,
 					format=conf_data["LOG_SETUP"]["LOG_FORMAT"],
@@ -26,13 +25,6 @@ r = redis.Redis(
 				password=conf_data['REDIS_CONF']['password'],
 				decode_responses=True, db=1
 				)
-
-try:
-	sys.path.append(conf_data["SERVICE_INSTALL_PATH"])
-	from libs.utils import get_device_query_crontab_task, add_crontab_task_to_redis
-except Exception as e:
-	logging.error("添加系统环境变量出错，请检查！")
-
 
 def handle_redis_crontab_task():
 	"""
@@ -70,7 +62,7 @@ if __name__ == "__main__":
 		add_crontab_task_to_redis(all_device_query_task)
 
 	# 监控设备探测任务
-	device_query_cron = "nohup python {0}&".format(conf_data["SCRIPT_PATH"]["DEVICE_QUERY_CRON_PATH"])
+	device_query_cron = "nohup {0} {1}&".format(conf_data["PYTHON_PATH"], conf_data["SCRIPT_PATH"]["DEVICE_QUERY_CRON_PATH"])
 	command = "ps aux|grep device_query_cron|grep -v grep"
 	values = os.popen(command)
 	if not values.readlines():

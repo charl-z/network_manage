@@ -20,14 +20,18 @@ weeks = {
 }
 
 
-conf = open(r'/opt/network_manage/conf/config.yml')
-conf_data = yaml.load(conf, Loader=yaml.FullLoader)
+def get_conf_handle(path=r'/opt/network_manage/network_manage_api/conf/config.yml'):
+	conf = open(path)
+	conf_data = yaml.load(conf, Loader=yaml.FullLoader)
+	return conf_data
+
+
+conf_data = get_conf_handle()
 r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 port=conf_data['REDIS_CONF']['port'],
                 password=conf_data['REDIS_CONF']['password'],
                 decode_responses=True, db=1
                 )
-
 
 def connect_postgresql_db():
 	try:

@@ -8,6 +8,8 @@ from libs.ssh import SSH
 from libs.utils import analysis_cron_time
 from libs.tool import check_ip, ipv4_to_num
 from libs import device_query_fun
+from libs.utils import get_conf_handle
+conf_data = get_conf_handle()
 
 import json
 import nmap
@@ -19,8 +21,6 @@ import socket
 from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable
 logger = logging.getLogger('django')
 
-conf = open(r'./conf/config.yml')
-conf_data = yaml.load(conf, Loader=yaml.FullLoader)
 
 r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 port=conf_data['REDIS_CONF']['port'],

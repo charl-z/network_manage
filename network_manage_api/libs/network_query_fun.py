@@ -8,10 +8,9 @@ import threading
 import datetime
 from libs.utils import connect_postgresql_db, close_db_connection
 from network_query.models import NetworkQueryDetails
+from libs.utils import get_conf_handle
 
-
-conf = open(r'/opt/network_manage/conf/config.yml')
-conf_data = yaml.load(conf, Loader=yaml.FullLoader)
+conf_data = get_conf_handle()
 r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 port=conf_data['REDIS_CONF']['port'],
                 password=conf_data['REDIS_CONF']['password'],

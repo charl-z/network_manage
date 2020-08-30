@@ -10,9 +10,9 @@ import requests
 import yaml
 import redis
 import threading
+from libs.utils import get_conf_handle
 
-conf = open(r'/opt/network_manage/conf/config.yml')
-conf_data = yaml.load(conf, Loader=yaml.FullLoader)
+conf_data = get_conf_handle()
 r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 port=conf_data['REDIS_CONF']['port'],
                 password=conf_data['REDIS_CONF']['password'],

@@ -8,10 +8,8 @@ from network_query.models import NetworkQueryList, NetworkQueryDetails
 import datetime
 import redis
 import yaml
-# Create your views here.
-
-conf = open(r'./conf/config.yml')
-conf_data = yaml.load(conf, Loader=yaml.FullLoader)
+from libs.utils import get_conf_handle
+conf_data = get_conf_handle()
 
 r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 port=conf_data['REDIS_CONF']['port'],
@@ -19,6 +17,7 @@ r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 decode_responses=True,
                 db=conf_data['REDIS_CONF']['db']
                 )
+
 
 def get_network_query_info(request):
 	data = dict()

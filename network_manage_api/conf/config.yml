@@ -17,21 +17,24 @@ DEVICE_QUERY_QUEUE: "device:query:queue"
 NETWORK_QUERY_QUEUE: "network:query:queue"
 
 # mac厂商信息保存路径
-MAC_OUI_PATH: "/opt/network_manage/conf/oui.txt"
+MAC_OUI_PATH: "/opt/network_manage/network_manage_api/conf/oui.txt"
 
 # redis里面缓存设备探测定时任务的哈希
 DEVICE_QUETY_CRONTAB_HASH: "device:crontab:task:time"
 
 # 服务安装路径
-SERVICE_INSTALL_PATH: "/opt/network_manage/"
+SERVICE_INSTALL_PATH: "/opt/network_manage/network_manage_api/"
+
+#python路径
+PYTHON_PATH: '/root/.virtualenvs/network_manage/bin/python'
 
 # 脚本安装目录
 SCRIPT_PATH:
-  DEVICE_QUERY_CRON_PATH: "/opt/network_manage/bin/device_query_cron.py"
+  DEVICE_QUERY_CRON_PATH: "/opt/network_manage/network_manage_api/bin/device_query_cron.py"
 
 # 日志配置
 LOG_SETUP:
   LOG_FORMAT: "%(asctime)s %(name)s %(levelname)s %(filename)s %(message)s"
   DATE_FORMAT: "%Y-%m-%d  %H:%M:%S"
-  SERVICE_MONITOR_PATH: "/opt/network_manage/log/serviceMonitor.log"
+  SERVICE_MONITOR_PATH: "/opt/network_manage/network_manage_api/log/serviceMonitor.log"
 
