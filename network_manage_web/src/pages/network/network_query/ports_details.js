@@ -38,14 +38,15 @@ const columns = [
 
 ];
 
-class TCPPortDetail extends Component{
+class PortDetail extends Component{
   render(){
-    const {TcpPortDetailInfos} = this.props
+    const {PortDetailInfos} = this.props
+    console.log(PortDetailInfos)
     return(
       <Content>
         <Table 
           columns={columns}
-          dataSource={TcpPortDetailInfos} 
+          dataSource={PortDetailInfos} 
           bordered
           pagination ={false}
         />
@@ -53,18 +54,19 @@ class TCPPortDetail extends Component{
     )
   }
   componentDidMount(){
-    this.props.getTcpPortDetailInfo(this.props.match.params.id);
+    // console.log(this.props.match.params.id)
+    this.props.getPortDetailInfo(this.props.match.params.id);
   }
 }
 
 const mapState = (state) => ({
-  TcpPortDetailInfos: state.getIn(['networkQuery', 'TcpPortDetailInfos']),
+  PortDetailInfos: state.getIn(['networkQuery', 'PortDetailInfos']),
 })
 
 const mapDispatch = (dispatch) =>({
-  getTcpPortDetailInfo(id){
-    dispatch(actionCreators.getTcpPortDetailInfo(id))
+  getPortDetailInfo(id){
+    dispatch(actionCreators.getPortDetailInfo(id))
       },
   })
 
-export default connect(mapState, mapDispatch)(TCPPortDetail)
+export default connect(mapState, mapDispatch)(PortDetail)

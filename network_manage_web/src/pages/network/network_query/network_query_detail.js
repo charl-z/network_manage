@@ -3,7 +3,7 @@ import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
-import { Table, Layout } from 'antd';
+import { Table, Layout,BackTop } from 'antd';
 const { Content } = Layout;
 
 const columns = [
@@ -16,15 +16,20 @@ const columns = [
   },
   {
     title: 'IP地址',
-    dataIndex: 'ip_address',
-    key: 'ip_address',
+    dataIndex: 'ip',
+    key: 'ip',
     width: 100,
+    sorter: true,
     ellipsis: true,
   },
   {
     title: 'IP地址状态',
     dataIndex: 'ip_status',
     key: 'ip_status',
+    filters: [
+      { text: '在线', value: '1' },
+      { text: '离线', value: '0' },
+    ],
     width: 100,
     ellipsis: true,
   },
@@ -47,6 +52,11 @@ const columns = [
     dataIndex: 'ip_type',
     key: 'ip_type',
     width: 100,
+    filters: [
+      { text: '未管理', value: '0' },
+      { text: '手动地址', value: '1' },
+      { text: '未使用', value: '2' },
+    ],
   },
   {
     title: '主机名',
@@ -66,9 +76,8 @@ const columns = [
         value = JSON.parse(text)
       }
       if(value.length >= 2){
-        // console.log(record)
         return (
-          <Link to={'/network/network_details/tcp_port_list/'+record.ip}>{value.join("\n")}</Link>
+          <Link to={'/network/network_details/tcp_port_list/tcp&'+record.ip}>{value.join("\n")}</Link>
         )
       }
       else{
@@ -90,9 +99,8 @@ const columns = [
         value = JSON.parse(text)
       }
       if(value.length >= 2){
-        // console.log(value)
         return (
-          <Link to={'/network/network_details/udp_port_list/'+record.ip}>{value.join("\n")}</Link>
+          <Link to={'/network/network_details/udp_port_list/udp&'+record.ip}>{value.join("\n")}</Link>
         )
       }
       else{
@@ -109,18 +117,39 @@ const columns = [
     width: 200,
   },
 ];
+
+const style = {
+  height: 40,
+  width: 40,
+  lineHeight: '40px',
+  borderRadius: 4,
+  backgroundColor: '#1088e9',
+  color: '#fff',
+  textAlign: 'center',
+  fontSize: 14,
+};
+const pageSizeOptions = [30, 100, 500]
 class NetworkQueryDetail extends Component{
   render(){
-    const { NetworkQueryDetailInfos } = this.props
+    const { NetworkQueryDetailInfos,  NetworkQueryDetailsPagination} = this.props
+    NetworkQueryDetailsPagination["pageSizeOptions"] = pageSizeOptions
+    NetworkQueryDetailsPagination["showTotal"] = () => `总共${NetworkQueryDetailsPagination.total}条`
+
     return(
+      <Fragment>
       <Content>
         <Table 
           columns={columns}
           dataSource={NetworkQueryDetailInfos} 
           bordered
-          pagination={{ pageSize: 30 }}
+          pagination={ NetworkQueryDetailsPagination }
+          onChange={(pagination, filters, sorter) => this.props.handleNetworkQueryDetailsTableChange(pagination, filters, sorter, this.props.match.params.id)}
         />
       </Content>
+     
+     
+      
+      </Fragment>
     )
   }
   componentDidMount(){
@@ -130,11 +159,19 @@ class NetworkQueryDetail extends Component{
 
 const mapState = (state) => ({
   NetworkQueryDetailInfos: state.getIn(['networkQuery', 'NetworkQueryDetailInfos']),
+  NetworkQueryDetailsPagination: state.getIn(['networkQuery', 'NetworkQueryDetailsPagination']).toObject(),
 })
 
 const mapDispatch = (dispatch) =>({
   getAllNetworkDetailsInfo(id){
-    dispatch(actionCreators.getAllNetworkDetailsInfo(id))
+    var NetworkQueryDetailsPagination = {
+      "pageSize": pageSizeOptions[0],
+      "current": 1
+    }
+    dispatch(actionCreators.getAllNetworkDetailsInfo(id, NetworkQueryDetailsPagination))
+  },
+  handleNetworkQueryDetailsTableChange(pagination, filters, sorter, id){
+    dispatch(actionCreators.handleNetworkQueryDetailsTableChange(pagination, filters, sorter, id))
   },
   
   })

@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/opt/network_manage/network_manage_api/bin/device_query_cron.py", line 9, in <module>
+    import requests
+ImportError: No module named requests
+Traceback (most recent call last):
+  File "/opt/network_manage/network_manage_api/bin/device_query_cron.py", line 9, in <module>
+    import requests
+ImportError: No module named requests
+Traceback (most recent call last):
+  File "/opt/network_manage/network_manage_api/bin/device_query_cron.py", line 9, in <module>
+    import requests
+ImportError: No module named requests

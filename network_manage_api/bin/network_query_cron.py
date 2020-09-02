@@ -22,8 +22,10 @@ r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
 
 def call_exec_network_query(network):
 	payload = {"network": network}
+	requests.adapters.DEFAULT_RETRIES = 5  # 增加重连次数
+	print("call_exec_network_query")
 	requests.post('http://127.0.0.1:8000/network_query/exec_network_query_task/', data=payload)
-	# return response.json()
+
 
 if __name__ == "__main__":
 	while True:

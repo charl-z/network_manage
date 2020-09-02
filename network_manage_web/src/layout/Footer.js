@@ -4,7 +4,7 @@
  * Released under the AGPL-3.0 License.
  */
 import React from 'react';
-import { Layout, Icon } from 'antd';
+import { Layout, Icon, BackTop } from 'antd';
 import styles from './layout.module.css';
 
 

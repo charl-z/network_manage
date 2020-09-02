@@ -89,31 +89,29 @@ class NetworkQueryList extends Component{
               />
         </div>
         {
-            this.props.BuildNetworkQueryVisible && <BuildDiviceQueryForm/> //通过newBuiltDeviceVisible得值得变化，重新加载组件
-          }
-
-          <Table 
-            rowSelection={rowSelection} 
-            columns={columns}
-            dataSource={networkQueryInfos} 
-            tableLayout='auto'
-            bordered
-            pagination={false}
+          this.props.BuildNetworkQueryVisible && <BuildDiviceQueryForm/> //通过newBuiltDeviceVisible得值得变化，重新加载组件
+        }
+        <Table 
+          rowSelection={rowSelection} 
+          columns={columns}
+          dataSource={networkQueryInfos} 
+          tableLayout='auto'
+          bordered
+          pagination={false}
+        />
+        <br/>
+        <div style={{marginTop: '10px', marginBottom: '10px' }}>
+          <Pagination 
+          showSizeChanger   
+          defaultCurrent={ NetworkQueryCurrentPage } 
+          defaultPageSize={ NetworkQueryPageSize } 
+          total={ totalNetworks }
+          showTotal={total => `总共${total}条`}
+          onShowSizeChange={this.props.handlePageSizeChange}  
+          onChange={this.props.handlePageChange}
+          pageSizeOptions={['30', '50', '100']}
           />
-          <br/>
-          <div style={{marginTop: '10px', marginBottom: '10px' }}>
-            <Pagination 
-            showSizeChanger   
-            defaultCurrent={ NetworkQueryCurrentPage } 
-            defaultPageSize={ NetworkQueryPageSize } 
-            total={ totalNetworks }
-            showTotal={total => `总共${total}条`}
-            onShowSizeChange={this.props.handlePageSizeChange}  
-            onChange={this.props.handlePageChange}
-            pageSizeOptions={['30', '50', '100']}
-            />
-          </div>
-         
+        </div>
         </Content>
       )
     }

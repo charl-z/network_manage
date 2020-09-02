@@ -61,27 +61,22 @@ class SSHConsumer(WebsocketConsumer):
         self.chan = None
         self.ssh = None
 
-
     def loop_read(self):
         while True:
             data = self.chan.recv(32 * 1024)
-            print('read: {!r}'.format(data))
             if not data:
                 self.close(3333)
                 break
-            print("---------------data:", type(data))
             self.send(bytes_data=data)
 
     def receive(self, text_data=None, bytes_data=None):
         data = text_data or bytes_data
         if data:
             data = json.loads(data)
-            print("receive:", data)
             resize = data.get('resize')
             if resize and len(resize) == 2:
                 self.chan.resize_pty(*resize)
             else:
-                print("send:", data['data'])
                 self.chan.send(data['data'])
 
     def disconnect(self, code):
@@ -132,15 +127,12 @@ class TelnetConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         data = text_data or bytes_data
-        # print("receive data:", data)
         if data:
             data = json.loads(data)
-            # print("receive:", data)
             resize = data.get('resize')
             if resize and len(resize) == 2:
                pass
             else:
-                # print("send:", data['data'])
                 self.tn.write(data['data'].encode('utf-8'))
 
     def django_to_telnet(self, data):

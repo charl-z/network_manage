@@ -40,7 +40,7 @@ export default class extends React.Component {
           />
           <Layout.Content className={styles.content} style={{height: `${document.body.clientHeight - 64}px`}}>
             <Router/>
-            <Footer/>
+            {/* <Footer/> */}
           </Layout.Content>
         </Layout>
       </Layout>

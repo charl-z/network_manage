@@ -1,4 +1,4 @@
-import { fromJS,List  } from 'immutable'
+import { fromJS, List, Map  } from 'immutable'
 import * as constant from './actionTypes'
 import { handleGetAllNetworkQueryInfo } from './actionCreators'
 
@@ -12,7 +12,13 @@ const defaultState = fromJS({
   NetworkQueryCurrentPage: 1,
   NetworkQueryPageSize: 30,  //要属于pageSizeOptions数据中的一个参数pageSizeOptions={['30', '50', '100']}
   NetworkQueryDetailInfos: [],
-  TcpPortDetailInfos: []
+  PortDetailInfos: [],
+  NetworkQueryDetailsPagination: Map({
+    showSizeChanger: true,
+    current: 1,
+    pageSize: 30,
+    total: 0
+  }),
 })
 
 const handleBuildNetworkQuery = (state, action) => {
@@ -65,8 +71,19 @@ const getDeviceQuerySelect = (state, action) => {
 }; 
 
 const getNetworkDetailsInfos  = (state, action) => {
+  var NetworkQueryDetailsPagination = state.getIn(['NetworkQueryDetailsPagination']).toObject()
+  NetworkQueryDetailsPagination['total'] = action.value.total_ips  
+  NetworkQueryDetailsPagination['current'] = action.value.current_page
+  NetworkQueryDetailsPagination['pageSize'] = action.value.page_size
   return state.merge({
-    'NetworkQueryDetailInfos': action.value,
+    'NetworkQueryDetailInfos': action.value.result,
+    'NetworkQueryDetailsPagination': Map(NetworkQueryDetailsPagination)
+  })
+};
+
+const getNetworkPortDetailsInfos  = (state, action) => {
+  return state.merge({
+    'PortDetailInfos': action.value,
   })
 };
 
@@ -84,6 +101,8 @@ export default (state = defaultState, action) => {
       return getDeviceQuerySelect(state, action);
     case constant.GET_NETWORK_DETAIL_INFO:
       return getNetworkDetailsInfos(state, action);
+    case constant.GET_NETWORK_PORT_DETAIL_INFO:
+      return getNetworkPortDetailsInfos(state, action);
     default:
       return state
   }

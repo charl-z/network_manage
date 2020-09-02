@@ -25,7 +25,7 @@ export const handleNetworkQuerySubmit = (form, values) => {
   return (dispatch) => {
     http.post('/api/network_query/add_network_query/', values)
       .then((res) => {
-        console.log("res:", res)
+        // console.log("res:", res)
         res["form"] = form
         dispatch(handleNetworkQuerySubmitData(res)) 
     })
@@ -86,15 +86,22 @@ export const handleStartNetworkQuery = (values) => {
 
 export const getNetworkDetails = (data) => ({
   type: constant.GET_NETWORK_DETAIL_INFO,
-  value: data.result
+  value: data
 })
 
 
-export const getAllNetworkDetailsInfo = (id) => {
+export const getAllNetworkDetailsInfo = (id, pagination) => {
+  var pageSize = pagination.pageSize
+  var currentPage = pagination.current
+  var ipStatusFilter = null
+  var ipTypeFilter = null
+  var columnKeySorter = null
+  var orderSorter = null
   return (dispatch) => {
-    http.get('/api/network_query/get_network_details/' + id + '/')
+    http.get(`/api/network_query/get_network_details/?id=${id}&current_page=${currentPage}&page_size=${pageSize}&ip_status=${ipStatusFilter}&ip_type=${ipTypeFilter}&columnKey=${columnKeySorter}&order=${orderSorter}`)
       .then((res) => {
-        // console.log("res:", res)
+        res["page_size"] = pageSize
+        res["current_page"] = currentPage
         dispatch(getNetworkDetails(res)) 
     })
     .catch(function (error) {
@@ -103,15 +110,58 @@ export const getAllNetworkDetailsInfo = (id) => {
   }
 }
 
-export const getTcpPortDetailInfo = (id) => {
+export const handlePortDetail = (data) => ({
+  type: constant.GET_NETWORK_PORT_DETAIL_INFO,
+  value: data
+})
+
+export const getPortDetailInfo = (id) => {
+  id = id.split("&")
+  var protocol = id[0]
+  var ip = id[1]
   return (dispatch) => {
-    http.get('/api/network_query/get_tcp_ports_details/' + id + '/')
+    if(protocol === 'udp'){
+      http.get('/api/network_query/get_udp_ports_details/' + ip + '/')
+        .then((res) => {
+        dispatch(handlePortDetail(res.result)) 
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+    else{
+      http.get('/api/network_query/get_tcp_ports_details/' + ip + '/')
+        .then((res) => {
+          dispatch(handlePortDetail(res.result)) 
+      })
+        .catch(function (error) {
+          console.log(error);
+      });
+    }
+  }
+}
+
+export const handleNetworkQueryDetailsTableChange  = (pagination, filters, sorter, id) => {
+  console.log(sorter)
+  var pageSize = pagination.pageSize
+  var currentPage = pagination.current
+  var ipStatusFilter = filters.ip_status
+  var ipTypeFilter = filters.ip_type
+  var columnKeySorter = null
+  var orderSorter = null
+  if(sorter.hasOwnProperty('columnKey')){
+    columnKeySorter = sorter.columnKey
+    orderSorter = sorter.order
+  }
+  return (dispatch) => {
+    http.get(`/api/network_query/get_network_details/?id=${id}&current_page=${currentPage}&page_size=${pageSize}&ip_status=${ipStatusFilter}&ip_type=${ipTypeFilter}&columnKey=${columnKeySorter}&order=${orderSorter}`)
       .then((res) => {
-        // console.log(id, res)
-        // dispatch(handleDevicePortToARP(res.result)) 
+        res["page_size"] = pageSize
+        res["current_page"] = currentPage
+        dispatch(getNetworkDetails(res)) 
     })
     .catch(function (error) {
-      console.log(error);
+    console.log(error);
     });
   }
 }

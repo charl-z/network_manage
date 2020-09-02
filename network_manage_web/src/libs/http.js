@@ -10,7 +10,7 @@ import {message} from 'antd';
 // response处理
 function handleResponse(response) {
   let result;
-  console.log("resule:", result)
+  // console.log("resule:", result)
   if (response.status === 401) {
     return Promise.resolve(response.data.data)
     result = '会话过期，请重新登录';

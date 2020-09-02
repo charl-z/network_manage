@@ -13,7 +13,6 @@ conf_data = get_conf_handle()
 
 import json
 import nmap
-import yaml
 import paramiko
 import logging
 import redis

@@ -165,7 +165,7 @@ LOGGING = {
             'formatter': 'standard'
         },
         'file_handler': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOG_DIR, 'backend.log'),
             'maxBytes': 1024*1024*1024,
@@ -177,7 +177,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console_handler', 'file_handler'],
-            'level': 'DEBUG'
+            'level': 'INFO'
              }
     }
 }
