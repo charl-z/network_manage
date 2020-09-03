@@ -1,23 +1,15 @@
-# Copyright: (c) OpenSpug Organization. https://github.com/openspug/spug
-# Copyright: (c) <spug.dev@gmail.com>
-# Released under the AGPL-3.0 License.
 from channels.generic.websocket import WebsocketConsumer
 from django_redis import get_redis_connection
-from django.http.request import QueryDict
-# from apps.setting.utils import AppSetting
-# from apps.account.models import User
-from device_query.models import QueryDevice
 from threading import Thread
-from asgiref.sync import async_to_sync
 import json
 from libs.ssh import SSH
-from libs.telnet import Telnet
-from libs.tool import gen_rand_char
-import time
+from libs.secret import aes_decode
 import socket
 from django.conf import settings
 import telnetlib
 
+from libs.utils import get_conf_handle
+conf_data = get_conf_handle()
 
 try:
     terminal_exipry_time = settings.CUSTOM_TERMINAL_EXIPRY_TIME
@@ -54,12 +46,19 @@ class SSHConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         kwargs = self.scope['url_route']['kwargs']
-        # print("kwargs:", kwargs)
-        # print("self.scope:", self.scope)
-        # self.token = kwargs['token']
-        self.ip = kwargs['id']
+        ssh_infos = kwargs['id']
+        print("*********:", ssh_infos)
+        ssh_infos = aes_decode(conf_data['AES_KEY'], ssh_infos)
+        ssh_infos = ssh_infos.split("&")
+        self.ssh_info_dict = dict()
+
+        for i in ssh_infos:
+            i = i.split("=")
+            self.ssh_info_dict[i[0]] = i[1]
+
         self.chan = None
         self.ssh = None
+
 
     def loop_read(self):
         while True:
@@ -73,10 +72,12 @@ class SSHConsumer(WebsocketConsumer):
         data = text_data or bytes_data
         if data:
             data = json.loads(data)
+            print("receive:", data)
             resize = data.get('resize')
             if resize and len(resize) == 2:
                 self.chan.resize_pty(*resize)
             else:
+                print("send:", data['data'])
                 self.chan.send(data['data'])
 
     def disconnect(self, code):
@@ -89,13 +90,13 @@ class SSHConsumer(WebsocketConsumer):
 
     def _init(self):
         self.send(bytes_data=b'Connecting ...\r\n')
-        host = QueryDevice.objects.filter(snmp_host=self.ip).first()
+        host = self.ssh_info_dict.get("ip")
         if not host:
             self.send(text_data='Unknown host\r\n')
             self.close()
         try:
-            self.ssh = SSH(hostname=host.snmp_host, username=host.ssh_console_username,
-                           password=host.ssh_console_password, port=host.ssh_console_port).get_client()
+            self.ssh = SSH(hostname=host, username=self.ssh_info_dict["username"],
+                           password=self.ssh_info_dict["password"], port=self.ssh_info_dict["port"]).get_client()
         except Exception as e:
             self.send(bytes_data=f'Exception: {e}\r\n'.encode())
             self.close()

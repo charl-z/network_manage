@@ -38,3 +38,7 @@ LOG_SETUP:
   DATE_FORMAT: "%Y-%m-%d  %H:%M:%S"
   SERVICE_MONITOR_PATH: "/opt/network_manage/network_manage_api/log/serviceMonitor.log"
 
+# AES密钥KEY
+AES_KEY: '1234123412ABCDEF'
+
+

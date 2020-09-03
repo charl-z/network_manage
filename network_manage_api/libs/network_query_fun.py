@@ -42,12 +42,11 @@ class NetworkQuery(object):
 	def exec_port_scan(self, ip, tcp_ports='', udp_ports='', network=''):
 		scan_result = dict()
 		if tcp_ports:
-			ret = self.nm.scan(hosts=ip, arguments='-p {0} --script nbstat'.format(tcp_ports))
+			ret = self.nm.scan(hosts=ip, arguments='-p {0},139 --script nbstat'.format(tcp_ports))
 		else:
-			ret = self.nm.scan(hosts=ip, arguments='--script nbstat -p 22')
+			ret = self.nm.scan(hosts=ip, arguments='--script nbstat -p 139')
 		if ret['scan']:
 			scan_info_dict = ret['scan'][ip]
-
 			try:
 				mac_address = scan_info_dict['addresses']['mac']
 			except:
@@ -77,7 +76,7 @@ class NetworkQuery(object):
 			hostname = ''
 			if scan_info_dict.get('hostscript'):
 				hostname_infos = scan_info_dict.get('hostscript')
-				hostname = hostname_infos[0]['output'].split(",")[0].split(" ", 2)[-1]
+				hostname = hostname_infos[0]['output'].split(",")[0].split("NetBIOS name:")[-1].strip()
 			scan_result["hostname"] = hostname
 
 			udp_port_list = []
@@ -103,7 +102,6 @@ class NetworkQuery(object):
 			NetworkQueryDetails.objects.create(**scan_result)
 
 	def exec_redis_task(self, redis_network_info):
-		# thread_list = []
 		redis_network_info_list = redis_network_info.split("&")
 		network = redis_network_info_list[0]
 		tcp_scan_ports = redis_network_info_list[1]

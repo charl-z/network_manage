@@ -5,10 +5,10 @@ import { FitAddon } from 'xterm-addon-fit';
 // import FileManager from './FileManager';
 import "../../../node_modules/xterm/css/xterm.css"
 import styles from './index.module.css';
-// import { http } from '../../libs';
+import { serviceIp } from '../../libs/constant';
 // import  setting_config  from '../../setting'
 
-const server_ip = "10.2.0.41:8000"
+const server_ip = "10."
 
 
 class WebTelnet extends React.Component {
@@ -28,7 +28,7 @@ class WebTelnet extends React.Component {
     const fitPlugin = new FitAddon();
     this.term.loadAddon(fitPlugin);
     // const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    var url = `ws://${server_ip}/ws/telnet/${this.id}`
+    var url = `ws://${serviceIp}/ws/telnet/${this.id}`
     // this.socket = new WebSocket(`ws//${window.location.host}/api/ws/ssh/${this.token}/${this.id}/`);
     // console.log("url:", url)
     this.socket = new WebSocket(url);

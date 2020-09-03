@@ -14,5 +14,7 @@ websocket_urlpatterns = [
     path('ws/exec/<str:token>/', ExecConsumer),
     # path('ws/ssh/<int:id>/', SSHConsumer),
     path('ws/ssh/<str:id>', SSHConsumer),
+    # path('ws/ssh/', SSHConsumer),
+
     path('ws/telnet/<str:id>', TelnetConsumer)
 ]

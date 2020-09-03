@@ -5,11 +5,7 @@ import { FitAddon } from 'xterm-addon-fit';
 // import FileManager from './FileManager';
 import "../../../node_modules/xterm/css/xterm.css"
 import styles from './index.module.css';
-import { http } from '../../libs';
-// import  setting_config  from '../../setting'
-
-const server_ip = "10.2.0.41:8000"
-
+import { serviceIp } from '../../libs/constant';
 
 class WebSSH extends React.Component {
   constructor(props) {
@@ -30,12 +26,12 @@ class WebSSH extends React.Component {
   }
 
   componentDidMount() {
-    this._fetch();
-    // console.log(this.id)
+    // this._fetch();
     const fitPlugin = new FitAddon();
     this.term.loadAddon(fitPlugin);
     // const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    var url = `ws://${server_ip}/ws/ssh/${this.id}`
+
+    var url = `ws://${serviceIp}/ws/ssh/${this.id}`
     // this.socket = new WebSocket(`ws//${window.location.host}/api/ws/ssh/${this.token}/${this.id}/`);
     // console.log("url:", url)
     this.socket = new WebSocket(url);
@@ -73,13 +69,13 @@ class WebSSH extends React.Component {
     this.setState({visible: !this.state.visible})
   };
 
-  _fetch = () => {
-      http.get(`/api/device_query/host/?ip=${this.id}`)
-      .then((res) => {
-        // console.log(res)
-        this.setState({host: res, managerDisabled: false})
-      })
-  };
+  // _fetch = () => {
+  //     http.get(`/api/device_query/host/?ip=${this.id}`)
+  //     .then((res) => {
+  //       // console.log(res)
+  //       this.setState({host: res, managerDisabled: false})
+  //     })
+  // };
 
   render() {
     // const {host, visible, managerDisabled} = this.state;

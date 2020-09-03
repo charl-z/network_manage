@@ -7,7 +7,7 @@
 """
 
 import requests
-import yaml
+import time
 import redis
 import threading
 from libs.utils import get_conf_handle
@@ -29,6 +29,7 @@ def call_exec_network_query(network):
 
 if __name__ == "__main__":
 	while True:
+		time.sleep(10)
 		thread_list = []
 		for i in range(10):
 			if r.llen(conf_data['NETWORK_QUERY_QUEUE']) != 0:

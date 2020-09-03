@@ -1,3 +1,33 @@
+**JS代码**
+
+```javascript
+//npm install crypto-js
+import CryptoJS from 'crypto-js';
+  
+const key = CryptoJS.enc.Utf8.parse("1234123412ABCDEF");  //十六位十六进制数作为密钥,key,iv使用同一个
+
+//解密方法
+export function Decrypt(word) {
+    let decrypt = CryptoJS.AES.decrypt(word, key, { iv: key, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+    return decryptedStr.toString();
+}
+
+//加密方法
+export function Encrypt(word) {
+    let src = CryptoJS.enc.Utf8.parse(word)
+    let encrypted = CryptoJS.AES.encrypt(src, key, { iv: key, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+    return encrypted.toString();
+}
+```
+
+**Python后台代码**
+
+```python
+# -*- coding: utf-8 -*-
+# @Time    : 2020/9/3 15:03
+# @Author  : weidengyi
+
 import base64
 from Crypto.Cipher import AES
 
@@ -19,6 +49,7 @@ def pkcs7padding(text):
     padding_text = chr(padding) * padding
     return text + padding_text
 
+
 def pkcs7unpadding(text):
     """
     处理使用PKCS7填充过的数据
@@ -31,6 +62,7 @@ def pkcs7unpadding(text):
         return text[0:length-unpadding]
     except Exception as e:
         pass
+
 
 def aes_encode(key, content):
     """
@@ -52,6 +84,7 @@ def aes_encode(key, content):
     # 重新编码
     result = str(base64.b64encode(aes_encode_bytes), encoding='utf-8')
     return result
+
 
 def aes_decode(key, content):
     """
@@ -77,16 +110,28 @@ def aes_decode(key, content):
     return result
 
 
-
-def main():
-	# encryptedData = 'Zrq5Gvyu+GgWCDI5TI6r3g=='
-	mystr = 'ZNDS@KNET.CN'
-	key = '1234123412ABCDEF'
-	secret = aes_encode(key, mystr)
+if __name__ == "__main__":
+	key = "1234123412ABCDEF"
+	myStr = "testor"
+	secret = aes_encode(key, myStr)
 	print(secret)
 	print(aes_decode(key, secret))
-	# print(Encrypt(key, iv, mystr))
-    # print(Decrypt(key, iv, encryptedData))
+```
 
-if __name__ == '__main__':
-    main()
+**验证**
+
+```
+//JS验证
+const secret = Encrypt("testor") 
+console.log("secret:", secret) //secret: bCvq7vZd/DcQVlbZaK2d+g==
+console.log(Decrypt(secret)) //testor
+
+#Python验证
+if __name__ == "__main__":
+	key = "1234123412ABCDEF"
+	myStr = "testor"
+	secret = aes_encode(key, myStr) #  bCvq7vZd/DcQVlbZaK2d+g==
+	print(secret)
+	print(aes_decode(key, secret)) # testor
+```
+

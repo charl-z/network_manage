@@ -80,9 +80,9 @@ def check_user_password(request):
             }
             ssh = SSH(**info)
             ssh.get_client()
-            QueryDevice.objects.filter(snmp_host=post_data["hostname"]).update(ssh_console_username=info["username"],
-                                                                               ssh_console_password=info["password"],
-                                                                               ssh_console_port=info["port"])
+            # QueryDevice.objects.filter(snmp_host=post_data["hostname"]).update(ssh_console_username=info["username"],
+            #                                                                    ssh_console_password=info["password"],
+            #                                                                    ssh_console_port=info["port"])
             data["status"] = "success"
             data['result'] = info
         except paramiko.ssh_exception.NoValidConnectionsError:

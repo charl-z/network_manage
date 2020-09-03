@@ -1,6 +1,10 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2020/9/3 15:03
+# @Author  : weidengyi
+
 import base64
 from Crypto.Cipher import AES
-
+from binascii import b2a_hex, a2b_hex
 
 def pkcs7padding(text):
     """
@@ -19,6 +23,7 @@ def pkcs7padding(text):
     padding_text = chr(padding) * padding
     return text + padding_text
 
+
 def pkcs7unpadding(text):
     """
     处理使用PKCS7填充过的数据
@@ -31,6 +36,7 @@ def pkcs7unpadding(text):
         return text[0:length-unpadding]
     except Exception as e:
         pass
+
 
 def aes_encode(key, content):
     """
@@ -49,9 +55,8 @@ def aes_encode(key, content):
     content_padding = pkcs7padding(content)
     # 加密
     aes_encode_bytes = cipher.encrypt(bytes(content_padding, encoding='utf-8'))
-    # 重新编码
-    result = str(base64.b64encode(aes_encode_bytes), encoding='utf-8')
-    return result
+    return b2a_hex(aes_encode_bytes) # 加密后的字符串转化为16进制
+
 
 def aes_decode(key, content):
     """
@@ -66,27 +71,17 @@ def aes_decode(key, content):
     key_bytes = bytes(key, encoding='utf-8')
     iv = key
     cipher = AES.new(key_bytes, AES.MODE_CBC, iv)
-    # base64解码
-    aes_encode_bytes = base64.b64decode(content)
     # 解密
-    aes_decode_bytes = cipher.decrypt(aes_encode_bytes)
+    aes_decode_bytes = cipher.decrypt(a2b_hex(content))
     # 重新编码
     result = str(aes_decode_bytes, encoding='utf-8')
     # 去除填充内容
     result = pkcs7unpadding(result)
     return result
 
-
-
-def main():
-	# encryptedData = 'Zrq5Gvyu+GgWCDI5TI6r3g=='
-	mystr = 'ZNDS@KNET.CN'
-	key = '1234123412ABCDEF'
-	secret = aes_encode(key, mystr)
+if __name__ == "__main__":
+	key = "1234123412ABCDEF"
+	myStr = "zdns@knet.cn"
+	secret = aes_encode(key, myStr)
 	print(secret)
 	print(aes_decode(key, secret))
-	# print(Encrypt(key, iv, mystr))
-    # print(Decrypt(key, iv, encryptedData))
-
-if __name__ == '__main__':
-    main()

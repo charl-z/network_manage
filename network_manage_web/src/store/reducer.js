@@ -6,7 +6,7 @@ import { reducer as networkQueryReducer} from '../pages/network/network_query/st
 
 const reducer = combineReducers({
   deviceQuery: deviceQueryReducer,
-  networkQuery: networkQueryReducer
+  networkQuery: networkQueryReducer,
 })
 
 export default reducer

@@ -1,4 +1,4 @@
-export const serviceIp = '10.2.0.41:8000'
+export const serviceIp = '10.1.107.28:8000'
 
 export const models = ["每小时", "每天", "每周", "每月"]
 export const weeks = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期天"]

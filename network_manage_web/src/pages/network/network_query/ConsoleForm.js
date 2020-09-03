@@ -65,7 +65,7 @@ const ConsoleForm = (props) => {
       <Form.Item label="IP地址" >
         { consoleIPAddress }
       </Form.Item>
-      <Form.Item name="protocol" label="协议"> 
+      <Form.Item name="protocol" label="协议" initialValue="ssh"> 
         <Select 
           onChange={ props.handleProtocolChange}
         >
@@ -105,12 +105,12 @@ const ConsoleForm = (props) => {
 }
 
 const mapState = (state) => ({
-  consoleIPAddress: state.getIn(['deviceQuery', 'consoleIPAddress']),
-  consonleLoginVisible: state.getIn(['deviceQuery', 'consonleLoginVisible']),
-  showConsoleCheckInfo: state.getIn(['deviceQuery', 'showConsoleCheckInfo']),
-  getConsoleCheckInfo: state.getIn(['deviceQuery', 'getConsoleCheckInfo']),
-  showConsolePasswordShow: state.getIn(['deviceQuery', 'showConsolePasswordShow']),
-  ConsoleSubmitClickStatus: state.getIn(['deviceQuery', 'ConsoleSubmitClickStatus']),
+  consoleIPAddress: state.getIn(['networkQuery', 'consoleIPAddress']),
+  consonleLoginVisible: state.getIn(['networkQuery', 'consonleLoginVisible']),
+  showConsoleCheckInfo: state.getIn(['networkQuery', 'showConsoleCheckInfo']),
+  getConsoleCheckInfo: state.getIn(['networkQuery', 'getConsoleCheckInfo']),
+  showConsolePasswordShow: state.getIn(['networkQuery', 'showConsolePasswordShow']),
+  ConsoleSubmitClickStatus: state.getIn(['networkQuery', 'ConsoleSubmitClickStatus']),
 })
 
 const mapDispatch = (dispatch) =>({

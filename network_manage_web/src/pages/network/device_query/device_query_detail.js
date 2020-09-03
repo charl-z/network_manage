@@ -127,6 +127,9 @@ const mapDispatch = (dispatch) =>({
   getAllDeviceDetailsInfo(id){
     dispatch(actionCreators.getAllDeviceDetailsInfo(id))
   },
+  handleConsoleClick(ipAddress){
+    dispatch(actionCreators.handleConsoleClick(ipAddress))
+  },
   
   })
 

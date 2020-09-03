@@ -1,6 +1,7 @@
 import { fromJS,List  } from 'immutable'
 import * as constant from './actionTypes'
-import {models, weeks} from '../../../../libs/constant'
+import {weeks} from '../../../../libs/constant'
+import {Encrypt} from '../../../../libs/secret'
 
 const defaultState = fromJS({
   selectedRowKeys: [],
@@ -161,7 +162,8 @@ function getConsoleSubmitInfo(state, action){
 
   if(action.value.protocol === 'ssh'){
     if(action.value.status === 'success'){
-      window.open(`/ssh/${action.value.result.hostname}`)
+      var sshInfo = `ip=${action.value.result.hostname}&password=${action.value.result.password}&username=${action.value.result.username}&port=${action.value.result.port}`
+      window.open(`/ssh/${Encrypt(sshInfo)}`)
       return state.merge({
         'consonleLoginVisible': false,
         'showConsoleCheckInfo': false,
