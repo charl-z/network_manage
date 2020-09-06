@@ -22,6 +22,9 @@ MAC_OUI_PATH: "/opt/network_manage/network_manage_api/conf/oui.txt"
 # redis里面缓存设备探测定时任务的哈希
 DEVICE_QUETY_CRONTAB_HASH: "device:crontab:task:time"
 
+# redis里面缓存网络探测定时任务的哈希
+NETWORK_QUETY_CRONTAB_HASH: "network:crontab:task:time"
+
 # 服务安装路径
 SERVICE_INSTALL_PATH: "/opt/network_manage/network_manage_api/"
 
@@ -31,14 +34,17 @@ PYTHON_PATH: '/root/.virtualenvs/network_manage/bin/python'
 # 脚本安装目录
 SCRIPT_PATH:
   DEVICE_QUERY_CRON_PATH: "/opt/network_manage/network_manage_api/bin/device_query_cron.py"
+  NETWORK_QUERY_CRON_PATH: "/opt/network_manage/network_manage_api/bin/network_query_cron.py"
 
 # 日志配置
 LOG_SETUP:
-  LOG_FORMAT: "%(asctime)s %(name)s %(levelname)s %(filename)s %(message)s"
+  LOG_FORMAT: "%(asctime)s %(name)s %(levelname)s %(filename)s [line:%(lineno)d] %(message)s"
   DATE_FORMAT: "%Y-%m-%d  %H:%M:%S"
   SERVICE_MONITOR_PATH: "/opt/network_manage/network_manage_api/log/serviceMonitor.log"
+  NETWORK_MANAGE_MONITOR_PATH: "/opt/network_manage/network_manage_api/log/djangoManage.log"
 
-# AES密钥KEY
+
+# AES密钥KEY，主要修改秘钥后，前台对应的秘钥也要同步进行修改
 AES_KEY: '1234123412ABCDEF'
 
 

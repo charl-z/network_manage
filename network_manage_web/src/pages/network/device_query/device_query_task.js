@@ -19,7 +19,7 @@ class DeviceQueryList extends Component{
       deviceQueryPageSize,
       deviceQueryCurrentPage,
         } = this.props;
-    // console.log("----- selectedRowKeys:", selectedRowKeys)
+
     const columns = [
       {
         title: '探测设备IP',
@@ -64,7 +64,7 @@ class DeviceQueryList extends Component{
         render: (text, record) => 
         <Fragment>
           <Space>
-          <Button onClick={() => this.props.handleEditDeviceQuery(record)}>编辑</Button>
+            <Button onClick={() => this.props.handleEditDeviceQuery(record)}>编辑</Button>
             <Button  danger onClick={() => this.props.handleDeleteDeviceQuery(record.key)}>删除</Button>
             <Button type='primary' onClick={() => this.props.handleConsoleClick(record.ip_address)}>Console</Button>
           </Space>

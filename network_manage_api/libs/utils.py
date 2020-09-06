@@ -70,11 +70,26 @@ def get_device_query_crontab_task(ip="all"):
 	return result['result']
 
 
+def get_network_query_crontab_task(network="all"):
+	"""
+	获取ip对应的设备探测任务
+	:param ip: 如果ip=all,则获取所有的设备探测任务，如果ip=10.1.101.1，则只获取10.1.101.1对应的探测任务
+	:return:
+	{
+	'10.1.107.0/24&22&53': '["45 1 8 * *"]',
+	'10.1.108.0/24&22&': '["30 1 8 * *"]'
+	}
+	"""
+	# 字符串有/时候，url解析时候会有问题
+	response = requests.get('http://127.0.0.1:8000/network_query/network_query_crontab_task/?network={0}'.format(network.replace("/", "$")))
+	result = response.json()
+	return result['result']
 
 
-def add_crontab_task_to_redis(crontabs):
+def add_crontab_task_to_redis(crontabs, redis_key=conf_data["DEVICE_QUETY_CRONTAB_HASH"]):
 	"""
 	:param crontab_task: {'10.1.101.1 161 public': '["15 * * * *", "15 5 * * *", "30 18 * * 2", "0 0 1 * *"]', '10.1.101.2': '["30 * * * *"]', '10.1.101.4': '["30 0 * * *"]'}
+	:param redis_key conf_data["DEVICE_QUETY_CRONTAB_HASH"]，保存在redis的key值
 	:return:
 	"""
 	"""
@@ -132,7 +147,7 @@ def add_crontab_task_to_redis(crontabs):
 					days = week - now_week
 					exec_time = now.replace(hour=hour, minute=minute) + datetime.timedelta(days=days)
 			temp_crontab_time.append(int(exec_time.timestamp()))
-		r.hset(name=conf_data["DEVICE_QUETY_CRONTAB_HASH"], key=ip, value=str(temp_crontab_time))
+		r.hset(name=redis_key, key=ip, value=str(temp_crontab_time))
 
 
 # 解析定时任务中的时间
@@ -168,6 +183,6 @@ def analysis_cron_time(cron):
 
 
 if __name__ == "__main__":
-	a = {'community': 'public', 'port': 161, 'device_ips': '100.1.1.1', 'crontab_task': 'on', 'model_0': '每小时', 'minute_0': '30', 'model_1': '每天', 'hour_1': '0:45', 'model_2': '每周', 'week_2': '星期三', 'hour_2': '0:45', 'model_3': '每月', 'day_3': '4号', 'hour_3': '19:30'}
-
-	print(analysis_cron_time(a))
+	# a = {'community': 'public', 'port': 161, 'device_ips': '100.1.1.1', 'crontab_task': 'on', 'model_0': '每小时', 'minute_0': '30', 'model_1': '每天', 'hour_1': '0:45', 'model_2': '每周', 'week_2': '星期三', 'hour_2': '0:45', 'model_3': '每月', 'day_3': '4号', 'hour_3': '19:30'}
+	# print(analysis_cron_time(a))
+	print(get_network_query_crontab_task("10.1.109.0/24"))

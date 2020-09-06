@@ -47,7 +47,6 @@ class SSHConsumer(WebsocketConsumer):
         super().__init__(*args, **kwargs)
         kwargs = self.scope['url_route']['kwargs']
         ssh_infos = kwargs['id']
-        print("*********:", ssh_infos)
         ssh_infos = aes_decode(conf_data['AES_KEY'], ssh_infos)
         ssh_infos = ssh_infos.split("&")
         self.ssh_info_dict = dict()

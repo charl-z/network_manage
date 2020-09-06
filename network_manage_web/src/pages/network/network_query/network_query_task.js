@@ -3,8 +3,9 @@ import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
-import { Table, Button, Input,  Pagination, Layout, Tooltip } from 'antd';
+import { Table, Button, Input,  Pagination, Layout, Space } from 'antd';
 import BuildDiviceQueryForm from './BuildNetwrokQueryFrom'
+import {weeks_obj} from '../../../libs/constant'
 
 const { Content } = Layout;
 
@@ -31,7 +32,6 @@ class NetworkQueryList extends Component{
         title: '状态',
         dataIndex: 'query_status',
         key: 'query_status',
-        render: (text, record) => <Tooltip title="只支持windows探测主机名">{text}</Tooltip> 
       },
       {
         title: '在线地址数量',
@@ -44,14 +44,51 @@ class NetworkQueryList extends Component{
         key: 'query_time',
       },
       {
+        title: '任务处理',
+        dataIndex: 'ssh',
+        key: 'ssh',
+        render: (text, record) => 
+        <Fragment>
+          <Space>
+            <Button  type='primary' onClick={ () => this.props.handleStartNetworkQuery(record.key)}>启动</Button>
+            <Button  type='primary' onClick={() => this.props.handleEditNetworkQuery(record)}>编辑</Button>
+            <Button  danger onClick={() => this.props.handleDeleteNetworkQuery(record.key)}>删除</Button>
+          </Space>
+        </Fragment>
+      },
+      {
         title: '定时任务',
         dataIndex: 'crontab_task',
         key: 'crontab_task',
+        render (text, record) {
+          var value= []
+          var res = []
+          if(text !== ''){
+            value = JSON.parse(text) //将text的列表字符串转化为列表
+            value.map((item, index) => {
+              var temp = item.split(" ")
+              if(temp[2] !== "*") {
+                res.push("每月" + temp[2] + "号" + temp[1] + ":" + temp[0])
+              }
+              else if(temp[4] !== "*") {
+                res.push("每周" + weeks_obj[temp[4]] + " " + temp[1] + ":" + temp[0])
+              }
+              else if(temp[1] !== "*") {
+                res.push("每天" + temp[1] + ":" + temp[0])
+              }
+              else{
+                res.push("每小时第" + temp[0] + "分")
+              }
+            })
+          }
+          return(
+          <div>{res.join("\n")}</div>
+          )
+        }
       },
     ];
 
   const { 
-    BuildNetworkQueryVisible,
     NetworkQueryCurrentPage,
     NetworkQueryPageSize,
     totalNetworks,
@@ -71,14 +108,12 @@ class NetworkQueryList extends Component{
               {
                 selectedRowKeys.length !== 0 ? 
                 <Fragment>
-                  <Button  style={{ marginLeft: '10px' }}>编辑</Button>
                   <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleDeleteNetworkQuery(selectedRowKeys)}>删除</Button>
                   <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleStartNetworkQuery(selectedRowKeys)}>启动</Button>
                 </Fragment>
                 :
                 <Fragment>
                   <Button disabled style={{ marginLeft: '10px' }}>编辑</Button>
-                  <Button disabled style={{ marginLeft: '10px' }}>删除</Button>
                   <Button  disabled style={{ marginLeft: '10px' }} >启动</Button>
                 </Fragment>
               }
@@ -154,6 +189,14 @@ const mapDispatch = (dispatch) =>({
   },
   handleStartNetworkQuery(selectedRowKeys){
     dispatch(actionCreators.handleStartNetworkQuery(selectedRowKeys))
+  },
+  handleEditNetworkQuery(record){
+    if(record['auto_enable']){
+      record['auto_enable'] = "on"
+    }else{
+      record['auto_enable'] = "off"
+    }
+    dispatch(actionCreators.handleEditNetworkQuery(record))
   },
   })
 

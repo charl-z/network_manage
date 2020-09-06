@@ -149,38 +149,38 @@ LOG_DIR = os.path.join(BASE_DIR, 'log')
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
-LOGGING = {
-    'version': 1,
-    # 日志格式
-    'formatters': {
-        'standard': {
-            'format': '%(asctime)s %(pathname)s:%(funcName)s:%(lineno)d %(levelname)s - %(message)s'
-
-        }
-    },
-    'handlers': {
-        'console_handler': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard'
-        },
-        'file_handler': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'backend.log'),
-            'maxBytes': 1024*1024*1024,
-            'backupCount': 5,
-            'formatter': 'standard',
-            'encoding': 'utf-8'
-            }
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console_handler', 'file_handler'],
-            'level': 'INFO'
-             }
-    }
-}
+# LOGGING = {
+#     'version': 1,
+#     # 日志格式
+#     'formatters': {
+#         'standard': {
+#             'format': '%(asctime)s %(pathname)s:%(funcName)s:%(lineno)d %(levelname)s - %(message)s'
+#
+#         }
+#     },
+#     'handlers': {
+#         'console_handler': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'standard'
+#         },
+#         'file_handler': {
+#             'level': 'INFO',
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': os.path.join(LOG_DIR, 'backend.log'),
+#             'maxBytes': 1024*1024*1024,
+#             'backupCount': 5,
+#             'formatter': 'standard',
+#             'encoding': 'utf-8'
+#             }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console_handler', 'file_handler'],
+#             'level': 'INFO'
+#              }
+#     }
+# }
 
 
 # CACHES = {

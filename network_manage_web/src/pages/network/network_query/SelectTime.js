@@ -105,15 +105,13 @@ class SelectTime extends Component{
 }
 
 const mapState = (state) => ({
-  SelectTimeList: state.getIn(['deviceQuery', 'SelectTimeList']),
-  SelectModelValue: state.getIn(['deviceQuery', 'SelectModelValue']),
-  CurrentSelectTimeIndex: state.getIn(['deviceQuery', 'CurrentSelectTimeIndex']),
-  
+  SelectTimeList: state.getIn(['networkQuery', 'SelectTimeList']),
+  SelectModelValue: state.getIn(['networkQuery', 'SelectModelValue']),
+  CurrentSelectTimeIndex: state.getIn(['networkQuery', 'CurrentSelectTimeIndex']),
 })
 
 const mapDispatch = (dispatch) =>({
   handleModelChange(value, index){
-    
     var modelSelectIndex = models.indexOf(value)
     var data = new Object()
     data["value"] = value

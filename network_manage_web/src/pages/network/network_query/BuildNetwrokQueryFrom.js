@@ -1,13 +1,11 @@
 import React, { Component, Fragment} from 'react'
 import { actionCreators } from './store'
 import { connect } from "react-redux";
-import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
 import { Button, Modal, Input, Form,InputNumber, Alert, Select, Space, Layout, Radio } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import  SelectTime  from './SelectTime'
-const { Option } = Select;
-const { Content } = Layout;
+
 
 const layout = {
   labelCol: { span: 6 },
@@ -24,16 +22,30 @@ const validateMessages = {
   },
 };
 
-const  BuildDiviceQueryForm = (props) => {
+const  BuildNetworkQueryForm = (props) => {
   const { 
     BuildNetworkQueryVisible,
-    getCheckNetworkQueryInputIpsInfo
+    getCheckNetworkQueryInputIpsInfo,
+    showNetworkQueryCron,
+    SelectTimeList,
+    NetworkQueryEditContent,
+    NetworkQueryEditTimeSelect,
+    NetworkQueryEditShow
          } = props
   const [form] = Form.useForm();
+  var tmpFormValues =
+  {
+    networks: NetworkQueryEditContent['network'], 
+    tcp_query_ports: NetworkQueryEditContent['tcp_query_ports'],
+    udp_query_ports: NetworkQueryEditContent['udp_query_ports'],
+    crontab_task_status: NetworkQueryEditContent['auto_enable'],
+  }
+  console.log("********NetworkQueryEditContent:", NetworkQueryEditContent, NetworkQueryEditShow)
+  var initialFormValues = Object.assign(tmpFormValues, NetworkQueryEditTimeSelect)
   
   return(
     <Modal 
-      title= "新建网络探测" 
+      title= { NetworkQueryEditShow ? "编辑网络探测" : "新建网络探测"}
       visible={BuildNetworkQueryVisible} 
       footer={null}
       onCancel={() => props.handleNetworkQueryCancel(form)}
@@ -41,9 +53,10 @@ const  BuildDiviceQueryForm = (props) => {
       <Form {...layout}  
         name="network_query" 
         form={form}
-        onFinish={(value) => props.handleNetworkQuerySubmit(form, value)} 
+        onFinish={(value) => props.handleNetworkQuerySubmit(form, value, NetworkQueryEditShow)} 
         validateMessages={validateMessages}
-        initialValues={{
+        initialValues={NetworkQueryEditShow ? initialFormValues :
+        {
           crontab_task: "off",
           tcp_query_ports: "",
           udp_query_ports: ""
@@ -63,10 +76,15 @@ const  BuildDiviceQueryForm = (props) => {
           label="网络" 
           rules={[{ required: true }]} 
           >
-          <Input.TextArea 
-            placeholder="可以多个网络探测，多个网络之间用空格或分行分隔，例如192.168.1.0/24 192.168.2.0/24"
-            autoSize={{ minRows: 3, maxRows: 5 }}
-            />
+          {
+            NetworkQueryEditShow ? 
+              <Input disabled />
+              :
+              <Input.TextArea 
+              placeholder="可以多个网络探测，多个网络之间用空格或分行分隔，例如192.168.1.0/24 192.168.2.0/24"
+              autoSize={{ minRows: 3, maxRows: 5 }}
+              />
+          }
         </Form.Item>
         <Form.Item name="tcp_query_ports" label="TCP探测端口">
           <Input.TextArea 
@@ -81,15 +99,47 @@ const  BuildDiviceQueryForm = (props) => {
             />
         </Form.Item>
         <Form.Item 
-          name="crontab_task" 
+          name="crontab_task_status" 
           label='自动探测' 
           rules={[{ required: true }]} 
           >
-          <Radio.Group>
+          <Radio.Group onChange={props.hanleAutoNetworkQuerySwitch}>
             <Radio value="on">开启</Radio>
             <Radio value="off">关闭</Radio>
           </Radio.Group>
         </Form.Item>
+        <div style={{marginLeft: '50px'}}>
+            <Space direction='vertical'>
+            {
+              showNetworkQueryCron==="on" ? 
+              <Fragment>
+                {
+                  SelectTimeList.map((item, index) => {
+                    return (  
+                    <div style={{display:'inline-block'}} key={index}>
+                      <SelectTime selectValue={item} index={index}/>
+                      {
+                        SelectTimeList.size !== 1 ?  <MinusCircleOutlined
+                        style={{ margin: '0 8px' }}
+                        onClick={() => props.handleDeleteModel(index)}
+                        /> : null
+                      }
+                    </div>
+                    )
+                  })
+                }
+              <Button
+                type="dashed"
+                onClick={props.handleAddField}
+                style={{ width: '60%' }}
+                >
+                <PlusOutlined /> 添加定时任务
+              </Button>
+              </Fragment>      
+              : null
+            }
+            </Space>
+          </div>
           
         <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }} style={{marginTop: '10px'}}>
           <Button type="primary" htmlType="submit">
@@ -103,6 +153,11 @@ const  BuildDiviceQueryForm = (props) => {
 const mapState = (state) => ({
   BuildNetworkQueryVisible: state.getIn(['networkQuery', 'BuildNetworkQueryVisible']),
   getCheckNetworkQueryInputIpsInfo: state.getIn(['networkQuery', 'getCheckNetworkQueryInputIpsInfo']),
+  showNetworkQueryCron: state.getIn(['networkQuery', 'showNetworkQueryCron']),
+  SelectTimeList: state.getIn(['networkQuery', 'SelectTimeList']),
+  NetworkQueryEditContent: state.getIn(['networkQuery', 'NetworkQueryEditContent']),
+  NetworkQueryEditTimeSelect: state.getIn(['networkQuery', 'NetworkQueryEditTimeSelect']),
+  NetworkQueryEditShow: state.getIn(['networkQuery', 'NetworkQueryEditShow']),
 })
 
 const mapDispatch = (dispatch) =>({
@@ -110,9 +165,18 @@ const mapDispatch = (dispatch) =>({
     dispatch(actionCreators.handleNetworkQueryCancel())
     form.resetFields()
   },
-  handleNetworkQuerySubmit(form, value){
-    dispatch(actionCreators.handleNetworkQuerySubmit(form, value))
+  handleNetworkQuerySubmit(form, value, editShow){
+    // console.log(editShow)
+    dispatch(actionCreators.handleNetworkQuerySubmit(form, value, editShow))
+  },
+  hanleAutoNetworkQuerySwitch(e){
+    dispatch(actionCreators.hanleAutoNetworkQuerySwitch(e.target.value))
+  },
+  handleAddField(){
+    dispatch(actionCreators.handleAddField())
+  },
+  handleDeleteModel(index){
+    dispatch(actionCreators.handleDeleteModel(index))
   }
-  
   })
-export default connect(mapState, mapDispatch)(BuildDiviceQueryForm)
+export default connect(mapState, mapDispatch)(BuildNetworkQueryForm)

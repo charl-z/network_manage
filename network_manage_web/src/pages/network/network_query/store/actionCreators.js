@@ -18,22 +18,36 @@ export const handleNetworkQuerySubmitData = (data) => ({
   type: constant.HANDLE_NEWORK_QUERY_SUBMIT,
   value: data
 })
-export const handleNetworkQuerySubmit = (form, values) => {
+export const handleNetworkQuerySubmit = (form, values, editShow) => {
   values.networks = values.networks.replace(/\n/g, " ")
   values.tcp_query_ports = values.tcp_query_ports.replace(/\n/g, ",")
   values.udp_query_ports = values.udp_query_ports.replace(/\n/g, ",")
-  return (dispatch) => {
-    http.post('/api/network_query/add_network_query/', values)
-      .then((res) => {
-        // console.log("res:", res)
-        res["form"] = form
-        dispatch(handleNetworkQuerySubmitData(res)) 
-    })
-    .catch(function (error) {
+  if(!editShow){
+    return (dispatch) => {
+      http.post('/api/network_query/add_network_query/', values)
+        .then((res) => {
+          // console.log("res:", res)
+          res["form"] = form
+          dispatch(handleNetworkQuerySubmitData(res)) 
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
+  }else{
+    return (dispatch) => {
+      http.put('/api/network_query/add_network_query/', values)
+        .then((res) => {
+          res["form"] = form
+          dispatch(handleNetworkQuerySubmitData(res)) 
+      })
+      .catch(function (error) {
       console.log(error);
-    });
+      });
+    }
   }
-}
+  }
+  
 
 export const handleGetAllNetworkQueryInfo = (data) => ({
   type: constant.HANDLE_GET_ALL_NETWORK_QUERY_INFO,
@@ -191,7 +205,6 @@ export const handleProtocolChange  = (data) => ({
   value: data
 })
 
-
 export const handleConsoleInfoSubmit = (values) => {
   let data = new Object();
   data["status"] = true
@@ -217,3 +230,27 @@ export const handleConsoleInfoSubmit = (values) => {
       }
     }
   }
+
+  export const hanleAutoNetworkQuerySwitch  = (data) => ({
+    type: constant.HANDLE_AUTO_NETWORK_QUERY_SWITCH,
+    value: data
+  })
+
+  export const handleModelChange  = (data) => ({
+    type: constant.HANDLE_MODEL_CHANGE,
+    value: data
+  })
+
+  export const handleAddField = () => ({
+    type: constant.HANDLE_ADD_FIELD,
+  })
+
+  export const handleDeleteModel  = (index) => ({
+    type: constant.HANDLE_DELETE_MODEL,
+    value: index
+  })
+
+  export const handleEditNetworkQuery  = (data) => ({
+    type: constant.HANDLE_EDIT_NETWORK_QUERY,
+    value: data
+  })

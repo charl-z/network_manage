@@ -27,7 +27,8 @@ const validateMessages = {
 const  BuildDiviceQueryForm = (props) => {
   const { newBuiltDeviceVisible, 
           getCheckDeviceQueryInputIpsInfo, 
-          showDeivceQueryCron, SelectTimeList, 
+          showDeivceQueryCron,
+          SelectTimeList, 
           DeivceQueryEditShow, 
           DeivceQueryEditContent,
           DeivceQueryEditTimeSelect
@@ -46,7 +47,7 @@ const  BuildDiviceQueryForm = (props) => {
 
   return(
     <Modal 
-      title= {DeivceQueryEditShow ? "编辑设备探测" : "新建设备探测" }
+      title= { DeivceQueryEditShow ? "编辑设备探测" : "新建设备探测" }
       visible={newBuiltDeviceVisible} 
       footer={null}
       onCancel={() => props.handleDeviceQueryCancel(form)}
@@ -163,13 +164,11 @@ const mapDispatch = (dispatch) =>({
     form.resetFields()
     dispatch(actionCreators.handleDeviceQueryCancel())
     form.resetFields()
-    // console.log("handleDeviceQueryCancel===========")
   },
   hanleAutoDeviceQuerySwitch(e){
     dispatch(actionCreators.hanleAutoDeviceQuerySwitch(e.target.value))
   },
   getDeviceQuerySubmit(form, value, editShow){
-    // console.log("----------", form.getFieldsValue())
     dispatch(actionCreators.getDeviceQuerySubmit(value, form, editShow))
   },
   handleModelChange(value){

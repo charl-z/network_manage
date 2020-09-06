@@ -176,7 +176,7 @@ def add_device_query(request):
                 if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
                     crontab_task_dict = dict()
                     crontab_task_dict["{0} {1} {2}".format(ip, port, community)] = crontab_task.replace("'", '"')
-                    add_crontab_task_to_redis(crontab_task_dict)
+                    add_crontab_task_to_redis(crontab_task_dict, conf_data["NETWORK_QUETY_CRONTAB_HASH"])
             data["status"] = "success"
         else:
             data["status"] = "success"
@@ -205,7 +205,7 @@ def add_device_query(request):
         if auto_enable:
             crontab_task_dict = dict()
             crontab_task_dict["{0} {1} {2}".format(device_ip, port, community)] = crontab_task.replace("'", '"')
-            add_crontab_task_to_redis(crontab_task_dict)
+            add_crontab_task_to_redis(crontab_task_dict, conf_data["DEVICE_QUETY_CRONTAB_HASH"])
         data["status"] = "success"
 
         return HttpResponse(json.dumps(data), content_type="application/json")
@@ -401,9 +401,13 @@ def get_device_query_crontab_task(request, parameter):
                 device_info = "{0} {1} {2}".format(device.snmp_host, device.snmp_port, device.snmp_group)
                 result[device_info] = device.crontab_time
     else:
-        all_device = QueryDevice.objects.get(snmp_host=parameter)
-        device_info = "{0} {1} {2}".format(all_device.snmp_host, all_device.snmp_port, all_device.snmp_group)
-        result[device_info] = all_device.crontab_time
+        try:
+            device = QueryDevice.objects.get(snmp_host=parameter)
+            if device and device.auto_enable:
+                device_info = "{0} {1} {2}".format(device.snmp_host, device.snmp_port, device.snmp_group)
+                result[device_info] = device.crontab_time
+        except Exception as e:
+            logging.error(e)
     data["status"] = "success"
     data['result'] = result
     return HttpResponse(json.dumps(data), content_type="application/json")

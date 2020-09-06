@@ -96,7 +96,6 @@ const handleConsoleInfo = (state, action) => {
 };
 
 const handleDeviceQueryCancel  = (state, action) => {
-  // state.setIn(['SelectTimeList'])
   return state.merge({
     'newBuiltDeviceVisible': false,
     'showDeivceQueryCron': false,
@@ -211,27 +210,12 @@ const handleAddFiled  = (state, action) => {
 
 const handleDeleteModel = (state, action) => {
   var SelectTimeList = state.getIn(['SelectTimeList']).toArray()
-  // var DeivceQueryEditTimeSelect1 = state.getIn(['DeivceQueryEditTimeSelect'])
   var index = action.value
-  // console.log("--DeivceQueryEditTimeSelect1:", DeivceQueryEditTimeSelect1, "SelectTimeList:", SelectTimeList)
-  // var model = "model_" + index
-  // delete DeivceQueryEditTimeSelect1[model]
-  // console.log("hou DeivceQueryEditTimeSelect1:", DeivceQueryEditTimeSelect1, "SelectTimeList:", SelectTimeList)
-  var tmp = {
-    "model_0": "每小时",
-    "minute_0": "30",
-    "model_1": "每天",
-    "hour_1": "3:30",
-    "model_2": "每天",
-    "hour_2": "1:30"
-  }
   SelectTimeList.splice(index, 1)
   return state.merge({
     'SelectTimeList': List(SelectTimeList),
-    'DeivceQueryEditTimeSelect': tmp
   })
 };
-
 
 const handleCrontabTask = (crontabTask) => {
   var editSelectTime = new Object()

@@ -108,7 +108,6 @@ const mapState = (state) => ({
   SelectTimeList: state.getIn(['deviceQuery', 'SelectTimeList']),
   SelectModelValue: state.getIn(['deviceQuery', 'SelectModelValue']),
   CurrentSelectTimeIndex: state.getIn(['deviceQuery', 'CurrentSelectTimeIndex']),
-  
 })
 
 const mapDispatch = (dispatch) =>({

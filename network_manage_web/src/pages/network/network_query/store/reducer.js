@@ -1,5 +1,6 @@
 import { fromJS, List, Map  } from 'immutable'
 import * as constant from './actionTypes'
+import {weeks} from '../../../../libs/constant'
 import {Encrypt} from '../../../../libs/secret'
 
 const defaultState = fromJS({
@@ -26,6 +27,11 @@ const defaultState = fromJS({
   ConsoleSubmitClickStatus: false,  //控制远程登陆登陆按钮置灰
   showConsolePasswordShow: true, // 控制远程登陆密码输入框展示，为ssh展示密码，telnet不展示
   consoleHostInfo: '',
+  showNetworkQueryCron: '',
+  SelectTimeList: List([0]),
+  NetworkQueryEditTimeSelect: {},
+  NetworkQueryEditShow: false, // 设备探测是否是编辑状态
+  NetworkQueryEditContent: ''
 })
 
 const handleProtocolChange = (state, action) => {
@@ -105,6 +111,9 @@ const setupConsoleSubmitClickStatus = (state, action) => {
 const handleBuildNetworkQuery = (state, action) => {
   return state.merge({
     'BuildNetworkQueryVisible': true,
+    'NetworkQueryEditShow': false,
+    'DeivceQueryEditTimeSelect': '',
+    'SelectTimeList': List([0]),
   })
 }
 
@@ -123,7 +132,9 @@ const handleNetworkQuerySubmit  = (state, action) => {
     return state.merge({
       'BuildNetworkQueryVisible': false,
       'checkNetworkQueryInputIps': true,
-      'selectedRowKeys': []
+      'selectedRowKeys': [],
+      'showNetworkQueryCron': false,
+      'SelectTimeList': List([0])
     })
   }
   if(action.value.status === 'fail'){
@@ -168,6 +179,79 @@ const getNetworkPortDetailsInfos  = (state, action) => {
   })
 };
 
+function hanleAutoNetworkQuerySwitch(state, action){
+  return state.merge({
+    'showNetworkQueryCron': action.value
+  })
+}
+
+function handleModelChange(state, action){
+  var SelectTimeList = state.getIn(['SelectTimeList'])
+  return state.merge({
+    'SelectModelValue': action.value.value,
+    'SelectTimeList': SelectTimeList.splice(action.value.index, 1, action.value.modelSelectIndex),
+    'CurrentSelectTimeIndex': action.value.index
+  })
+};
+
+const handleAddFiled  = (state, action) => {
+  return state.merge({
+    'SelectTimeList': state.getIn(['SelectTimeList']).push(0)
+  })
+};
+
+const handleDeleteModel = (state, action) => {
+  var SelectTimeList = state.getIn(['SelectTimeList']).toArray()
+  var index = action.value
+  SelectTimeList.splice(index, 1)
+  return state.merge({
+    'SelectTimeList': List(SelectTimeList),
+  })
+};
+
+const handleCrontabTask = (crontabTask) => {
+  var editSelectTime = new Object()
+  var SelectTimeList = []
+  crontabTask.map((item,index) => {
+    item = item.split(" ")
+    if(item[2] !== "*"){
+      editSelectTime["model_" + index] = "每月"
+      editSelectTime["day_" + index] = item[2] + "号"
+      editSelectTime["hour_" + index] = item[1] + ":" + item[0]
+      SelectTimeList.push(3)
+    }
+    else if(item[4] !== "*"){
+      editSelectTime["model_" + index] = "每周"
+      editSelectTime["week_" + index] = weeks[item[4]-1]
+      editSelectTime["hour_" + index] = item[1] + ":" + item[0]
+      SelectTimeList.push(2)
+    }else if(item[1] === "*" && item[2] === "*" && item[3] === "*" && item[4] === "*"){
+      editSelectTime["model_" + index] = "每小时"
+      editSelectTime["minute_" + index] = item[0]
+      SelectTimeList.push(0)
+    }else{
+      editSelectTime["model_" + index] = "每天"
+      editSelectTime["hour_" + index] = item[1] + ":" + item[0]
+      SelectTimeList.push(1)
+    }
+  })
+  return [editSelectTime, SelectTimeList]
+}
+
+const handleEditNetworkQuery = (state, action) => {
+// console.log("action.value.:", action.value)
+
+  var crontab_task = JSON.parse(action.value.crontab_task)
+  var editSelectTime = handleCrontabTask(crontab_task)
+  return state.merge({
+    'NetworkQueryEditContent': action.value,
+    'NetworkQueryEditShow': true,
+    'BuildNetworkQueryVisible': true,
+    "showNetworkQueryCron": action.value.auto_enable,
+    'NetworkQueryEditTimeSelect': editSelectTime[0],
+    "SelectTimeList": List(editSelectTime[1]),
+  })
+}; 
 
 export default (state = defaultState, action) => {
   switch (action.type) {
@@ -195,6 +279,16 @@ export default (state = defaultState, action) => {
       return setupConsoleSubmitClickStatus(state, action)
     case constant.HANDLE_PROTOCOL_CHANGE:
       return handleProtocolChange(state, action)
+    case constant.HANDLE_AUTO_NETWORK_QUERY_SWITCH:
+      return hanleAutoNetworkQuerySwitch(state, action)
+    case constant.HANDLE_MODEL_CHANGE:
+      return handleModelChange(state, action)
+    case constant.HANDLE_ADD_FIELD:
+      return handleAddFiled(state, action)
+    case constant.HANDLE_DELETE_MODEL:
+      return handleDeleteModel(state, action)
+    case constant.HANDLE_EDIT_NETWORK_QUERY:
+      return handleEditNetworkQuery(state, action)
     default:
       return state
   }

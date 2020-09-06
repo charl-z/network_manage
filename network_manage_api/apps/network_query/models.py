@@ -20,12 +20,11 @@ class NetworkQueryList(models.Model):
     tcp_query_ports = models.TextField(verbose_name=u'TCP探测端口', default='')
     udp_query_ports = models.TextField(verbose_name=u'UDP探测端口', default='')
     online_ip_num = models.IntegerField(verbose_name=u'在线地址数量', default=0)
-    auto_enable = models.BooleanField(verbose_name=u'定时任务开关', default=False)
     query_status = models.SmallIntegerField(verbose_name='探测状态', choices=QUERY_STATUS, default=0)
+    auto_enable = models.BooleanField(verbose_name=u'定时任务开关', default=False)
     crontab_task = models.TextField(verbose_name=u'定时任务时间', default='')
     query_time = models.DateTimeField(verbose_name=u'最新探测时间', default=datetime.now())
     created_time = models.DateTimeField(verbose_name=u'创建时间', default=datetime.now())
-
 
     def __str__(self):
         return self.network

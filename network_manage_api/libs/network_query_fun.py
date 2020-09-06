@@ -3,6 +3,7 @@
 # @Author  : weidengyi
 import nmap
 import redis
+import logging
 import yaml
 import threading
 import datetime
@@ -16,6 +17,13 @@ r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
                 password=conf_data['REDIS_CONF']['password'],
                 decode_responses=True, db=1
                 )
+
+logging.basicConfig(
+					level=logging.INFO,
+					format=conf_data["LOG_SETUP"]["LOG_FORMAT"],
+					datefmt=conf_data["LOG_SETUP"]["DATE_FORMAT"],
+					filename=conf_data["LOG_SETUP"]["NETWORK_MANAGE_MONITOR_PATH"]
+					)
 
 
 class NetworkQuery(object):
@@ -99,6 +107,7 @@ class NetworkQuery(object):
 			scan_result['ip_status'] = 1
 			scan_result['ip_type'] = 0
 			scan_result['query_time'] = datetime.datetime.now()
+			logging.info("探测结果：{0}".format(scan_result))
 			NetworkQueryDetails.objects.create(**scan_result)
 
 	def exec_redis_task(self, redis_network_info):
@@ -106,7 +115,6 @@ class NetworkQuery(object):
 		network = redis_network_info_list[0]
 		tcp_scan_ports = redis_network_info_list[1]
 		udp_scan_ports = redis_network_info_list[2]
-
 		ips = r.llen(redis_network_info)
 		while True:
 			try:
@@ -127,6 +135,7 @@ class NetworkQuery(object):
 				pass
 
 			if r.llen(redis_network_info) == 0:
+				logging.info("网络探测任务执行完成：{0}".format(redis_network_info))
 				sql = "select count(1) from network_query_result where network = '{0}'".format(network)
 				self.cur_psql.execute(sql)
 				online_ip_num = int(self.cur_psql.fetchall()[0][0])
