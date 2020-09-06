@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/6/22 19:22
-# @Author  : weidengyi
+# @Author  : charl-z
 
 import telnetlib
 from threading import Thread

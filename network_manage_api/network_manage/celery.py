@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/3/16 19:35
-# @Author  : weidengyi
+# @Author  : charl-z
 
 from celery import Celery
 from django.conf import settings

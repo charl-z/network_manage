@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/8/22 21:59
-# @Author  : weidengyi
+# @Author  : charl-z
 import nmap
 import redis
 import logging

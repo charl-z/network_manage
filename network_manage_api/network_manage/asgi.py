@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/6/16 19:03
-# @Author  : weidengyi
+# @Author  : charl-z
 
 import os
 import django

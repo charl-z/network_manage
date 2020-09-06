@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/8/22 10:49
-# @Author  : weidengyi
+# @Author  : charl-z
 
 from django.conf.urls import url
 from .views import *
