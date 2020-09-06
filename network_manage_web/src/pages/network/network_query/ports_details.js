@@ -41,7 +41,6 @@ const columns = [
 class PortDetail extends Component{
   render(){
     const {PortDetailInfos} = this.props
-    console.log(PortDetailInfos)
     return(
       <Content>
         <Table 

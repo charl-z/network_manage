@@ -40,7 +40,6 @@ const  BuildNetworkQueryForm = (props) => {
     udp_query_ports: NetworkQueryEditContent['udp_query_ports'],
     crontab_task_status: NetworkQueryEditContent['auto_enable'],
   }
-  console.log("********NetworkQueryEditContent:", NetworkQueryEditContent, NetworkQueryEditShow)
   var initialFormValues = Object.assign(tmpFormValues, NetworkQueryEditTimeSelect)
   
   return(

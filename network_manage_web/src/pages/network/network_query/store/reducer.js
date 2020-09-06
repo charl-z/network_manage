@@ -57,7 +57,6 @@ const handleConsoleInfo = (state, action) => {
 
 
 const handleConsoleCancel  = (state, action) => {
-  console.log("handleConsoleCancel:", action)
   return state.merge({
     'consonleLoginVisible': false,
     'showConsoleCheckInfo': false,

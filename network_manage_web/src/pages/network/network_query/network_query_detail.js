@@ -7,12 +7,6 @@ import { Table, Layout,Button, Space} from 'antd';
 import {Encrypt, Decrypt}  from '../../../libs/secret';
 import ConsoleForm from './ConsoleForm'
 
-
-const secret = Encrypt("zdns@knet.cn")
-console.log("secret:", secret)
-console.log(Decrypt(secret))
-
-
 const { Content } = Layout;
 
 const style = {
@@ -160,7 +154,6 @@ class NetworkQueryDetail extends Component{
     NetworkQueryDetailsPagination["pageSizeOptions"] = pageSizeOptions
     NetworkQueryDetailsPagination["showTotal"] = () => `总共${NetworkQueryDetailsPagination.total}条`
 
-    console.log("this.props.consonleLoginVisible:", this.props.consonleLoginVisible, this.props.consonleLoginVisible1)
     return(
       <Fragment>
       <Content>
