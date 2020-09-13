@@ -11,6 +11,30 @@
     margin-right: 10px;
 }
 
+.submenu {
+  display: inline;
+  padding: 50px 5px 0;
+}
+
+.node {
+  padding-left: 0px;
+}
+
+.tree li a {
+	display: inline-block;
+	height: 26px;
+	margin: 0;
+	padding-right: 15px;
+	color: #333;
+	text-decoration: none;
+	vertical-align: top;
+	background-color: rgba(0,0,0,0);
+	cursor: pointer;
+}
+.button {
+  width: 15px;
+}
+
 .content {
     display: flex;
     flex-direction: column;

@@ -1,13 +1,7 @@
-/**
- * Copyright (c) OpenSpug Organization. https://github.com/openspug/spug
- * Copyright (c) <spug.dev@gmail.com>
- * Released under the AGPL-3.0 License.
- */
 import React from 'react';
 import { Layout } from 'antd';
 import Sider from './Sider';
 import Header from './Header';
-import Footer from './Footer'
 import { Router } from '../libs/router';
 import { updatePermissions} from '../libs';
 import styles from './layout.module.css';

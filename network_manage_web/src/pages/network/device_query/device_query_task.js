@@ -3,8 +3,9 @@ import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
-import { Table, Button, Input,  Pagination, Layout, Space} from 'antd';
+import { Table, Button, Input,  Pagination, Layout, Space, Row, Col } from 'antd';
 import BuildDiviceQueryForm from './BuildDeviceQueryFrom'
+import GroupManage from '../group_manage/'
 import ConsoleForm from './ConsoleForm'
 import {weeks_obj} from '../../../libs/constant'
 
@@ -110,8 +111,13 @@ class DeviceQueryList extends Component{
     };
     
   return(
-      <Content>
-          <div style={{marginTop: '10px', marginLeft: '10px', marginBottom: '10px'}}>
+      <Row>
+        <Col span={3}>
+          <GroupManage />
+        </Col>
+        <Col span={21}>
+          <div>
+           <div style={{marginTop: '10px', marginLeft: '10px', marginBottom: '10px'}}>
               <Button style={{ marginLeft: '10px' }} type='primary' onClick={this.props.handleNewBuildDeviceQuery}>新建</Button>
               {
                 selectedRowKeys.length !== 0 ? 
@@ -164,7 +170,9 @@ class DeviceQueryList extends Component{
             pageSizeOptions={['30', '50', '100']}
             />
           </div>
-        </Content>
+         </div> 
+        </Col>
+      </Row>
       )
     }
   componentWillReceiveProps(prevProps) {

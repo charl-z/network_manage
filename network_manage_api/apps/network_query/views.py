@@ -449,7 +449,6 @@ def get_network_query_crontab_task(request):
 	data = dict()
 	result = dict()
 	parameter = request.GET.get("network").replace("$", "/")
-	print("parameter************;", parameter)
 	if parameter == "all":
 		all_networks = NetworkQueryList.objects.all()
 		for network in all_networks:
@@ -467,3 +466,7 @@ def get_network_query_crontab_task(request):
 	data["status"] = "success"
 	data['result'] = result
 	return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+
+
