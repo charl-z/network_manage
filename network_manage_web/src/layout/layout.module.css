@@ -7,6 +7,8 @@
     z-index: 2;
 }
 
+
+
 .header .icon {
     margin-right: 10px;
 }
@@ -17,8 +19,11 @@
     justify-content: space-between;
     padding: 10px 5px 0;
     overflow-y: scroll;
-
+    width: 100%;
+    height: 100%;
+    /* position: absolute; */
 }
+
 
 .trigger {
     font-size: 20px;

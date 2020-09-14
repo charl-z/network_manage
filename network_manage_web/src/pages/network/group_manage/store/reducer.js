@@ -19,7 +19,9 @@ function handleGetAllGroupInfo(state, action){
     'newBuildGroupModalVisible': false,
     'getCheckGroupInputErrorInfo': '',
     'editGroupStatus': false,
-    'deleteGroupModalVisible': false
+    'deleteGroupModalVisible': false,
+    'selectGroupName': ''
+    
   })
 }
 
