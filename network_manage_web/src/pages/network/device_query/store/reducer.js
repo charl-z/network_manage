@@ -20,7 +20,7 @@ const defaultState = fromJS({
   showConsoleCheckInfo: false,  //控制远程登陆对话框错误提示是否展示
   ConsoleSubmitClickStatus: false,  //控制远程登陆登陆按钮置灰
   showConsolePasswordShow: true, // 控制远程登陆密码输入框展示，为ssh展示密码，telnet不展示
-  consoleHostInfo: '',
+  // consoleHostInfo: '',
   PortToMAC: '', //端口对应的转发表（即所有mac地址）
   PortToARP: '', //端口对应的ARP信息（即端口对应的ip和mac地址信息）
   DeivceQueryCron: '', //获取新建设备探测定时任务选择输入
@@ -160,25 +160,16 @@ function getConsoleSubmitInfo(state, action){
   }
 
   if(action.value.protocol === 'ssh'){
-    if(action.value.status === 'success'){
-      var sshInfo = `ip=${action.value.result.hostname}&password=${action.value.result.password}&username=${action.value.result.username}&port=${action.value.result.port}`
+    // if(action.value.status === 'success'){
+      console.log("action.value:", action.value)
+      var sshInfo = `ip=${action.value.hostname}&password=${action.value.password}&username=${action.value.username}&port=${action.value.port}`
       window.open(`/ssh/${Encrypt(sshInfo)}`)
       return state.merge({
         'consonleLoginVisible': false,
         'showConsoleCheckInfo': false,
         'getConsoleCheckInfo': '',
         'ConsoleSubmitClickStatus': false,
-        'consoleHostInfo': action.value.result
       })
-    }
-    if(action.value.status === 'fail'){
-      return state.merge({
-        'consonleLoginVisible': true,
-        'showConsoleCheckInfo': true,
-        'ConsoleSubmitClickStatus': false,
-        'getConsoleCheckInfo': action.value.result,
-      })
-    }
   }
 }
 

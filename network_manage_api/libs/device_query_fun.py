@@ -156,11 +156,8 @@ class deviceQuery():
 		try:
 			brige_phy_port_to_macs = self.get_brige_phy_port_to_macs()
 			phy_port_to_index = self.get_phy_port_to_index()
-			print(brige_phy_port_to_macs.keys(), phy_port_to_index)
-
 			index_to_macs = {}
 			for phy_index in brige_phy_port_to_macs.keys():
-				print(phy_port_to_index[phy_index])
 				index_to_macs[phy_port_to_index[phy_index]] = brige_phy_port_to_macs[phy_index]
 		except Exception as e:
 			logging.error(e)
@@ -172,7 +169,6 @@ class deviceQuery():
 		oid = "1.3.6.1.2.1.4.20.1.2"
 		info = {}
 		results = self.snmkwalkv3(oid)
-		# print(results)
 		for result in results:
 			result = result.split("=")
 			address = ".".join(result[0].split(".")[-4:]).strip()

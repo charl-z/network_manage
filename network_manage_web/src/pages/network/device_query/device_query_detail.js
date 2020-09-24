@@ -70,7 +70,6 @@ const columns = [
         value = JSON.parse(text)
       }
       if(value.length >= 2){
-        // console.log(value)
         return (
           <Link to={'/network/device_details/arp_table/'+record.key}>{value.join("\n")}</Link>
         )
@@ -110,6 +109,7 @@ class DeviceQueryDetail extends Component{
           dataSource={getDeviceDetailsInfos} 
           bordered
           pagination={{ pageSize: 30 }}
+          scroll={{ y: 900 }}
         />
       </Content>
     )

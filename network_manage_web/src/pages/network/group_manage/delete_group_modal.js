@@ -13,9 +13,6 @@ const layout = {
 const DeleteGroup = (props) => {
   const {selectGroupName, deleteGroupModalVisible} = props
 
-  console.log("selectGroupName**********:", selectGroupName)
-
- 
   return(
     <Modal
       title='删除分组'

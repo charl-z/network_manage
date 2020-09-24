@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'channels',
     'device_query',
     'network_query',
-    'group_manage'
+    'group_manage',
+    'networks_manage'
 ]
 
 MIDDLEWARE = [

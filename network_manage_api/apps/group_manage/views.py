@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from group_manage.models import NetworkGroup
 from django.http import HttpResponse
+from group_manage.models import NetworkGroup
 import json
 # Create your views here.
 
@@ -24,17 +25,23 @@ def parent_array_to_dig(parent_array, name_dict):
 	return res
 
 
-def get_group_to_parent(request):
-	"""获取分组对应的父亲分组"""
+def get_group_to_infos(request):
+	"""获取分组对应的信息"""
 	group = request.GET.get("group")
 	group_info = NetworkGroup.objects.get(name=group)
 	parent_array = json.loads(group_info.parent_array)
+	networks = json.loads(group_info.networks)
+
 	parent_group = ''
 	if parent_array:
 		parent_group = parent_array[-1]
 	data = dict()
+	result = dict()
+	result['parent_array'] = parent_group
+	result['networks'] = networks
+
 	data["status"] = "success"
-	data["result"] = parent_group
+	data["result"] = result
 
 	return HttpResponse(json.dumps(data), content_type="application/json")
 
@@ -98,23 +105,6 @@ def new_build_group(request):
 		NetworkGroup.objects.filter(name=group_name).delete()
 		data["status"] = "success"
 		return HttpResponse(json.dumps(data), content_type="application/json")
-
-
-
-
-
-		data["status"] = "success"
-		return HttpResponse(json.dumps(data), content_type="application/json")
-
-
-
-def delete_group(request):
-	data = dict()
-	post_data = json.loads(str(request.body, encoding='utf-8'))
-	group_name = post_data.get('group_name')
-	group_infos = NetworkGroup.objects.filter(parent_array__icontains='"' + group_name + '"')  # 修改所有parent_array信息
-	print("group_infos:", group_infos)
-	return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_network_group_info(request):

@@ -30,7 +30,6 @@ logging.basicConfig(
 
 def get_network_query_info(request):
 	data = dict()
-	data['status'] = "success"
 	page_size = request.GET.get("page_size")
 	current_page = request.GET.get("current_page")
 

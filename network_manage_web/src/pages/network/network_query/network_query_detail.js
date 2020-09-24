@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
 import { Table, Layout,Button, Space} from 'antd';
-import {Encrypt, Decrypt}  from '../../../libs/secret';
 import ConsoleForm from './ConsoleForm'
 
 const { Content } = Layout;

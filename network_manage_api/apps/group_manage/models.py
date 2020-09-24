@@ -5,7 +5,7 @@ from django.db import models
 
 class NetworkGroup(models.Model):
 	name = models.TextField(verbose_name=u'分组名称', default='', unique=True)
-	networks = models.TextField(verbose_name=u'网络', default='')
+	networks = models.TextField(verbose_name=u'网络', default='[]')
 	# parent = models.TextField(verbose_name=u'父分组', default='')
 	parent_array = models.TextField(verbose_name=u'父分组列表', default='')
 	# child = models.TextField(verbose_name=u'子分组', default='')

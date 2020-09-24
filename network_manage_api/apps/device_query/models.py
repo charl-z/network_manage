@@ -23,6 +23,7 @@ class QueryDevice(models.Model):
     query_status = models.SmallIntegerField(verbose_name='探测状态', choices=QUERY_STATUS, default=0)
     auto_enable = models.BooleanField(verbose_name=u'定时任务开关', default=False)
     crontab_time = models.TextField(verbose_name=u'定时任务时间', default='')
+    networks = models.TextField(verbose_name=u'所有网络', default='[]')
     created_time = models.DateTimeField(verbose_name=u'创建时间', default=datetime.now())
     last_mod_time = models.DateTimeField(verbose_name=u'修改时间', default=datetime.now())
 
@@ -57,6 +58,23 @@ class SnmpQueryResult(models.Model):
         db_table = "device_query_result"
         unique_together = ("snmp_host_int", "if_index")
         verbose_name = u"设备探测详情"
+        verbose_name_plural = verbose_name
+
+
+class NetworkToDivice(models.Model):
+    """探测网络所在的设备"""
+    network = models.GenericIPAddressField(verbose_name=u'网络', max_length=30, blank=False)
+    device_ip = models.TextField(verbose_name=u'探测设备IP', default='[]')
+    device_hostname = models.TextField(verbose_name=u'探测设备主机名', default='[]')
+    interface = models.TextField(verbose_name=u'端口名称', default='[]')
+
+
+    def __str__(self):
+        return self.network
+
+    class Meta:
+        db_table = "network_to_device"
+        verbose_name = u"探测网络对应的设备"
         verbose_name_plural = verbose_name
 
 

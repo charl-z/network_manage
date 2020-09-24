@@ -22,4 +22,5 @@ urlpatterns = [
     path('network_query/', include('apps.network_query.urls')),
     path('device_query/', include('apps.device_query.urls')),
     path('group_manage/', include('apps.group_manage.urls')),
+    path('networks_manage/', include('apps.networks_manage.urls')),
 ]

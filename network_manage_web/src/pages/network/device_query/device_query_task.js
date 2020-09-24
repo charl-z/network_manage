@@ -26,7 +26,7 @@ class DeviceQueryList extends Component{
         title: '探测设备IP',
         dataIndex: 'ip_address',
         key: 'ip_address',
-        render: (text, record) => <Link to={'/network/device_details/'+record.key}>{text}</Link> //record是对象
+        render: (text, record) => <Link to={'/network/device_details/'+text}>{text}</Link> //record是对象
       },
       {
         title: '探测设备名称',
@@ -111,12 +111,7 @@ class DeviceQueryList extends Component{
     };
     
   return(
-      <Row>
-        <Col span={3}>
-          <GroupManage />
-        </Col>
-        <Col span={21}>
-          <div>
+          <Fragment>
            <div style={{marginTop: '10px', marginLeft: '10px', marginBottom: '10px'}}>
               <Button style={{ marginLeft: '10px' }} type='primary' onClick={this.props.handleNewBuildDeviceQuery}>新建</Button>
               {
@@ -170,9 +165,7 @@ class DeviceQueryList extends Component{
             pageSizeOptions={['30', '50', '100']}
             />
           </div>
-         </div> 
-        </Col>
-      </Row>
+         </Fragment> 
       )
     }
   componentWillReceiveProps(prevProps) {

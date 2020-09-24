@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 import datetime
 
 from libs.ssh import SSH
+from libs.IPy import IP
 from libs.utils import analysis_cron_time
 from libs.tool import check_ip, ipv4_to_num
 from libs import device_query_fun
@@ -17,7 +18,7 @@ import paramiko
 import logging
 import redis
 import socket
-from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable
+from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable, NetworkToDivice
 logger = logging.getLogger('django')
 
 
@@ -80,9 +81,7 @@ def check_user_password(request):
             }
             ssh = SSH(**info)
             ssh.get_client()
-            # QueryDevice.objects.filter(snmp_host=post_data["hostname"]).update(ssh_console_username=info["username"],
-            #                                                                    ssh_console_password=info["password"],
-            #                                                                    ssh_console_port=info["port"])
+
             data["status"] = "success"
             data['result'] = info
         except paramiko.ssh_exception.NoValidConnectionsError:
@@ -266,15 +265,45 @@ def exec_device_query_task(request):
                 device_host_name = device_object.device_name
                 device_manufacturer_info = device_object.enterprise_code
                 ip_num = ipv4_to_num(ip)
+                networks = []
                 for result in results:
+                    network_info = result["ip_setup"]
+                    interface_name = result["name"]
+                    if network_info:
+                        ip_netmask = network_info.split(" ")[0].split("/")
+                        port_ip, netmask = ip_netmask[0], ip_netmask[1]
+                        network = str(IP(port_ip).make_net(netmask))
+                        networks.append(network)
+                        network_to_device_info = NetworkToDivice.objects.filter(network=network)
+                        if network_to_device_info:
+                            network_to_device_ip = json.loads(network_to_device_info[0].device_ip)
+                            if ip not in network_to_device_ip:
+                                network_to_device_ip.append(ip)
+                                network_to_device_hostname = json.loads(network_to_device_info[0].device_hostname)
+                                network_to_device_interface = json.loads(network_to_device_info[0].interface)
+                                network_to_device_hostname.append(device_host_name)
+                                network_to_device_interface.append(interface_name)
+                                network_to_device_info.update(
+                                                    device_ip=str(network_to_device_ip).replace("'", '"'),
+                                                    device_hostname=str(network_to_device_hostname).replace("'", '"'),
+                                                    interface=str(network_to_device_interface).replace("'", '"')
+                                )
+                        else:
+                            NetworkToDivice.objects.create(
+                                                    network=network,
+                                                    device_ip=str([ip]).replace("'", '"'),
+                                                    device_hostname=str([device_host_name]).replace("'", '"'),
+                                                    interface=str([interface_name]).replace("'", '"')
+                                                           )
+
                     result = {
                         "snmp_host": ip,
                         "snmp_host_int": ip_num,
-                        "if_name": result["name"],
+                        "if_name": interface_name,
                         "if_speed": result["speed"],
                         "if_descrs": result["if_descrs"],
                         "if_operstatus": result["status"],
-                        "if_ip_setup": result["ip_setup"],
+                        "if_ip_setup": network_info,
                         "arp_infos": result["arp_infos"],
                         "brige_macs": result["brige_macs"],
                         "if_index": result["index"],
@@ -299,6 +328,7 @@ def exec_device_query_task(request):
                     device_hostname=device_host_name,
                     device_manufacturer_info=device_manufacturer_info,
                     query_status=2,
+                    networks=str(networks).replace("'", '"'),
                     last_mod_time=datetime.datetime.now()
                         )
                 data = {
@@ -306,6 +336,7 @@ def exec_device_query_task(request):
                     "device_info": "ip:{0}, port:{1}, community:{2}".format(ip, port, community)
                 }
             except Exception as e:
+                QueryDevice.objects.filter(snmp_host=ip).update(query_status=4, last_mod_time=datetime.datetime.now())
                 logger.error("探测任务执行失败：{0}".format(e))
                 data = {
                     "status": "fail",
@@ -316,7 +347,7 @@ def exec_device_query_task(request):
 
 def get_device_details(request, parameter):
     """获取设备探测的详细信息"""
-    device_info = QueryDevice.objects.get(id=parameter)
+    device_info = QueryDevice.objects.get(snmp_host=parameter)
     device_details = SnmpQueryResult.objects.filter(snmp_host_int=device_info.snmp_host_int)
 
     data = dict()

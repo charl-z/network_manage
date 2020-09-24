@@ -20,14 +20,16 @@ function handleGetAllGroupInfo(state, action){
     'getCheckGroupInputErrorInfo': '',
     'editGroupStatus': false,
     'deleteGroupModalVisible': false,
-    'selectGroupName': ''
+    'selectGroupName': '',
+
     
   })
 }
 
 export const handleGroupSelect = (state, action) => {
+  console.log("action:", action)
   return state.merge({
-    'selectGroupName': action.value
+    'selectGroupName': action.value,
   })
 }
 

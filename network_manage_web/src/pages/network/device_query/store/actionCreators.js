@@ -42,10 +42,10 @@ function handleDeviceQuerySubmitData(data){
   }
 }
 
-export const getConsoleSubmitInfo = (data) => ({
-  type: constant.GET_CONSOLE_SUBMIT_INFO,
-  value: data
-})
+// export const getConsoleSubmitInfo = (data) => ({
+//   type: constant.GET_CONSOLE_SUBMIT_INFO,
+//   value: data
+// })
 
 export const setupConsoleSubmitClickStatus = (data) => ({
   type: constant.SETUP_CONSOLE_SUBMIT_STATUS,
@@ -78,30 +78,11 @@ export const handleDeleteModel  = (index) => ({
   value: index
 })
 
-export const handleConsoleInfoSubmit = (values) => {
-  let data = new Object();
-  data["status"] = true
-  data["result"] = "登陆中......"
-  return (dispatch) => {
-    if(values.protocol === "telnet"){
-      dispatch(getConsoleSubmitInfo(values))
-    }
-    if(values.protocol === "ssh"){
-      dispatch(setupConsoleSubmitClickStatus(data))
-      http.post('/api/device_query/check_user_password/', values)
-        .then((res) => {
-          res["protocol"] = "ssh"
-          dispatch(getConsoleSubmitInfo(res))
-        })
-        .catch(function (error) {
-          data["status"] = false
-          data["result"] = "未知错误"
-          dispatch(setupConsoleSubmitClickStatus(data))
-            console.log(error);
-        });
-      }
-    }
-  }
+export const handleConsoleInfoSubmit = (values) => ({
+  type: constant.GET_CONSOLE_SUBMIT_INFO,
+  value: values
+  })
+
 
 export const getAllDeviceQueryInfo = (currentPage, pageSize) => {
   return (dispatch) => {

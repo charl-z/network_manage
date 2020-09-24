@@ -1,7 +1,8 @@
 export default [
   {icon: 'desktop', title: '工作台', auth: 'home.home.view', path: '/home'},
   {
-    icon: 'code', title: '设备探测', auth: 'exec.task.do|exec.template.view', child: [
+    icon: 'code', title: '网络', auth: 'exec.task.do|exec.template.view', child: [
+      {title: '网络管理', auth: 'exec.network.manage', path: '/network/network_manage'},
       {title: '网络探测', auth: 'exec.task.do', path: '/network/network_query'},
       {title: '设备探测', auth: 'exec.template.view', path: '/network/device_query'},
     ]

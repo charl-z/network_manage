@@ -10,7 +10,7 @@ export const getAllGroupInfo = () => {
   return (dispatch) => {
     http.get('/api/group_manage/get_network_group_info/')
     .then((res) => {
-      console.log("res:", res)
+      // console.log("res:", res)
       dispatch(handleGetAllGroupInfo(res.result))
     })
     .catch(function (error) {
@@ -44,6 +44,27 @@ export const handleGroupSelect = (data) => ({
   type: constant.HANDLE_GROUP_SELECT,
   value: data
 })
+
+
+
+// export const handleGroupSelect = (selectGroup) => {
+//   return (dispatch) => {
+//     http.get(`/api/group_manage/get_group_to_infos/?group=${selectGroup}`)
+//     .then((res) => {
+//       res['select_group'] = selectGroup
+//       console.log(res)
+//       dispatch({
+//         type: constant.HANDLE_GROUP_SELECT,
+//         value: res
+//       })
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+//   }
+// }
+
+
 
 export const handleGroupMoadleSubmitError  = (data) => ({
   type: constant.HANDLE_GROUP_MOADL_SUBMIT,
@@ -109,10 +130,10 @@ export const getParentGroupName = (data) => ({
 
 export const handleEditGroup = (selectGroup) => {
   return (dispatch) => {
-    http.get(`/api/group_manage/get_group_to_parent/?group=${selectGroup}`)
+    http.get(`/api/group_manage/get_group_to_infos/?group=${selectGroup}`)
     .then((res) => {
       console.log(res)
-      dispatch(getParentGroupName(res.result))
+      dispatch(getParentGroupName(res.result.parent_array))
     })
     .catch(function (error) {
       console.log(error);
