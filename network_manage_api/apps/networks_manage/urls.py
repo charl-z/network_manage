@@ -8,6 +8,12 @@ from .views import *
 urlpatterns = [
     url(r'^build_network/', build_network),
     url(r'^get_all_networks/', get_all_networks),
+    url(r'^patch_import_networks/', patch_import_networks),
+    url(r'^patch_export_networks/', patch_export_networks),
+
+
+
+
 
 ]
 

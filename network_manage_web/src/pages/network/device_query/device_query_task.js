@@ -174,6 +174,7 @@ class DeviceQueryList extends Component{
       }
     };
   onSelectChange = (ids) => {
+    // console.log("ids:", ids)
     this.props.getSelectQuery(ids)
     };
   

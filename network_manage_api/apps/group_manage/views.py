@@ -98,7 +98,7 @@ def new_build_group(request):
 		data["status"] = "success"
 		return HttpResponse(json.dumps(data), content_type="application/json")
 	if request.method == "DELETE":
-		print(request.body)
+		# print(request.body)
 		post_data = json.loads(str(request.body, encoding='utf-8'))
 		group_name = post_data.get('group_name')
 		NetworkGroup.objects.filter(parent_array__icontains='"' + group_name + '"').delete()

@@ -2,13 +2,18 @@ import React, { Component, Fragment} from 'react'
 import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
+import ReactFileReader from 'react-file-reader';
 import 'antd/dist/antd.css';
 import { Table, Button, Tooltip,  Pagination, Layout, Space, Row, Col  } from 'antd';
 import GroupManage from '../group_manage'
+import DeleteNetwork from './delete_network_modal'
 import NetworkManageForm from './build_networks_form'
+import ExportNetwork from './export_network_modal'
 
 
 const { Content } = Layout;
+
+
 
 class NetworkManage extends Component{
   render(){
@@ -54,7 +59,7 @@ class NetworkManage extends Component{
             {
               value.map(
                 (item, index) => {
-                  return <Link key={index} to={'/network/device_details/'+item}>{item + "\n"}</Link>
+                  return <Link key={index} to={'/network/device_details/'+item}>{item + " "}</Link>
                 } 
               )
             }
@@ -63,7 +68,7 @@ class NetworkManage extends Component{
         }
       },
       {
-        title: '交换机端口',
+        title: '设备端口',
         dataIndex: 'device_interface',
         key: 'device_interface',
         ellipsis: true,
@@ -72,12 +77,7 @@ class NetworkManage extends Component{
           if(text !== ''){
             value = JSON.parse(text) //将text的列表字符串转化为列表
           }
-          return(
-            <div>
-              {value.join("\n")}
-            </div>
-          )
-          
+          return <div>{value.join("\n")}</div>
         }
       },
       {
@@ -86,73 +86,85 @@ class NetworkManage extends Component{
         key: 'total_ips',
         width: 100
       },
-      
     ];
 
   const { 
     BuildNetworksVisible,
     networInfos,
-    selectGroupName
+    selectedRowKeys,
+    deleteNetworkModalVisible,
+    exportNetworkModalVisible
   } = this.props
-
-  // console.log("selectGroupName*********:", selectGroupName)
+  // console.log("selectedRowKeys:", selectedRowKeys)
   const rowSelection = {
-    // selectedRowKeys,
-    // onChange: this.onSelectChange,
+    selectedRowKeys,
+    onChange: this.onSelectChange,
   };
-  
+
   return(
     <Row>
       <Col span={3}>
           <GroupManage />
         </Col>
         <Col span={21}>
-          <Space>
-            <Button style={{ marginLeft: '10px' }} type='primary' onClick={this.props.handleBuildNetworks}>新建</Button>
-            <Button type='primary'>编辑</Button>
-            <Button type='primary'>删除</Button>
-            <Button style={{ marginLeft: '20px' }} type='primary' >批量添加</Button>
-            <Button type='primary'>导出</Button>
+        <Space>
+          <Button style={{ marginLeft: '10px' }} type='primary' onClick={this.props.handleBuildNetworks}>新建</Button>
+          {
+            selectedRowKeys.length === 0 ?
+            <Button type='primary' disabled>删除</Button>
+              :
+            <Button type='primary' onClick={() => this.props.handleDeleteNetworks(selectedRowKeys)}>删除</Button>
+          }
+            <ReactFileReader fileTypes={[".csv"]} base64={true} handleFiles={this.handleFiles}>
+              <Button >批量导入</Button>
+            </ReactFileReader>
+            
+            <Button type='primary' onClick={() => this.props.handleExportNetworks(selectedRowKeys)}>导出</Button>
           </Space>
           <Table 
             rowSelection={rowSelection} 
             columns={columns}
             dataSource={networInfos} 
-            // tableLayout='auto'
+            tableLayout='auto'
             bordered
             pagination={false}
           />
           {
             BuildNetworksVisible && <NetworkManageForm/>
           }
-          
+          {
+            deleteNetworkModalVisible && <DeleteNetwork/>
+          }
+          {
+            exportNetworkModalVisible && <ExportNetwork/>
+          }
         </Col>
-    </Row>
-        
-      
-      )
+      </Row>
+    )
+  }
+  componentDidMount(){
+    this.props.getAllNetworksInfo(this.props.selectGroupName)
+  }
+  componentWillReceiveProps(prevProps) {
+    if(this.props.selectGroupName !== prevProps.selectGroupName){
+      this.props.getAllNetworksInfo(prevProps.selectGroupName)
     }
-    componentWillReceiveProps(prevProps) {
-      };
-    componentDidMount(){
-      this.props.getAllNetworksInfo(this.props.selectGroupName)
-    }
-    componentWillReceiveProps(prevProps) {
-      if(this.props.selectGroupName !== prevProps.selectGroupName){
-        this.props.getAllNetworksInfo(prevProps.selectGroupName)
-      }
-      
-    }
-    onSelectChange = (ids) => {
-      };
- 
+  }
+  onSelectChange = selectedRowKeys => {
+    this.props.handleNetworksSelected(selectedRowKeys)
+    };
+  handleFiles = (files) => {
+    this.props.handleImportNetwork(files.base64)
+  }
 }
 
 const mapState = (state) => ({
   BuildNetworksVisible: state.getIn(['networkManage', 'BuildNetworksVisible']),
   networInfos: state.getIn(['networkManage', 'networInfos']),
-  // groupToNetworks: state.getIn(['groupManage', 'groupToNetworks']),
   selectGroupName: state.getIn(['groupManage', 'selectGroupName']),
+  selectedRowKeys: state.getIn(['networkManage', 'selectedRowKeys']),
+  deleteNetworkModalVisible: state.getIn(['networkManage', 'deleteNetworkModalVisible']),
+  exportNetworkModalVisible: state.getIn(['networkManage', 'exportNetworkModalVisible']),
 })
 
 const mapDispatch = (dispatch) =>({
@@ -161,8 +173,19 @@ const mapDispatch = (dispatch) =>({
   },
   getAllNetworksInfo(selectGroup){
     dispatch(actionCreators.getAllNetworksInfo(selectGroup)) 
-  }
-  
+  },
+  handleDeleteNetworks(){
+    dispatch(actionCreators.handleDeleteNetworks()) 
+  },
+  handleNetworksSelected(selectedRowKeys){
+    dispatch(actionCreators.handleNetworksSelected(selectedRowKeys)) 
+  },
+  handleImportNetwork(files){
+    dispatch(actionCreators.handleImportNetwork(files)) 
+  },
+  handleExportNetworks(selectedRowKeys){
+    dispatch(actionCreators.handleExportNetworks(selectedRowKeys)) 
+  },
   })
 
 export default connect(mapState, mapDispatch)(NetworkManage)

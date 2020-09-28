@@ -41,7 +41,7 @@ export const handleBuildNetworks = () => {
   }
 }
 
-export const handleNetworkManageSubmit  = (values) => {
+export const handleNetworkManageSubmit = (values) => {
   values.networks = values.networks.replace(/\n/g, " ")
   return (dispatch) => {
     http.post('/api/networks_manage/build_network/', values)
@@ -53,3 +53,69 @@ export const handleNetworkManageSubmit  = (values) => {
     });
   }
 }
+
+export const deleteNetworksOk = (selectedRowKeys, selectGroupName) => {
+  var param={networks: selectedRowKeys}
+  return (dispatch) => {
+    http.delete('/api/networks_manage/build_network/', {data: param})
+      .then((res) => {
+        console.log("res:", res)
+        dispatch(getAllNetworksInfo(selectGroupName))
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+}
+
+export const handleImportNetwork = (file) => {
+  var param={data: file}
+  console.log("param:", file)
+  return (dispatch) => {
+    http.post('/api/networks_manage/patch_import_networks/', param)
+      .then((res) => {
+        console.log("res:", res)
+        // dispatch(getAllNetworksInfo(selectGroupName))
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+}
+
+export const handleNetworksSelected = (selectedRowKeys) => ({
+  type: constant.NETWORK_SELECTED,
+  value: selectedRowKeys
+})
+
+export const handleDeleteNetworks = () => ({
+  type: constant.DETELE_NETWORK,
+})
+
+export const deleteNetworkMoadlCancel = () => ({
+  type: constant.DETELE_NETWORK_CANCEL,
+})
+
+
+export const handleExportNetworks = (selectedRowKeys) => {
+  return (dispatch) => {
+    http.post('/api/networks_manage/patch_export_networks/', {networks: selectedRowKeys})
+      .then((res) => {
+        console.log("res:", res.result)
+        dispatch({
+          type: constant.NETWORK_EXPORT,
+          value: res.result
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+}
+
+
+
+export const exportNetworkMoadlCancel = () => ({
+  type: constant.NETWORK_EXPORT_CANCEL,
+}) 
