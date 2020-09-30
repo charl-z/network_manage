@@ -42,11 +42,6 @@ function handleDeviceQuerySubmitData(data){
   }
 }
 
-// export const getConsoleSubmitInfo = (data) => ({
-//   type: constant.GET_CONSOLE_SUBMIT_INFO,
-//   value: data
-// })
-
 export const setupConsoleSubmitClickStatus = (data) => ({
   type: constant.SETUP_CONSOLE_SUBMIT_STATUS,
   value: data
@@ -196,7 +191,7 @@ export const handleDevicePortToARP = (data) => ({
 })
 export const getDevicePortToARP = (id) => {
   return (dispatch) => {
-    http.get('api/device_query/device_port_arp/' + id + '/')
+    http.get('/api/device_query/device_port_arp/' + id + '/')
       .then((res) => {
         // console.log(id, res)
         dispatch(handleDevicePortToARP(res.result)) 
@@ -216,7 +211,6 @@ export const handleDeviceQuerySearch = (value, currentPage, pageSize) => {
   return (dispatch) => {
     http.get(`/api/device_query/get_device_query_info/?current_page=${currentPage}&page_size=${pageSize}&search_ip=${value}`)
     .then((res) => {
-      // console.log("res:", res)
       res["current_page"] = currentPage
       dispatch(handleAllDeviceQueryInfo(res))
     })
@@ -226,5 +220,41 @@ export const handleDeviceQuerySearch = (value, currentPage, pageSize) => {
   }
 }
 
+export const NetworkSetCancel = () => ({
+  type: constant.NETWORK_SET_CANCEL,
+})
 
+
+export const handleNetworksSet = () => {
+  return (dispatch) => {
+    dispatch({
+      type: constant.HANDLE_NETWORK_SET_LOADING
+    })
+    http.get('/api/device_query/get_device_to_networks/')
+    .then((res) => {
+      dispatch({
+        type: constant.HANDLE_NETWORK_SET,
+        value: res.result
+      })
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+  }
+}
+
+export const handleNetworkSetSubmit = (values) => {
+  console.log(values)
+  return (dispatch) => {
+    http.post('/api/device_query/handle_networks_set/', values)
+    .then((res) => {
+      dispatch({
+        type: constant.NETWORK_SET_SUBMIT,
+      })
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+  }
+}
 

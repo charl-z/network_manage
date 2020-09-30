@@ -19,6 +19,8 @@ import logging
 import redis
 import socket
 from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable, NetworkToDivice
+from networks_manage.models import Networks
+from group_manage.models import NetworkGroup
 logger = logging.getLogger('django')
 
 
@@ -129,11 +131,32 @@ def del_device_query(request):
 
             # 删除snmpqueryresult表中探测数据数据
             SnmpQueryResult.objects.filter(snmp_host_int=ipv4_to_num(device_ip)).delete()
+            # 删除network_to_device表中的探测数据
+            network_to_device_infos = NetworkToDivice.objects.filter(device_ip__icontains='"'+device_ip+'"')
+            for network_to_device in network_to_device_infos:
+                network_to_device_ip = json.loads(network_to_device.device_ip)
+                if len(network_to_device_ip) == 1:
+                    network_to_device.delete()
+                else:
+                    network_to_device_hostname = json.loads(network_to_device.device_hostname)
+                    network_to_device_interface = json.loads(network_to_device.interface)
+                    device_ip_index = network_to_device_ip.index(device_ip)
+                    network_to_device_ip.remove(network_to_device_ip[device_ip_index])
+                    network_to_device_hostname.remove(network_to_device_hostname[device_ip_index])
+                    network_to_device_interface.remove(network_to_device_interface[device_ip_index])
+
+                    network_to_device.update(
+                        device_ip=str(network_to_device_ip).replace("'", '"'),
+                        device_hostname=str(network_to_device_hostname).replace("'", '"'),
+                        interface=str(network_to_device_interface).replace("'", '"'),
+                    )
+
             # 批量删除探测任务时候，redis缓存以及该设备相关的探测记录也要对应的删除
             device_infos = "{0} {1} {2}".format(device_ip, device_snmp_port, device_snmp_group)
             r.lrem(conf_data['DEVICE_QUERY_QUEUE'], device_infos, 0)
             # Todo 删除设备探测任务时候，需要将redis哈希表中的定时任务同步删除
             r.hdel(conf_data['DEVICE_QUETY_CRONTAB_HASH'], device_infos)
+
 
             QueryDevice.objects.filter(id=id).delete()
         data["status"] = "success"
@@ -289,12 +312,13 @@ def exec_device_query_task(request):
                                                     interface=str(network_to_device_interface).replace("'", '"')
                                 )
                         else:
-                            NetworkToDivice.objects.create(
-                                                    network=network,
-                                                    device_ip=str([ip]).replace("'", '"'),
-                                                    device_hostname=str([device_host_name]).replace("'", '"'),
-                                                    interface=str([interface_name]).replace("'", '"')
-                                                           )
+                            if IP(network).prefixlen() != 32:
+                                NetworkToDivice.objects.create(
+                                                        network=network,
+                                                        device_ip=str([ip]).replace("'", '"'),
+                                                        device_hostname=str([device_host_name]).replace("'", '"'),
+                                                        interface=str([interface_name]).replace("'", '"')
+                                                               )
 
                     result = {
                         "snmp_host": ip,
@@ -442,5 +466,55 @@ def get_device_query_crontab_task(request, parameter):
     data["status"] = "success"
     data['result'] = result
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def get_device_to_networks(request):
+    """获取可以网络归集的网络，如果网络管理已存在的网络，需要剔除"""
+    data = dict()
+    result = dict()
+    all_groups = NetworkGroup.objects.values_list('name', flat=True)
+    all_groups = list(all_groups)
+
+    networks_network = Networks.objects.values_list('network', flat=True)
+    networks_network = list(networks_network)
+
+    network_to_device_network = NetworkToDivice.objects.values_list('network', flat=True)
+    network_to_device_network = list(network_to_device_network)
+    difference_networks = list(set(network_to_device_network).difference(set(networks_network)))
+    result['all_groups'] = all_groups
+    result['networks'] = difference_networks
+
+    data['result'] = result
+    data["status"] = "success"
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def handle_networks_set(request):
+    """处理网络归集请求"""
+    data = dict()
+    post_data = json.loads(str(request.body, encoding='utf-8'))
+    group = post_data.get("group")
+    networks = post_data.get("networks")
+
+    insert_to_networks = []
+    for network in networks:
+        insert_to_networks.append(Networks(
+            network=network,
+            ip_total=IP(network).len(),
+            query_time=datetime.datetime.now())
+        )
+    Networks.objects.bulk_create(insert_to_networks)
+
+    network_group_info = NetworkGroup.objects.get(name=group)
+    network_group_networks = json.loads(network_group_info.networks)
+    network_group_networks.extend(networks)
+    NetworkGroup.objects.filter(name=group).update(networks=str(network_group_networks).replace("'", '"'))
+
+    data["status"] = "success"
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+
+
 
 

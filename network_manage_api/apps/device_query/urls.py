@@ -17,6 +17,10 @@ urlpatterns = [
 	url(r'^device_port_arp/(.+)/$', get_device_port_arp),
 	url(r'^host/', get_console_info),
 	url(r'^device_query_crontab_task/(.+)/$', get_device_query_crontab_task),
+	url(r'^get_device_to_networks/', get_device_to_networks),
+	url(r'^handle_networks_set/', handle_networks_set),
+
+
 ]
 
 

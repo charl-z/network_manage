@@ -8,6 +8,7 @@ from django.db.models.query import QuerySet
 import base64
 import os
 import csv
+import time, datetime
 # Create your views here.
 
 
@@ -38,7 +39,8 @@ def build_network(request):
 				network_group_networks.append(network)
 				Networks.objects.create(
 					network=network,
-					ip_total=IP(network).len()
+					ip_total=IP(network).len(),
+					query_time=datetime.datetime.now()
 				)
 			NetworkGroup.objects.filter(name=parent_group_name).update(networks=str(network_group_networks).replace("'", '"'))
 			data["status"] = "success"
@@ -88,6 +90,7 @@ def get_all_networks(request):
 		network_info['key'] = network
 		network_info['network'] = network
 		network_info['total_ips'] = total_ips
+		print(network)
 		group_name_info = NetworkGroup.objects.get(networks__icontains='"'+network+'"')
 		group_name_parent_array = json.loads(group_name_info.parent_array)
 		if group_name_parent_array:
@@ -124,24 +127,90 @@ def patch_import_networks(request):
 		post_data = json.loads(str(request.body, encoding='utf-8'))
 		csv_date = post_data.get('data')
 		csv_date = csv_date.split(",")[-1]
-		print(csv_date)
-		csv_date_decode = base64.urlsafe_b64decode(csv_date).decode('gbk')
-		# print(csv_date_decode, type(csv_date_decode))
-		filename = "/tmp/malformedcsv"
-		new_filename = "/tmp/malformedcsv_out"
+		try:
+			csv_date_decode = base64.urlsafe_b64decode(csv_date).decode('gbk')
+		except UnicodeDecodeError:
+			csv_date_decode = base64.urlsafe_b64decode(csv_date).decode('utf-8-sig')
+		try:
+			filename = "/tmp/malformedcsv"
+			new_filename = "/tmp/malformedcsv_out"
 
-		network_csv_header = ["网络地址", "分组名称"]
+			network_csv_header = ['网络地址', '分组名称']
 
-		with open(filename, "w") as file:
-			file.write(csv_date_decode)
-			os.popen("csv_format {0} {1}".format(filename, new_filename))
-			tmp_file = open(new_filename, 'r', encoding='utf-8')
-			reader = csv.DictReader(tmp_file)
-			for i in reader:
-				print(i.keys(), i[network_csv_header[0]], i[network_csv_header[1]])
+			with open(filename, "w") as file:
+				file.write(csv_date_decode)
+				file.flush()
+				os.popen("csv_format {0} {1}".format(filename, new_filename))
+				count = 0
+				while count < 10:
+					if os.path.exists(new_filename):
+						break
+					time.sleep(0.2)
+					count += 1
 
-	data["status"] = "success"
-	return HttpResponse(json.dumps(data), content_type="application/json")
+				tmp_file = open(new_filename, 'r', encoding='utf-8')
+				reader = csv.DictReader(tmp_file)
+				fieldnames = reader.fieldnames
+				print("fieldnames:", fieldnames)
+				if not (set(network_csv_header).issubset(fieldnames)):
+					data["status"] = "fail"
+					data["result"] = "导入字段名称有误，请检查！"
+					return HttpResponse(json.dumps(data), content_type="application/json")
+
+				unvalid_info = []
+				network_to_group = dict()
+				for i in reader:
+					network = i[network_csv_header[0]]
+					group_name = i[network_csv_header[1]].split("/")[0]
+					try:
+						if not checkNetwork(network):
+							unvalid_info.append("{0} 非法网络".format(network))
+							break
+						elif Networks.objects.filter(network=network):
+							unvalid_info.append("{0} 网络已存在".format(network))
+							break
+						elif "/" not in network:
+							unvalid_info.append("{0} 非法网络".format(network))
+							break
+					except:
+						unvalid_info.append("{0} 非法网络".format(network))
+						break
+					if not NetworkGroup.objects.filter(name=group_name):
+						unvalid_info.append("{0} 未知分组名".format(group_name))
+						break
+					if group_name in network_to_group.keys():
+						network_to_group[group_name].append(network)
+					else:
+						network_to_group[group_name] = [network]
+				if unvalid_info:
+					data["status"] = "fail"
+					data["result"] = "，".join(unvalid_info) + "，请检查！"
+					return HttpResponse(json.dumps(data), content_type="application/json")
+				else:
+					for group_name, networks in network_to_group.items():
+						network_group_info = NetworkGroup.objects.get(name=group_name)
+						network_group_networks = json.loads(network_group_info.networks)
+						network_group_networks.extend(networks)
+
+						insert_to_networks = []
+						for network in networks:
+							insert_to_networks.append(Networks(
+								network=network,
+								ip_total=IP(network).len(),
+								query_time=datetime.datetime.now())
+							)
+						Networks.objects.bulk_create(insert_to_networks)
+						NetworkGroup.objects.filter(name=group_name).update(networks=str(network_group_networks).replace("'", '"'))
+			data["status"] = "success"
+			return HttpResponse(json.dumps(data), content_type="application/json")
+		except Exception as e:
+			print(e)
+			data["status"] = "fail"
+			data["result"] = "未知错误，请检查！"
+			return HttpResponse(json.dumps(data), content_type="application/json")
+		finally:
+			os.popen("rm -rf {0} {1}".format(filename, new_filename))
+			# pass
 
 
 def patch_export_networks(request):

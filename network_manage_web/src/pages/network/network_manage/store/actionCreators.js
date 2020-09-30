@@ -59,7 +59,7 @@ export const deleteNetworksOk = (selectedRowKeys, selectGroupName) => {
   return (dispatch) => {
     http.delete('/api/networks_manage/build_network/', {data: param})
       .then((res) => {
-        console.log("res:", res)
+        // console.log("res:", res)
         dispatch(getAllNetworksInfo(selectGroupName))
       })
       .catch(function (error) {
@@ -68,21 +68,35 @@ export const deleteNetworksOk = (selectedRowKeys, selectGroupName) => {
   }
 }
 
-export const handleImportNetwork = (file) => {
-  var param={data: file}
-  console.log("param:", file)
+export const handleCSVtData = (file, selectGroupName) => {
   return (dispatch) => {
-    http.post('/api/networks_manage/patch_import_networks/', param)
+    dispatch({
+      type: constant.HANDLE_CSV_DATA_START,
+    })
+    http.post('/api/networks_manage/patch_import_networks/', {data: file})
       .then((res) => {
-        console.log("res:", res)
-        // dispatch(getAllNetworksInfo(selectGroupName))
+        dispatch({
+          type: constant.HANDLE_CSV_DATA,
+          value: res 
+        })
       })
       .catch(function (error) {
         console.log(error);
-      });
+      })
+      .finally(
+        () => {
+          dispatch(getAllNetworksInfo(selectGroupName))
+        })
   }
 }
 
+export const handleImportNetwork = () => ({
+  type: constant.NETWORK_IMPORT,
+})
+
+export const importNetworkMoadlCancel  = () => ({
+  type: constant.NETWORK_IMPORT_CANCEL,
+})
 export const handleNetworksSelected = (selectedRowKeys) => ({
   type: constant.NETWORK_SELECTED,
   value: selectedRowKeys

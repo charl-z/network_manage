@@ -1,4 +1,4 @@
-import { fromJS,List  } from 'immutable'
+import { fromJS, List, Map  } from 'immutable'
 import * as constant from './actionTypes'
 import {weeks} from '../../../../libs/constant'
 import {Encrypt} from '../../../../libs/secret'
@@ -30,6 +30,12 @@ const defaultState = fromJS({
   DeivceQueryEditShow: false, // 设备探测是否是编辑状态
   DeivceQueryEditContent: '',
   DeivceQueryEditTimeSelect: {},
+  NetworkSet: Map({
+    all_groups: [],
+    networks: []
+  }),
+  NetworkSetVisible: false,
+  NetworkSetLoading: false
 })
 
 
@@ -58,7 +64,10 @@ const getAllDiviceInfos  = (state, action) => {
     'totalDeivces': action.value.total_device,
     'checkDeviceQueryInputIps': false,
     'getCheckDeviceQueryInputIpsInfo': '',
-    'deviceQueryCurrentPage': action.value.current_page
+    'deviceQueryCurrentPage': action.value.current_page,
+    'NetworkSetVisible': false,
+    'NetworkSetLoading': false,
+    
   })
 };
 
@@ -84,7 +93,6 @@ const handleDeviceQueryNewBuild  = (state, action) => {
     'DeivceQueryEditShow': false,
     'DeivceQueryEditTimeSelect': '',
     'SelectTimeList': List([0]),
-
   })
 };
 
@@ -251,6 +259,33 @@ const handleEditDeviceQuery = (state, action) => {
   })
 }; 
 
+const handleNetworkSet = (state, action) => {
+  return state.merge({
+    'NetworkSet': Map(action.value),
+    'NetworkSetLoading': false
+  })
+};
+
+const handleNetworkSetLoading = (state, action) => {
+  return state.merge({
+    'NetworkSetVisible': true,
+    'NetworkSetLoading': true
+  })
+};
+
+const handleNetworkSetCancel =  (state, action) => {
+  return state.merge({
+    'NetworkSetVisible': false,
+    'NetworkSetLoading': false
+  })
+};
+
+const handleNetworkSetSubmit =  (state, action) => {
+  return state.merge({
+    'NetworkSetVisible': false,
+  })
+};
+
 export default (state = defaultState, action) => {
   switch (action.type) {
     case constant.SELECT_DEVICE_QUERY_LIST:
@@ -291,6 +326,14 @@ export default (state = defaultState, action) => {
       return handleDeleteModel(state, action)
     case constant.HANDLE_EDIT_DEVICE_QUERY:
       return handleEditDeviceQuery(state, action)
+    case constant.HANDLE_NETWORK_SET:
+      return handleNetworkSet(state, action)
+    case constant.HANDLE_NETWORK_SET_LOADING:
+      return handleNetworkSetLoading(state, action)
+    case constant.NETWORK_SET_CANCEL:
+      return handleNetworkSetCancel(state, action)
+    case constant.NETWORK_SET_SUBMIT:
+      return handleNetworkSetSubmit(state, action)
     default:
       return state
   }

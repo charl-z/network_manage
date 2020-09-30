@@ -8,11 +8,14 @@ const defaultState = fromJS({
   selectedRowKeys: [],
   deleteNetworkModalVisible: false,
   exportNetworkModalVisible: false,
-  exportNetworkData: []
+  exportNetworkData: [],
+  importNetworkModalVisible: false,
+  importNeworkErrorMessages: '',
+  importNetworLoading: false
 })
 
 const handleBuildNetworks = (state, action) => {
-  action.value.splice(0,1)
+  action.value.splice(0, 1)
   return state.merge({
     'BuildNetworksVisible': true,
     'allGroupName': action.value,
@@ -31,7 +34,9 @@ const getALLNetworks = (state, action) => {
     'networInfos': action.value,
     'selectedRowKeys': [],
     'deleteNetworkModalVisible': false,
-    'exportNetworkModalVisible': false
+    'exportNetworkModalVisible': false,
+    'importNetworkLoading': false,
+    'importNeworkErrorMessages': ''
   })
 }
 
@@ -61,11 +66,47 @@ const handleExportNetworks = (state, action) => {
   })
 }
 
+const handleImportNetworks = (state, action) => {
+  // console.log("action:", action)
+  return state.merge({
+    'importNetworkModalVisible': true,
+  })
+}
+
+const handleImportNetworksCancel = (state, action) => {
+  // console.log("action:", action)
+  return state.merge({
+    'importNetworkModalVisible': false,
+  })
+}
+
 const handleExportNetworksCancel = (state, action) => {
   return state.merge({
     'exportNetworkModalVisible': false
   })
 }
+
+const handleCSVData = (state, action) => {
+  if(action.value.status === 'success'){
+    return state.merge({
+      'importNetworkModalVisible': false,
+      'importNetworkLoading': false
+    })
+  }else{
+    return state.merge({
+      'importNetworkModalVisible': true,
+      'importNeworkErrorMessages': action.value.result,
+      'importNetworkLoading': false
+    })
+  }
+}
+
+const handleCSVDataLoading = (state, action) => {
+  return state.merge({
+    'importNetworkLoading': true
+  })
+}
+ 
 
 export default (state = defaultState, action) => {
   switch (action.type) {
@@ -85,6 +126,16 @@ export default (state = defaultState, action) => {
       return handleExportNetworks(state, action)
     case constant.NETWORK_EXPORT_CANCEL:
       return handleExportNetworksCancel(state, action)
+    case constant.NETWORK_IMPORT:
+      return handleImportNetworks(state, action)
+    case constant.NETWORK_IMPORT_CANCEL:
+      return handleImportNetworksCancel(state, action)
+    case constant.HANDLE_CSV_DATA:
+      return handleCSVData(state, action)
+    case constant.HANDLE_CSV_DATA_START:
+      return handleCSVDataLoading(state, action)
+      
+    
     default:
       return state
   }

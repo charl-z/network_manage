@@ -5,11 +5,12 @@ import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
 import { Table, Button, Input,  Pagination, Layout, Space, Row, Col } from 'antd';
 import BuildDiviceQueryForm from './BuildDeviceQueryFrom'
-import GroupManage from '../group_manage/'
 import ConsoleForm from './ConsoleForm'
+import NetworkSet from './network_set_modal'
+
 import {weeks_obj} from '../../../libs/constant'
 
-const { Content } = Layout;
+// const { Content } = Layout;
 
 class DeviceQueryList extends Component{
   render(){
@@ -19,8 +20,9 @@ class DeviceQueryList extends Component{
       totalDeivces,
       deviceQueryPageSize,
       deviceQueryCurrentPage,
+      NetworkSetVisible
         } = this.props;
-
+      // console.log("NetworkSet***************:", NetworkSet)
     const columns = [
       {
         title: '探测设备IP',
@@ -111,37 +113,39 @@ class DeviceQueryList extends Component{
     };
     
   return(
+    <Fragment>
+      <Space style={{marginTop: '10px', marginLeft: '10px', marginBottom: '10px'}}>
+        <Button type='primary' onClick={this.props.handleNewBuildDeviceQuery}>新建</Button>
+        {
+          selectedRowKeys.length !== 0 ? 
           <Fragment>
-           <div style={{marginTop: '10px', marginLeft: '10px', marginBottom: '10px'}}>
-              <Button style={{ marginLeft: '10px' }} type='primary' onClick={this.props.handleNewBuildDeviceQuery}>新建</Button>
-              {
-                selectedRowKeys.length !== 0 ? 
-                <Fragment>
-                  <Button  style={{ marginLeft: '10px' }}>编辑</Button>
-                  <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleDeleteDeviceQuery(selectedRowKeys)}>删除</Button>
-                  <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleStartDeviceQuery(selectedRowKeys)}>启动</Button>
-                </Fragment>
-                :
-                <Fragment>
-                  <Button disabled style={{ marginLeft: '10px' }}>编辑</Button>
-                  <Button disabled style={{ marginLeft: '10px' }}>删除</Button>
-                  <Button  disabled style={{ marginLeft: '10px' }} >启动</Button>
-                </Fragment>
-              }
-               <Button style={{ marginLeft: '10px' }} type='primary' onClick={() => this.props.getAllDeviceQueryInfo(deviceQueryCurrentPage, deviceQueryPageSize)}>刷新</Button>
-               <Input.Search
-                placeholder="输入需要搜索IP"
-                enterButton="搜索"
-                
-                onSearch={value => this.props.handleDeviceQuerySearch(value, deviceQueryCurrentPage, deviceQueryPageSize)}
-                style={{ marginLeft: '20px', width: 200, }}
-              />
-          </div>
+            <Button>编辑</Button>
+            <Button onClick={ () => this.props.handleDeleteDeviceQuery(selectedRowKeys)}>删除</Button>
+            <Button onClick={ () => this.props.handleStartDeviceQuery(selectedRowKeys)}>启动</Button>
+          </Fragment>
+          :
+          <Fragment>
+            <Button disabled >编辑</Button>
+            <Button disabled >删除</Button>
+            <Button disabled >启动</Button>
+          </Fragment>
+        }
+          <Button type='primary' onClick={this.props.handleNetworksSet}>网络归集</Button>
+          <Button type='primary' onClick={() => this.props.getAllDeviceQueryInfo(deviceQueryCurrentPage, deviceQueryPageSize)}>刷新</Button>
+          <Input.Search
+            placeholder="输入需要搜索IP"
+            enterButton="搜索"
+            onSearch={value => this.props.handleDeviceQuerySearch(value, deviceQueryCurrentPage, deviceQueryPageSize)}
+          />
+      </Space>
           {
             this.props.newBuiltDeviceVisible && <BuildDiviceQueryForm/> //通过newBuiltDeviceVisible得值得变化，重新加载组件
           }
           {
             this.props.consonleLoginVisible && <ConsoleForm />
+          }
+          {
+            NetworkSetVisible && <NetworkSet/>
           }
           
           <Table 
@@ -197,6 +201,7 @@ const mapState = (state) => ({
   showDeivceQueryCron: state.getIn(['deviceQuery', 'showDeivceQueryCron']),
   SelectTimeList: state.getIn(['deviceQuery', 'SelectTimeList']),
   consonleLoginVisible: state.getIn(['deviceQuery', 'consonleLoginVisible']),
+  NetworkSetVisible: state.getIn(['deviceQuery', 'NetworkSetVisible']),
 })
 
 const mapDispatch = (dispatch) =>({
@@ -235,15 +240,14 @@ const mapDispatch = (dispatch) =>({
     }else{
       record['auto_enable'] = "off"
     }
-    // console.log("record:", record)
     dispatch(actionCreators.handleEditDeviceQuery(record))
-    
   },
   handleDeviceQuerySearch(value, currentPage, pageSize){
-    // console.log(value, pageNumber, pageSize)
-    // var pageNumber = 1
     dispatch(actionCreators.handleDeviceQuerySearch(value, currentPage, pageSize))
   },
+  handleNetworksSet(){
+    dispatch(actionCreators.handleNetworksSet())
+  }
 
   })
 

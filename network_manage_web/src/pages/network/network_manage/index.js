@@ -2,17 +2,13 @@ import React, { Component, Fragment} from 'react'
 import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
-import ReactFileReader from 'react-file-reader';
 import 'antd/dist/antd.css';
 import { Table, Button, Tooltip,  Pagination, Layout, Space, Row, Col  } from 'antd';
 import GroupManage from '../group_manage'
 import DeleteNetwork from './delete_network_modal'
 import NetworkManageForm from './build_networks_form'
 import ExportNetwork from './export_network_modal'
-
-
-const { Content } = Layout;
-
+import ImportNetwork from './import_network_modal'
 
 
 class NetworkManage extends Component{
@@ -93,7 +89,8 @@ class NetworkManage extends Component{
     networInfos,
     selectedRowKeys,
     deleteNetworkModalVisible,
-    exportNetworkModalVisible
+    exportNetworkModalVisible,
+    importNetworkModalVisible
   } = this.props
   // console.log("selectedRowKeys:", selectedRowKeys)
   const rowSelection = {
@@ -115,12 +112,10 @@ class NetworkManage extends Component{
               :
             <Button type='primary' onClick={() => this.props.handleDeleteNetworks(selectedRowKeys)}>删除</Button>
           }
-            <ReactFileReader fileTypes={[".csv"]} base64={true} handleFiles={this.handleFiles}>
-              <Button >批量导入</Button>
-            </ReactFileReader>
-            
+            <Button type='primary' onClick={this.props.handleImportNetworks}>批量导入</Button>
             <Button type='primary' onClick={() => this.props.handleExportNetworks(selectedRowKeys)}>导出</Button>
           </Space>
+          
           <Table 
             rowSelection={rowSelection} 
             columns={columns}
@@ -138,6 +133,9 @@ class NetworkManage extends Component{
           {
             exportNetworkModalVisible && <ExportNetwork/>
           }
+          {
+            importNetworkModalVisible && <ImportNetwork/>
+          }
         </Col>
       </Row>
     )
@@ -153,9 +151,6 @@ class NetworkManage extends Component{
   onSelectChange = selectedRowKeys => {
     this.props.handleNetworksSelected(selectedRowKeys)
     };
-  handleFiles = (files) => {
-    this.props.handleImportNetwork(files.base64)
-  }
 }
 
 const mapState = (state) => ({
@@ -165,6 +160,7 @@ const mapState = (state) => ({
   selectedRowKeys: state.getIn(['networkManage', 'selectedRowKeys']),
   deleteNetworkModalVisible: state.getIn(['networkManage', 'deleteNetworkModalVisible']),
   exportNetworkModalVisible: state.getIn(['networkManage', 'exportNetworkModalVisible']),
+  importNetworkModalVisible: state.getIn(['networkManage', 'importNetworkModalVisible']),
 })
 
 const mapDispatch = (dispatch) =>({
@@ -180,8 +176,8 @@ const mapDispatch = (dispatch) =>({
   handleNetworksSelected(selectedRowKeys){
     dispatch(actionCreators.handleNetworksSelected(selectedRowKeys)) 
   },
-  handleImportNetwork(files){
-    dispatch(actionCreators.handleImportNetwork(files)) 
+  handleImportNetworks(){
+    dispatch(actionCreators.handleImportNetwork()) 
   },
   handleExportNetworks(selectedRowKeys){
     dispatch(actionCreators.handleExportNetworks(selectedRowKeys)) 
