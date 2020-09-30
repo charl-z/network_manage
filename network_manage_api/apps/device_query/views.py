@@ -145,7 +145,7 @@ def del_device_query(request):
                     network_to_device_hostname.remove(network_to_device_hostname[device_ip_index])
                     network_to_device_interface.remove(network_to_device_interface[device_ip_index])
 
-                    network_to_device.update(
+                    NetworkToDivice.objects.filter(network=network_to_device.network).update(
                         device_ip=str(network_to_device_ip).replace("'", '"'),
                         device_hostname=str(network_to_device_hostname).replace("'", '"'),
                         interface=str(network_to_device_interface).replace("'", '"'),
