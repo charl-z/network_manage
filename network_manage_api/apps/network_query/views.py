@@ -95,6 +95,7 @@ def add_network_query(request):
 				unvalid_network.append("非法UDP扫描端口")
 
 		auto_enable = False
+		crontab_task = ''
 		if crontab_task_status == "on":
 			auto_enable = True
 			crontab_task = analysis_cron_time(post_data)
