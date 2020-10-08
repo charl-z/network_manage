@@ -18,7 +18,7 @@ import paramiko
 import logging
 import redis
 import socket
-from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable, NetworkToDivice
+from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable, NetworkToDevice, DeviceMacTable, DeviceArpTable
 from networks_manage.models import Networks
 from group_manage.models import NetworkGroup
 logger = logging.getLogger('django')
@@ -132,7 +132,7 @@ def del_device_query(request):
             # 删除snmpqueryresult表中探测数据数据
             SnmpQueryResult.objects.filter(snmp_host_int=ipv4_to_num(device_ip)).delete()
             # 删除network_to_device表中的探测数据
-            network_to_device_infos = NetworkToDivice.objects.filter(device_ip__icontains='"'+device_ip+'"')
+            network_to_device_infos = NetworkToDevice.objects.filter(device_ip__icontains='"'+device_ip+'"')
             for network_to_device in network_to_device_infos:
                 network_to_device_ip = json.loads(network_to_device.device_ip)
                 if len(network_to_device_ip) == 1:
@@ -145,7 +145,7 @@ def del_device_query(request):
                     network_to_device_hostname.remove(network_to_device_hostname[device_ip_index])
                     network_to_device_interface.remove(network_to_device_interface[device_ip_index])
 
-                    NetworkToDivice.objects.filter(network=network_to_device.network).update(
+                    NetworkToDevice.objects.filter(network=network_to_device.network).update(
                         device_ip=str(network_to_device_ip).replace("'", '"'),
                         device_hostname=str(network_to_device_hostname).replace("'", '"'),
                         interface=str(network_to_device_interface).replace("'", '"'),
@@ -284,6 +284,13 @@ def exec_device_query_task(request):
                 QueryDevice.objects.filter(snmp_host=ip).update(query_status=6, last_mod_time=datetime.datetime.now())
                 device_object = device_query_fun.deviceQuery(community, ip, port)
                 results = device_object.get_all_infos()
+                """
+                在执行设备探测，将本次探测设备的数据写入数据数据之前，
+                要先删除前一次设备探测的数据，涉及到的表包括：SnmpQueryResult，SnmpQueryIpRouteTable，DeviceMacTable，NetworkToDevice
+                待完成
+                """
+                SnmpQueryResult.objects.filter(snmp_host=ip).delete()
+
                 logging.info("开始执行设备探测任务,ip:{0}, port:{1}, community:{2}".format(ip, port, community))
                 device_host_name = device_object.device_name
                 device_manufacturer_info = device_object.enterprise_code
@@ -297,7 +304,7 @@ def exec_device_query_task(request):
                         port_ip, netmask = ip_netmask[0], ip_netmask[1]
                         network = str(IP(port_ip).make_net(netmask))
                         networks.append(network)
-                        network_to_device_info = NetworkToDivice.objects.filter(network=network)
+                        network_to_device_info = NetworkToDevice.objects.filter(network=network)
                         if network_to_device_info:
                             network_to_device_ip = json.loads(network_to_device_info[0].device_ip)
                             if ip not in network_to_device_ip:
@@ -313,14 +320,14 @@ def exec_device_query_task(request):
                                 )
                         else:
                             if IP(network).prefixlen() != 32:
-                                NetworkToDivice.objects.create(
+                                NetworkToDevice.objects.create(
                                                         network=network,
                                                         device_ip=str([ip]).replace("'", '"'),
                                                         device_hostname=str([device_host_name]).replace("'", '"'),
                                                         interface=str([interface_name]).replace("'", '"')
                                                                )
 
-                    result = {
+                    result_db = {
                         "snmp_host": ip,
                         "snmp_host_int": ip_num,
                         "if_name": interface_name,
@@ -328,15 +335,47 @@ def exec_device_query_task(request):
                         "if_descrs": result["if_descrs"],
                         "if_operstatus": result["status"],
                         "if_ip_setup": network_info,
-                        "arp_infos": result["arp_infos"],
-                        "brige_macs": result["brige_macs"],
+                        "arp_infos": str(result["arp_infos"]).replace("'", '"'),
+                        "brige_macs": str(result["brige_macs"]).replace("'", '"'),
                         "if_index": result["index"],
                         "last_mod_time": datetime.datetime.now()
                     }
-                    if SnmpQueryResult.objects.filter(snmp_host_int=ipv4_to_num(ip), if_index=result["if_index"]):
-                        SnmpQueryResult.objects.filter(snmp_host_int=ipv4_to_num(ip), if_index=result["if_index"]).update(**result)
-                    else:
-                        SnmpQueryResult.objects.create(**result)
+
+                    SnmpQueryResult.objects.create(**result_db)
+
+                    """将mac和IP信息分别写入device_query_mac_table和device_query_arp_table的表中"""
+                    """这里可以将数据缓存到redis后再去处理，待优化"""
+                    macs = result["brige_macs"]
+                    ip_to_macs = result["arp_infos"]
+                    device_host_detail = "{0}/{1}".format(ip, device_host_name)
+                    for mac in macs:
+                        device_ip_details = DeviceMacTable.objects.filter(mac=mac)
+                        if not device_ip_details:
+                            DeviceMacTable.objects.create(mac=mac, host_and_port=json.dumps({device_host_detail: [interface_name]}))
+                        else:
+                            device_ip_details_host_and_port = json.loads(device_ip_details[0].host_and_port)
+                            if device_host_detail in device_ip_details_host_and_port.keys() and interface_name not in device_ip_details_host_and_port[device_host_detail]:
+                                device_ip_details_host_and_port[device_host_detail].append(interface_name)
+                            else:
+                                device_ip_details_host_and_port[device_host_detail] = [interface_name]
+                            DeviceMacTable.objects.filter(mac=mac).update(
+                                host_and_port=json.dumps(device_ip_details_host_and_port))
+                    for ip_to_mac in ip_to_macs:
+                        ip_to_mac = ip_to_mac.split(' ')
+                        arp_ip, arp_mac = ip_to_mac[0], ip_to_mac[1]
+                        device_arp_table = DeviceArpTable.objects.filter(ip=arp_ip)
+                        if not device_arp_table:
+                            DeviceArpTable.objects.create(ip=arp_ip, mac=arp_mac, host_and_port=json.dumps(
+                                {device_host_detail: [interface_name]}))
+                        else:
+                            device_arp_table_host_and_port = json.loads(device_arp_table[0].host_and_port)
+                            if device_host_detail in device_arp_table_host_and_port.keys() and interface_name not in device_arp_table_host_and_port[device_host_detail]:
+                                device_arp_table_host_and_port[device_host_detail].append(interface_name)
+                            else:
+                                device_arp_table_host_and_port[device_host_detail] = [interface_name]
+                            DeviceArpTable.objects.filter(ip=arp_ip).update(
+                                host_and_port=json.dumps(device_ip_details_host_and_port), mac=arp_mac)
+
                 """写入路由表信息到数据库"""
                 device_ip_route_tables = device_object.package_ip_route_table()
                 for route_infos in device_ip_route_tables:
@@ -478,7 +517,7 @@ def get_device_to_networks(request):
     networks_network = Networks.objects.values_list('network', flat=True)
     networks_network = list(networks_network)
 
-    network_to_device_network = NetworkToDivice.objects.values_list('network', flat=True)
+    network_to_device_network = NetworkToDevice.objects.values_list('network', flat=True)
     network_to_device_network = list(network_to_device_network)
     difference_networks = list(set(network_to_device_network).difference(set(networks_network)))
     result['all_groups'] = all_groups

@@ -19,7 +19,7 @@ class NetworkManage extends Component{
         dataIndex: 'network',
         key: 'network',
         ellipsis: true,
-        // render: (text, record) => <Link to={'/network/network_details/'+record.key}>{text}</Link> //record是对象
+        render: (text, record) => <Link to={'/network/network_manage/'+record.key.replace("/", "$")}>{text}</Link> //record是对象
       },
       {
         title: '分组名称',

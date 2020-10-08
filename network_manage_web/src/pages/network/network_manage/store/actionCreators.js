@@ -59,7 +59,6 @@ export const deleteNetworksOk = (selectedRowKeys, selectGroupName) => {
   return (dispatch) => {
     http.delete('/api/networks_manage/build_network/', {data: param})
       .then((res) => {
-        // console.log("res:", res)
         dispatch(getAllNetworksInfo(selectGroupName))
       })
       .catch(function (error) {
@@ -125,11 +124,47 @@ export const handleExportNetworks = (selectedRowKeys) => {
         console.log(error);
       });
   }
-
 }
-
-
 
 export const exportNetworkMoadlCancel = () => ({
   type: constant.NETWORK_EXPORT_CANCEL,
 }) 
+
+
+// export const getNetworkIpDetailsInfo = (id) => {
+//   return (dispatch) => {
+//     http.get(`/api/networks_manage/get_network_ip_details/?id=${id}`)
+//       .then((res) => {
+//         console.log("res:", res.result)
+//         // dispatch({
+//         //   type: constant.NETWORK_EXPORT,
+//         //   value: res.result
+//         // })
+//       })
+//       .catch(function (error) {
+//         console.log(error);
+//       });
+//   }
+// }
+
+
+export const getNetworkIpDetailsInfo = (id, pagination) => {
+  var pageSize = pagination.pageSize
+  var currentPage = pagination.current
+  var ipStatusFilter = null
+  var ipTypeFilter = null
+  var columnKeySorter = null
+  var orderSorter = null
+  return (dispatch) => {
+    http.get(`/api/networks_manage/get_network_ip_details/?id=${id}&current_page=${currentPage}&page_size=${pageSize}&ip_status=${ipStatusFilter}&ip_type=${ipTypeFilter}&columnKey=${columnKeySorter}&order=${orderSorter}`)
+      .then((res) => {
+        console.log("res:", res)
+        // res["page_size"] = pageSize
+        // res["current_page"] = currentPage
+        // dispatch(getNetworkDetails(res)) 
+    })
+    .catch(function (error) {
+    console.log(error);
+    });
+  }
+}

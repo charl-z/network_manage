@@ -347,12 +347,12 @@ class deviceQuery():
 						ip_to_macs.append(ip_to_mac)
 					content["arp_infos"] = ip_to_macs
 				else:
-					content["arp_infos"] = ""
+					content["arp_infos"] = []
 
 				if index in brige_index_to_mac.keys():
 					content["brige_macs"] = brige_index_to_mac[index]
 				else:
-					content["brige_macs"] = ""
+					content["brige_macs"] = []
 				info.append(content)
 			except Exception as e:
 				logging.error(e)

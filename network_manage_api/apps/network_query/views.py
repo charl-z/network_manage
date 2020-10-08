@@ -247,7 +247,6 @@ def get_network_details(request):
 	ip_type = request.GET.get("ip_type")
 	column_key = request.GET.get("columnKey")
 	order = request.GET.get("order")
-	# print("**********", page_size, current_page, ip_status,  ip_type, column_key, order)
 	network_info = NetworkQueryList.objects.get(id=id)
 	result = []
 	network_details = NetworkQueryDetails.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
