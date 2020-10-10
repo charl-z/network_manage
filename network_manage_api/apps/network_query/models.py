@@ -36,24 +36,13 @@ class NetworkQueryList(models.Model):
 
 
 class NetworkQueryDetails(models.Model):
-    IP_STATUS = (
-        (0, u'离线'),
-        (1, u'在线'),
-    )
-    IP_TYPE = (
-        (0, u'未管理'),
-        (1, u'手动地址'),
-        (2, u'未使用')
-    )
     network = models.GenericIPAddressField(verbose_name=u'探测网络', max_length=30, db_index=True)
     ip = models.GenericIPAddressField(verbose_name=u'ip地址', max_length=30, unique=True, db_index=True)
     scan_mac = models.CharField(verbose_name=u'MAC地址', max_length=30)
     scan_mac_product = models.CharField(verbose_name=u'MAC地址', max_length=60)
     tcp_port_list = models.TextField(verbose_name=u'TCP端口探测数据', default='')
     udp_port_list = models.TextField(verbose_name=u'UDP端口探测数据', default='')
-    hostname = models.CharField(verbose_name=u'MAC地址', max_length=60)
-    ip_status = models.SmallIntegerField(verbose_name=u'IP地址状态', choices=IP_STATUS, default=0)
-    ip_type = models.SmallIntegerField(verbose_name=u'IP地址类型', choices=IP_TYPE, default=0)
+    hostname = models.CharField(verbose_name=u'MAC地址', max_length=60, default='')
     query_time = models.DateTimeField(verbose_name=u'最新探测时间', default=datetime.now())
 
     def __str__(self):

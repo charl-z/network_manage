@@ -351,30 +351,40 @@ def exec_device_query_task(request):
                     for mac in macs:
                         device_ip_details = DeviceMacTable.objects.filter(mac=mac)
                         if not device_ip_details:
-                            DeviceMacTable.objects.create(mac=mac, host_and_port=json.dumps({device_host_detail: [interface_name]}))
+                            DeviceMacTable.objects.create(mac=mac,
+                                                          host_and_port=json.dumps({device_host_detail: [interface_name]}),
+                                                          query_time=datetime.datetime.now())
                         else:
                             device_ip_details_host_and_port = json.loads(device_ip_details[0].host_and_port)
-                            if device_host_detail in device_ip_details_host_and_port.keys() and interface_name not in device_ip_details_host_and_port[device_host_detail]:
+                            if device_host_detail in device_ip_details_host_and_port.keys() and interface_name not in \
+                                    device_ip_details_host_and_port[device_host_detail]:
                                 device_ip_details_host_and_port[device_host_detail].append(interface_name)
                             else:
                                 device_ip_details_host_and_port[device_host_detail] = [interface_name]
                             DeviceMacTable.objects.filter(mac=mac).update(
-                                host_and_port=json.dumps(device_ip_details_host_and_port))
+                                host_and_port=json.dumps(device_ip_details_host_and_port),
+                                query_time=datetime.datetime.now())
                     for ip_to_mac in ip_to_macs:
                         ip_to_mac = ip_to_mac.split(' ')
                         arp_ip, arp_mac = ip_to_mac[0], ip_to_mac[1]
                         device_arp_table = DeviceArpTable.objects.filter(ip=arp_ip)
                         if not device_arp_table:
                             DeviceArpTable.objects.create(ip=arp_ip, mac=arp_mac, host_and_port=json.dumps(
-                                {device_host_detail: [interface_name]}))
+                                {device_host_detail: [interface_name]}), network=network, query_time=datetime.datetime.now())
                         else:
                             device_arp_table_host_and_port = json.loads(device_arp_table[0].host_and_port)
-                            if device_host_detail in device_arp_table_host_and_port.keys() and interface_name not in device_arp_table_host_and_port[device_host_detail]:
+
+                            if device_host_detail in device_arp_table_host_and_port.keys() and interface_name not in\
+                                    device_arp_table_host_and_port[device_host_detail]:
                                 device_arp_table_host_and_port[device_host_detail].append(interface_name)
                             else:
                                 device_arp_table_host_and_port[device_host_detail] = [interface_name]
+
                             DeviceArpTable.objects.filter(ip=arp_ip).update(
-                                host_and_port=json.dumps(device_ip_details_host_and_port), mac=arp_mac)
+                                network=network,
+                                host_and_port=json.dumps(device_arp_table_host_and_port),
+                                mac=arp_mac,
+                                query_time=datetime.datetime.now())
 
                 """写入路由表信息到数据库"""
                 device_ip_route_tables = device_object.package_ip_route_table()
@@ -383,7 +393,8 @@ def exec_device_query_task(request):
                     route_infos["snmp_host_int"] = ip_num
                     route_infos["last_mod_time"] = datetime.datetime.now()
                     if SnmpQueryIpRouteTable.objects.filter(snmp_host_int=ip_num, dest_ip=route_infos["dest_ip"]):
-                        SnmpQueryIpRouteTable.objects.filter(snmp_host_int=ip_num, dest_ip=route_infos["dest_ip"]).update(**route_infos)
+                        SnmpQueryIpRouteTable.objects.filter(snmp_host_int=ip_num,
+                                                             dest_ip=route_infos["dest_ip"]).update(**route_infos)
                     else:
                         SnmpQueryIpRouteTable.objects.create(**route_infos)
 

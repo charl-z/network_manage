@@ -1,10 +1,11 @@
 from django.http import HttpResponse
 import json
 from libs.IPy import checkNetwork, IP
+from libs.utils import insert_query_data
 from libs.tool import json_encoder, ipv4_to_num, num_to_ipv4
 from network_query.models import NetworkQueryList, NetworkQueryDetails
 from django.core.paginator import Paginator
-from networks_manage.models import Networks
+from networks_manage.models import Networks, IpDetailsInfo
 from group_manage.models import NetworkGroup
 from device_query.models import NetworkToDevice
 from django.db.models.query import QuerySet
@@ -45,11 +46,17 @@ def build_network(request):
 					ip_total=IP(network).len(),
 					query_time=datetime.datetime.now()
 				)
-			NetworkGroup.objects.filter(name=parent_group_name).update(networks=str(network_group_networks).replace("'", '"'))
+				"""
+				通过新建线程，给ip_detail_info表中填入数据
+				"""
+				insert_query_data(network)
+			NetworkGroup.objects.filter(name=parent_group_name).update(networks=json.dumps(network_group_networks))
+
 			data["status"] = "success"
 		else:
 			data["status"] = "fail"
 			data["data"] = unvalid_network
+
 	if request.method == "DELETE":
 		post_data = json.loads(str(request.body, encoding='utf-8'))
 		networks = post_data.get("networks")
@@ -57,8 +64,11 @@ def build_network(request):
 			network_group_info = NetworkGroup.objects.get(networks__icontains='"' + network + '"')
 			network_group_networks = json.loads(network_group_info.networks)
 			network_group_networks.remove(network)
-			NetworkGroup.objects.filter(name=network_group_info.name).update(networks=str(network_group_networks).replace("'", '"'))
+			NetworkGroup.objects.filter(name=network_group_info.name).update(networks=json.dumps(network_group_networks))
 			Networks.objects.filter(network=network).delete()
+
+			IpDetailsInfo.objects.filter(network=network).delete()
+
 		data["status"] = "success"
 
 	return HttpResponse(json.dumps(data), content_type="application/json")

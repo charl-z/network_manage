@@ -2,6 +2,7 @@
 # @Time    : 2020/8/22 21:59
 # @Author  : charl-z
 import nmap
+import json
 import redis
 import logging
 import yaml
@@ -77,7 +78,7 @@ class NetworkQuery(object):
 						protocol='unknown'
 					tcp_port_list.append("{0} {1} {2}".format(info, state, protocol))
 			if tcp_ports:
-				scan_result["tcp_port_list"] = tcp_port_list
+				scan_result["tcp_port_list"] = json.dumps(tcp_port_list)
 			else:
 				scan_result["tcp_port_list"] = ''
 
@@ -102,10 +103,8 @@ class NetworkQuery(object):
 							if not protocol:
 								protocol = 'unknown'
 							udp_port_list.append("{0} {1} {2}".format(info, state, protocol))
-				scan_result["udp_port_list"] = udp_port_list
+				scan_result["udp_port_list"] = json.dumps(udp_port_list)
 			scan_result['network'] = network
-			scan_result['ip_status'] = 1
-			scan_result['ip_type'] = 0
 			scan_result['query_time'] = datetime.datetime.now()
 			logging.info("探测结果：{0}".format(scan_result))
 			NetworkQueryDetails.objects.create(**scan_result)

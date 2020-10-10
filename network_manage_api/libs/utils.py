@@ -6,6 +6,7 @@ import redis
 import yaml
 import requests
 import psycopg2
+from libs.IPy import IP
 
 weeks = {
     "星期一": "1",
@@ -45,6 +46,7 @@ def connect_postgresql_db():
 	else:
 		return conn
 	return None
+
 
 
 def close_db_connection(conn):
@@ -180,7 +182,147 @@ def analysis_cron_time(cron):
 	return str(list(result.values()))
 
 
+def insert_query_data(network):
+	# 将网络探测或设备探测的数据插入ip_detail_info的表中
+	try:
+		conn_psql = connect_postgresql_db()
+		cur_psql = conn_psql.cursor()
+
+		print("network*****:", network)
+
+		SQL = "SELECT ip, mac, host_and_port, query_time FROM device_query_arp_table WHERE network='{0}';".format(network)
+		cur_psql.execute(SQL)
+		device_query_arp_table_info = cur_psql.fetchall()
+		device_query_arp_table_dict = dict()
+		for i in device_query_arp_table_info:
+			device_query_arp_table_dict[i[0]] = list(i)
+
+		SQL = "SELECT ip, scan_mac, tcp_port_list, udp_port_list, hostname, query_time FROM network_query_result WHERE network='{0}';".format(network)
+		cur_psql.execute(SQL)
+		network_query_result_info = cur_psql.fetchall()
+		network_query_result_dict = dict()
+		for i in network_query_result_info:
+			network_query_result_dict[i[0]] = list(i)
+
+		arp_ips = device_query_arp_table_dict.keys()
+		network_query_ips = network_query_result_dict.keys()
+
+		arp_ips_difference_query = set(arp_ips).difference(set(network_query_ips))
+		network_query_ips_difference_arp = set(network_query_ips).difference(set(arp_ips))
+		arps_query_mixed = set(network_query_ips) & set(arp_ips)
+
+
+		padding_data = {
+			'query_arp_mac': '',
+			'device_hostname_interface': '',
+			'tcp_port_list': '',
+			'udp_port_list': '',
+			'hostname': '',
+			'ip_status': 1,
+			'ip_type': 0,
+			'manual_mac': '',
+			'created_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		}
+		padding_network_query = [
+			padding_data['tcp_port_list'],
+			padding_data['udp_port_list'],
+			padding_data['hostname'],
+			padding_data['ip_status'],
+			padding_data['ip_type'],
+			padding_data['manual_mac'],
+			padding_data['created_time'],
+		]
+		padding_arp = [
+			padding_data['ip_status'],
+			padding_data['ip_type'],
+			padding_data['manual_mac'],
+			padding_data['created_time'],
+			padding_data['device_hostname_interface'],
+		]
+
+		padding_mixed = [
+			padding_data['ip_status'],
+			padding_data['ip_type'],
+			padding_data['manual_mac'],
+			padding_data['created_time'],
+		]
+
+		arp_ips_difference_query_info = []
+		for i in arp_ips_difference_query:
+			ip_detail_info = device_query_arp_table_dict[i]
+			query_time = ip_detail_info.pop()
+			ip_detail_info.extend(padding_network_query)
+			ip_detail_info.append(str(query_time))
+			ip_detail_info.append(network)
+			arp_ips_difference_query_info.append(tuple(ip_detail_info))
+
+		SQL = "INSERT INTO ip_detail_info(ip, query_arp_mac, device_hostname_interface, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, query_time, network) VALUES "
+		if arp_ips_difference_query_info:
+			for i in arp_ips_difference_query_info:
+				SQL += str(i) + ","
+			SQL = SQL[:-1] + ";"
+			cur_psql.execute(SQL)
+
+		SQL = "INSERT INTO ip_detail_info(ip, query_arp_mac, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, device_hostname_interface, query_time, network) VALUES "
+		network_query_ips_difference_arp_info = []
+		for i in network_query_ips_difference_arp:
+			ip_detail_info = network_query_result_dict[i]
+			query_time = ip_detail_info.pop()
+			ip_detail_info.extend(padding_arp)
+
+			ip_detail_info.append(str(query_time))
+			ip_detail_info.append(network)
+			network_query_ips_difference_arp_info.append(tuple(ip_detail_info))
+
+		if network_query_ips_difference_arp_info:
+			for i in network_query_ips_difference_arp_info:
+				SQL += str(i) + ","
+			SQL = SQL[:-1] + ";"
+			cur_psql.execute(SQL)
+
+		arps_query_mixed_info = []
+		SQL = "INSERT INTO ip_detail_info(ip, query_arp_mac, device_hostname_interface, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, query_time, network) VALUES "
+		for i in arps_query_mixed:
+			arps_info = device_query_arp_table_dict[i]
+			query_time = arps_info.pop()
+			network_query_info = network_query_result_dict[i]
+			network_query_info.pop()
+			if network_query_info[1] and arps_info[1] != network_query_info[1] : # 设备探测和网络探测的IP对应的MAC不一致
+				print("{0}:设备探测和网络探测的IP对应的MAC不一致".format(arps_info[0]))
+			arps_info.extend(network_query_info[2:])
+			arps_info.extend(padding_mixed)
+			arps_info.append(str(query_time))
+			arps_info.append(network)
+			arps_query_mixed_info.append(tuple(arps_info))
+		if arps_query_mixed_info:
+			for i in arps_query_mixed_info:
+				SQL += str(i) + ","
+			SQL = SQL[:-1] + ";"
+			cur_psql.execute(SQL)
+
+
+
+
+
+
+
+
+
+
+
+	finally:
+		close_db_connection(conn_psql)
+
+
+
+
+	# print(network_query_result_info)
+
+
+
+
+
 if __name__ == "__main__":
 	# a = {'community': 'public', 'port': 161, 'device_ips': '100.1.1.1', 'crontab_task': 'on', 'model_0': '每小时', 'minute_0': '30', 'model_1': '每天', 'hour_1': '0:45', 'model_2': '每周', 'week_2': '星期三', 'hour_2': '0:45', 'model_3': '每月', 'day_3': '4号', 'hour_3': '19:30'}
 	# print(analysis_cron_time(a))
-	print(get_network_query_crontab_task("10.1.109.0/24"))
+	print(insert_query_data("10.1.108.0/24"))
