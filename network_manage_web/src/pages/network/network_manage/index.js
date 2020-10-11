@@ -6,7 +6,7 @@ import 'antd/dist/antd.css';
 import { Table, Button, Tooltip,  Pagination, Layout, Space, Row, Col  } from 'antd';
 import GroupManage from '../group_manage'
 import DeleteNetwork from './delete_network_modal'
-import NetworkManageForm from './build_networks_form'
+import NetworkManageForm from './build_networks_modal'
 import ExportNetwork from './export_network_modal'
 import ImportNetwork from './import_network_modal'
 
@@ -102,7 +102,7 @@ class NetworkManage extends Component{
     <Row>
       <Col span={3}>
           <GroupManage />
-        </Col>
+      </Col>
         <Col span={21}>
         <Space>
           <Button style={{ marginLeft: '10px' }} type='primary' onClick={this.props.handleBuildNetworks}>新建</Button>

@@ -177,10 +177,10 @@ class NetworkQueryDetail extends Component{
 }
 
 const mapState = (state) => ({
-  // consonleLoginVisible1: state.getIn(['consoleForm', 'consonleLoginVisible']),
   consonleLoginVisible: state.getIn(['networkQuery', 'consonleLoginVisible']),
   NetworkQueryDetailInfos: state.getIn(['networkQuery', 'NetworkQueryDetailInfos']),
   NetworkQueryDetailsPagination: state.getIn(['networkQuery', 'NetworkQueryDetailsPagination']).toObject(),
+  
 })
 
 const mapDispatch = (dispatch) =>({

@@ -34,7 +34,7 @@ class IpDetailsInfo(models.Model):
     )
     ip = models.GenericIPAddressField(verbose_name=u'网络', max_length=30, unique=True)
     network = models.GenericIPAddressField(verbose_name=u'网络', max_length=30)
-    query_arp_mac = models.CharField(verbose_name=u'mac地址', max_length=20, default='')  # 设备探测或网络探测的mac地址
+    query_mac = models.CharField(verbose_name=u'mac地址', max_length=20, default='')  # 设备探测或网络探测的mac地址
     device_hostname_interface = models.TextField(verbose_name=u'IP地址所对应的主机名和端口', default='')
     manual_mac = models.CharField(verbose_name=u'手动配置mac地址', max_length=20, default='')
     tcp_port_list = models.TextField(verbose_name=u'TCP端口探测数据', default='')

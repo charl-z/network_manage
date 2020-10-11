@@ -182,13 +182,42 @@ def analysis_cron_time(cron):
 	return str(list(result.values()))
 
 
+def convert_device_hostname_interface(interface):
+	"""
+	:param interface: {"10.1.101.4/Quidway": ["Vlanif101"], "10.1.101.1/KNET-TEST-2F-202": ["Vlan-interface101", "Vlan-interface102"]}
+	:return: ['10.1.101.4/Quidway/Vlanif101', '10.1.101.1/KNET-TEST-2F-202/Vlan-interface101,Vlan-interface102']
+	"""
+	result = []
+	for key, value in interface.items():
+		result.append("{0}/{1}".format(key, ",".join(value)))
+	return result
+
+
+def get_mac_manufacturer(mac):
+	"""
+	:param mac: 00:00:00:02:fe:3a
+	:return: Apple, Inc.
+	"""
+	try:
+		conn_psql = connect_postgresql_db()
+		cur_psql = conn_psql.cursor()
+		mac_pre = "-".join(mac.split(":")[:3])
+		sql = "select manufacturer from mac_manufacturer where mac_pre='{0}';".format(mac_pre)
+		cur_psql.execute(sql)
+
+		manufacturer_info = cur_psql.fetchall()
+		if not manufacturer_info:
+			return ""
+		return manufacturer_info[0][0]
+	finally:
+		close_db_connection(conn_psql)
+
+
 def insert_query_data(network):
 	# 将网络探测或设备探测的数据插入ip_detail_info的表中
 	try:
 		conn_psql = connect_postgresql_db()
 		cur_psql = conn_psql.cursor()
-
-		print("network*****:", network)
 
 		SQL = "SELECT ip, mac, host_and_port, query_time FROM device_query_arp_table WHERE network='{0}';".format(network)
 		cur_psql.execute(SQL)
@@ -213,7 +242,7 @@ def insert_query_data(network):
 
 
 		padding_data = {
-			'query_arp_mac': '',
+			'query_mac': '',
 			'device_hostname_interface': '',
 			'tcp_port_list': '',
 			'udp_port_list': '',
@@ -256,14 +285,14 @@ def insert_query_data(network):
 			ip_detail_info.append(network)
 			arp_ips_difference_query_info.append(tuple(ip_detail_info))
 
-		SQL = "INSERT INTO ip_detail_info(ip, query_arp_mac, device_hostname_interface, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, query_time, network) VALUES "
+		SQL = "INSERT INTO ip_detail_info(ip, query_mac, device_hostname_interface, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, query_time, network) VALUES "
 		if arp_ips_difference_query_info:
 			for i in arp_ips_difference_query_info:
 				SQL += str(i) + ","
 			SQL = SQL[:-1] + ";"
 			cur_psql.execute(SQL)
 
-		SQL = "INSERT INTO ip_detail_info(ip, query_arp_mac, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, device_hostname_interface, query_time, network) VALUES "
+		SQL = "INSERT INTO ip_detail_info(ip, query_mac, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, device_hostname_interface, query_time, network) VALUES "
 		network_query_ips_difference_arp_info = []
 		for i in network_query_ips_difference_arp:
 			ip_detail_info = network_query_result_dict[i]
@@ -281,13 +310,13 @@ def insert_query_data(network):
 			cur_psql.execute(SQL)
 
 		arps_query_mixed_info = []
-		SQL = "INSERT INTO ip_detail_info(ip, query_arp_mac, device_hostname_interface, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, query_time, network) VALUES "
+		SQL = "INSERT INTO ip_detail_info(ip, query_mac, device_hostname_interface, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, query_time, network) VALUES "
 		for i in arps_query_mixed:
 			arps_info = device_query_arp_table_dict[i]
 			query_time = arps_info.pop()
 			network_query_info = network_query_result_dict[i]
 			network_query_info.pop()
-			if network_query_info[1] and arps_info[1] != network_query_info[1] : # 设备探测和网络探测的IP对应的MAC不一致
+			if network_query_info[1] and arps_info[1] != network_query_info[1]:  # 设备探测和网络探测的IP对应的MAC不一致
 				print("{0}:设备探测和网络探测的IP对应的MAC不一致".format(arps_info[0]))
 			arps_info.extend(network_query_info[2:])
 			arps_info.extend(padding_mixed)
@@ -298,31 +327,15 @@ def insert_query_data(network):
 			for i in arps_query_mixed_info:
 				SQL += str(i) + ","
 			SQL = SQL[:-1] + ";"
+
 			cur_psql.execute(SQL)
-
-
-
-
-
-
-
-
-
-
-
 	finally:
 		close_db_connection(conn_psql)
-
-
-
-
-	# print(network_query_result_info)
-
-
-
 
 
 if __name__ == "__main__":
 	# a = {'community': 'public', 'port': 161, 'device_ips': '100.1.1.1', 'crontab_task': 'on', 'model_0': '每小时', 'minute_0': '30', 'model_1': '每天', 'hour_1': '0:45', 'model_2': '每周', 'week_2': '星期三', 'hour_2': '0:45', 'model_3': '每月', 'day_3': '4号', 'hour_3': '19:30'}
 	# print(analysis_cron_time(a))
-	print(insert_query_data("10.1.108.0/24"))
+	# print(insert_query_data("10.1.108.0/24"))
+	interface = {"10.1.101.4/Quidway": ["Vlanif101"], "10.1.101.1/KNET-TEST-2F-202": ["Vlan-interface101", "Vlan-interface102"]}
+	print(convert_device_hostname_interface(interface))

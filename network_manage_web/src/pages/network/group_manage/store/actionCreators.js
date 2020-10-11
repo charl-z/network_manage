@@ -46,26 +46,6 @@ export const handleGroupSelect = (data) => ({
 })
 
 
-
-// export const handleGroupSelect = (selectGroup) => {
-//   return (dispatch) => {
-//     http.get(`/api/group_manage/get_group_to_infos/?group=${selectGroup}`)
-//     .then((res) => {
-//       res['select_group'] = selectGroup
-//       console.log(res)
-//       dispatch({
-//         type: constant.HANDLE_GROUP_SELECT,
-//         value: res
-//       })
-//     })
-//     .catch(function (error) {
-//       console.log(error);
-//     });
-//   }
-// }
-
-
-
 export const handleGroupMoadleSubmitError  = (data) => ({
   type: constant.HANDLE_GROUP_MOADL_SUBMIT,
   value: data

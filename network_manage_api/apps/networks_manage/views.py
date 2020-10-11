@@ -1,13 +1,13 @@
 from django.http import HttpResponse
 import json
 from libs.IPy import checkNetwork, IP
-from libs.utils import insert_query_data
+from libs.utils import insert_query_data, get_mac_manufacturer, convert_device_hostname_interface
 from libs.tool import json_encoder, ipv4_to_num, num_to_ipv4
-from network_query.models import NetworkQueryList, NetworkQueryDetails
 from django.core.paginator import Paginator
 from networks_manage.models import Networks, IpDetailsInfo
 from group_manage.models import NetworkGroup
 from device_query.models import NetworkToDevice
+from network_query.models import NetworkQueryList
 from django.db.models.query import QuerySet
 import base64
 import os
@@ -67,7 +67,10 @@ def build_network(request):
 			NetworkGroup.objects.filter(name=network_group_info.name).update(networks=json.dumps(network_group_networks))
 			Networks.objects.filter(network=network).delete()
 
+			# 删除网络下IP地址详细信息
 			IpDetailsInfo.objects.filter(network=network).delete()
+			# 删除网络探测配置
+			NetworkQueryList.objects.filter(network=network).delete()
 
 		data["status"] = "success"
 
@@ -274,19 +277,12 @@ def patch_export_networks(request):
 	data["status"] = "success"
 	return HttpResponse(json.dumps(data), content_type="application/json")
 
-#
-# def get_network_ip_details(request):
-# 	print(request.GET.get('id'))
-# 	data = dict()
-# 	data["status"] = "success"
-# 	return HttpResponse(json.dumps(data), content_type="application/json")
-
 
 def get_network_ip_details(request):
 	data = dict()
 	network = request.GET.get("id").replace("$", "/")
-	print(network)
-	network_info = NetworkQueryList.objects.get(network=network)
+	print("network_info:", network)
+	network_info = Networks.objects.get(network=network)
 	print("network_info:", network_info)
 	page_size = int(request.GET.get("page_size"))
 	current_page = int(request.GET.get("current_page"))
@@ -295,14 +291,17 @@ def get_network_ip_details(request):
 	column_key = request.GET.get("columnKey")
 	order = request.GET.get("order")
 
+	print(page_size, current_page, ip_status, ip_type, column_key, order)
+
 	result = []
-	network_details = NetworkQueryDetails.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
+	network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
+
 	if ip_status == "1":
 		if column_key == "ip":
 			if order == 'descend':
-				network_details = NetworkQueryDetails.objects.filter(network=network_info.network, ip_status=1).order_by('-ip')
+				network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by('-ip')
 			elif order == 'ascend':
-				network_details = NetworkQueryDetails.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
+				network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
 		paginator = Paginator(network_details, page_size)
 		ips_page = paginator.page(current_page)
 		for query in ips_page:
@@ -311,13 +310,28 @@ def get_network_ip_details(request):
 			ip_info["ip"] = query.ip
 			ip_info["network"] = query.network
 			ip_info["ip_status"] = query.get_ip_status_display()
-			ip_info["scan_mac_address"] = query.scan_mac
-			ip_info["scan_mac_product"] = query.scan_mac_product
+			ip_info["query_mac"] = query.query_mac
+
+			device_hostname_interface = query.device_hostname_interface
+			if device_hostname_interface:
+				device_hostname_interface = convert_device_hostname_interface(json.loads(device_hostname_interface))
+			ip_info["device_hostname_interface"] = device_hostname_interface
+
+			ip_info["manual_mac"] = query.manual_mac
 			ip_info["ip_type"] = query.get_ip_type_display()
 			ip_info["hostname"] = query.hostname
-			ip_info["tcp_port_list"] = query.tcp_port_list.replace("'", '"')
-			ip_info["udp_port_list"] = query.udp_port_list.replace("'", '"')
-			ip_info["query_time"] = query.query_time.strftime( "%Y-%m-%d %H:%M:%S")
+
+			tcp_port_list = query.tcp_port_list
+			if tcp_port_list:
+				tcp_port_list = json.loads(tcp_port_list)
+			ip_info["tcp_port_list"] = tcp_port_list
+
+			udp_port_list = query.udp_port_list
+			if udp_port_list:
+				udp_port_list = json.loads(udp_port_list)
+			ip_info["udp_port_list"] = udp_port_list
+
+			ip_info["query_time"] = query.query_time.strftime("%Y-%m-%d %H:%M:%S")
 			result.append(ip_info)
 		data['result'] = result
 		data['total_ips'] = network_details.count()
@@ -331,8 +345,8 @@ def get_network_ip_details(request):
 			for ip in range(ipv4_to_num(ip_start), ipv4_to_num(ip_end) + 1):
 				all_ip.append(num_to_ipv4(ip))
 
-			online_ip = NetworkQueryDetails.objects.values_list('ip', flat=True).filter(network=network_info.network, ip_status=1)
-			offline_ip_db = NetworkQueryDetails.objects.filter(network=network_info.network, ip_status=0)
+			online_ip = IpDetailsInfo.objects.values_list('ip', flat=True).filter(network=network_info.network, ip_status=1)
+			offline_ip_db = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=0)
 
 			online_ip = list(online_ip)
 			offline_ip = list(set(all_ip).difference(set(online_ip)))
@@ -347,12 +361,16 @@ def get_network_ip_details(request):
 				ip_info = dict()
 				ip_info["network"] = query.network
 				ip_info["ip_status"] = query.get_ip_status_display()
-				ip_info["scan_mac_address"] = query.scan_mac
-				ip_info["scan_mac_product"] = query.scan_mac_product
+				ip_info["query_mac"] = query.query_mac
+				# ip_info["scan_mac_product"] = query.scan_mac_product
+				ip_info["device_hostname_interface"] = query.device_hostname_interface
+				ip_info["manual_mac"] = query.manual_mac
 				ip_info["ip_type"] = query.get_ip_type_display()
 				ip_info["hostname"] = query.hostname
+
 				ip_info["tcp_port_list"] = query.tcp_port_list
 				ip_info["udp_port_list"] = query.udp_port_list
+
 				ip_info["query_time"] = query.query_time
 				scan_ips_info[query.ip] = ip_info
 			scan_ips = list(scan_ips_info.keys())
@@ -363,21 +381,46 @@ def get_network_ip_details(request):
 					scan_ip_infos["key"] = ip
 					scan_ip_infos["ip"] = ip
 					scan_ip_infos["network"] = scan_ips_info[ip]["network"]
+
+					device_hostname_interface = scan_ips_info[ip]["device_hostname_interface"]
+					if device_hostname_interface:
+						print("device_hostname_interface:", device_hostname_interface)
+						device_hostname_interface = convert_device_hostname_interface(
+							json.loads(device_hostname_interface))
+
+					scan_ip_infos["device_hostname_interface"] = device_hostname_interface
+
 					scan_ip_infos["ip_status"] = scan_ips_info[ip]["ip_status"]
-					scan_ip_infos["scan_mac_address"] = scan_ips_info[ip]["scan_mac_address"]
-					scan_ip_infos["scan_mac_product"] = scan_ips_info[ip]["scan_mac_product"]
+					query_mac = scan_ips_info[ip]["query_mac"]
+					scan_ip_infos["query_mac"] = query_mac
+					scan_ip_infos["query_mac_product"] = get_mac_manufacturer(query_mac)
+					manual_mac = scan_ips_info[ip]["manual_mac"]
+					scan_ip_infos["manual_mac"] = manual_mac
+					scan_ip_infos["manual_mac_product"] = get_mac_manufacturer(manual_mac)
 					scan_ip_infos["ip_type"] = scan_ips_info[ip]["ip_type"]
 					scan_ip_infos["hostname"] = scan_ips_info[ip]["hostname"]
-					scan_ip_infos["tcp_port_list"] = scan_ips_info[ip]["tcp_port_list"].replace("'", '"')
-					scan_ip_infos["udp_port_list"] = scan_ips_info[ip]["udp_port_list"].replace("'", '"')
+
+					tcp_port_list = scan_ips_info[ip]["tcp_port_list"]
+					if tcp_port_list:
+						tcp_port_list = json.loads(tcp_port_list)
+					scan_ip_infos["tcp_port_list"] = tcp_port_list
+
+					udp_port_list = scan_ips_info[ip]["udp_port_list"]
+					if udp_port_list:
+						udp_port_list = json.loads(udp_port_list)
+					scan_ip_infos["udp_port_list"] = udp_port_list
+
 					scan_ip_infos["query_time"] = scan_ips_info[ip]["query_time"]
 				else:
 					scan_ip_infos["key"] = ip
 					scan_ip_infos["ip"] = ip
 					scan_ip_infos["network"] = network_info.network
+					scan_ip_infos["device_hostname_interface"] = ""
+					scan_ip_infos["manual_mac"] = ""
+					scan_ip_infos["manual_mac_product"] = ""
 					scan_ip_infos["ip_status"] = "离线"
-					scan_ip_infos["scan_mac_address"] = ""
-					scan_ip_infos["scan_mac_product"] = ""
+					scan_ip_infos["query_mac"] = ""
+					scan_ip_infos["query_mac_product"] = ""
 					scan_ip_infos["ip_type"] = "未使用"
 					scan_ip_infos["hostname"] = ""
 					scan_ip_infos["tcp_port_list"] = ""
@@ -391,19 +434,24 @@ def get_network_ip_details(request):
 			return HttpResponse(json.dumps(data, cls=json_encoder), content_type="application/json")
 
 	else:
-		network_details = NetworkQueryDetails.objects.filter(network=network_info.network)
+		network_details = IpDetailsInfo.objects.filter(network=network_info.network)
 		scan_ips_info = dict()
 		for query in network_details:
 			ip_info = dict()
+
 			ip_info["network"] = query.network
 			ip_info["ip_status"] = query.get_ip_status_display()
-			ip_info["scan_mac_address"] = query.scan_mac
-			ip_info["scan_mac_product"] = query.scan_mac_product
+			ip_info["query_mac"] = query.query_mac
+			ip_info["device_hostname_interface"] = query.device_hostname_interface
+			ip_info["manual_mac"] = query.manual_mac
 			ip_info["ip_type"] = query.get_ip_type_display()
 			ip_info["hostname"] = query.hostname
+
 			ip_info["tcp_port_list"] = query.tcp_port_list
 			ip_info["udp_port_list"] = query.udp_port_list
+
 			ip_info["query_time"] = query.query_time
+
 			scan_ips_info[query.ip] = ip_info
 
 		ips = list(IP(network_info.network))
@@ -416,7 +464,7 @@ def get_network_ip_details(request):
 
 		result = []
 		total_ips = len(ips)
-		current_page = current_page -1
+		current_page = current_page - 1
 		for ip in ips[current_page*page_size : current_page*page_size+page_size]:
 			ip = str(ip)
 			scan_ip_infos = dict()
@@ -424,21 +472,44 @@ def get_network_ip_details(request):
 				scan_ip_infos["key"] = ip
 				scan_ip_infos["ip"] = ip
 				scan_ip_infos["network"] = scan_ips_info[ip]["network"]
+
+				device_hostname_interface = scan_ips_info[ip]["device_hostname_interface"]
+				if device_hostname_interface:
+					device_hostname_interface = convert_device_hostname_interface(json.loads(device_hostname_interface))
+
+				scan_ip_infos["device_hostname_interface"] = device_hostname_interface
 				scan_ip_infos["ip_status"] = scan_ips_info[ip]["ip_status"]
-				scan_ip_infos["scan_mac_address"] = scan_ips_info[ip]["scan_mac_address"]
-				scan_ip_infos["scan_mac_product"] = scan_ips_info[ip]["scan_mac_product"]
+				query_mac = scan_ips_info[ip]["query_mac"]
+				scan_ip_infos["query_mac"] = query_mac
+				scan_ip_infos["query_mac_product"] = get_mac_manufacturer(query_mac)
+				manual_mac = scan_ips_info[ip]["manual_mac"]
+				scan_ip_infos["manual_mac"] = manual_mac
+				scan_ip_infos["manual_mac_product"] = get_mac_manufacturer(manual_mac)
 				scan_ip_infos["ip_type"] = scan_ips_info[ip]["ip_type"]
 				scan_ip_infos["hostname"] = scan_ips_info[ip]["hostname"]
-				scan_ip_infos["tcp_port_list"] = scan_ips_info[ip]["tcp_port_list"].replace("'", '"')
-				scan_ip_infos["udp_port_list"] = scan_ips_info[ip]["udp_port_list"].replace("'", '"')
+
+				tcp_port_list = scan_ips_info[ip]["tcp_port_list"]
+				if tcp_port_list:
+					tcp_port_list = json.loads(tcp_port_list)
+				scan_ip_infos["tcp_port_list"] = tcp_port_list
+
+				udp_port_list = scan_ips_info[ip]["udp_port_list"]
+				if udp_port_list:
+					udp_port_list = json.loads(udp_port_list)
+				scan_ip_infos["udp_port_list"] = udp_port_list
+
 				scan_ip_infos["query_time"] = scan_ips_info[ip]["query_time"]
+
 			else:
 				scan_ip_infos["key"] = ip
 				scan_ip_infos["ip"] = ip
 				scan_ip_infos["network"] = network_info.network
+				scan_ip_infos["device_hostname_interface"] = ""
+				scan_ip_infos["manual_mac"] = ""
+				scan_ip_infos["manual_mac_product"] = ""
 				scan_ip_infos["ip_status"] = "离线"
-				scan_ip_infos["scan_mac_address"] = ""
-				scan_ip_infos["scan_mac_product"] = ""
+				scan_ip_infos["query_mac"] = ""
+				scan_ip_infos["query_mac_product"] = ""
 				scan_ip_infos["ip_type"] = "未使用"
 				scan_ip_infos["hostname"] = ""
 				scan_ip_infos["tcp_port_list"] = ""

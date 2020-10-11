@@ -68,7 +68,7 @@ def add_network_query(request):
 	"""批量添加网络探测任务，设备探测信息写入到数据库"""
 	if request.method == "POST":
 		post_data = json.loads(str(request.body, encoding='utf-8'))
-		networks = post_data["networks"].strip()
+		networks = post_data["networks"]
 		tcp_query_ports = post_data["tcp_query_ports"].strip()
 		udp_query_ports = post_data["udp_query_ports"].strip()
 		crontab_task_status = post_data["crontab_task_status"]
@@ -100,34 +100,19 @@ def add_network_query(request):
 			auto_enable = True
 			crontab_task = analysis_cron_time(post_data)
 
-		networks = networks.split(" ")
 		for network in networks:
-			try:
-				if not checkNetwork(network):
-					unvalid_network.append("{0} 非法网络".format(network))
-				elif NetworkQueryList.objects.filter(network=network):
-					unvalid_network.append("{0} 网络已存在".format(network))
-				elif "/" not in network:
-					unvalid_network.append("{0} 非法网络".format(network))
-			except:
-				unvalid_network.append("{0} 非法网络".format(network))
-		if len(unvalid_network) == 0:
-			for network in networks:
-				NetworkQueryList.objects.create(
-					network=network,
-					tcp_query_ports=tcp_query_ports,
-					udp_query_ports=udp_query_ports,
-					auto_enable=auto_enable,
-					crontab_task=crontab_task.replace("'", '"')
-				)
-				if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
-					crontab_task_dict = dict()
-					crontab_task_dict["{0}&{1}&{2}".format(network, tcp_query_ports, udp_query_ports)] = crontab_task.replace("'", '"')
-					add_crontab_task_to_redis(crontab_task_dict, conf_data["NETWORK_QUETY_CRONTAB_HASH"])
-			data["status"] = "success"
-		else:
-			data["status"] = "fail"
-			data["data"] = unvalid_network
+			NetworkQueryList.objects.create(
+				network=network,
+				tcp_query_ports=tcp_query_ports,
+				udp_query_ports=udp_query_ports,
+				auto_enable=auto_enable,
+				crontab_task=crontab_task.replace("'", '"')
+			)
+			if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
+				crontab_task_dict = dict()
+				crontab_task_dict["{0}&{1}&{2}".format(network, tcp_query_ports, udp_query_ports)] = crontab_task.replace("'", '"')
+				add_crontab_task_to_redis(crontab_task_dict, conf_data["NETWORK_QUETY_CRONTAB_HASH"])
+		data["status"] = "success"
 		return HttpResponse(json.dumps(data), content_type="application/json")
 	if request.method == "PUT":
 		data = dict()

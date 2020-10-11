@@ -1,4 +1,4 @@
-import { fromJS,List  } from 'immutable'
+import { fromJS, Map  } from 'immutable'
 import * as constant from './actionTypes'
 
 const defaultState = fromJS({
@@ -11,7 +11,14 @@ const defaultState = fromJS({
   exportNetworkData: [],
   importNetworkModalVisible: false,
   importNeworkErrorMessages: '',
-  importNetworLoading: false
+  importNetworLoading: false,
+  ipDetailInfos: [],
+  iPDetailsPagination: Map({
+    showSizeChanger: true,
+    current: 1,
+    pageSize: 30,
+    total: 0
+  }),
 })
 
 const handleBuildNetworks = (state, action) => {
@@ -108,6 +115,18 @@ const handleCSVDataLoading = (state, action) => {
 }
  
 
+const getIpDetailsInfo  = (state, action) => {
+  var iPDetailsPagination = state.getIn(['iPDetailsPagination']).toObject()
+  iPDetailsPagination['total'] = action.value.total_ips  
+  iPDetailsPagination['current'] = action.value.current_page
+  iPDetailsPagination['pageSize'] = action.value.page_size
+  return state.merge({
+    'ipDetailInfos': action.value.result,
+    'iPDetailsPagination': Map(iPDetailsPagination)
+  })
+};
+
+
 export default (state = defaultState, action) => {
   switch (action.type) {
     case constant.HANDLE_BUILD_NETWORKS:
@@ -134,6 +153,9 @@ export default (state = defaultState, action) => {
       return handleCSVData(state, action)
     case constant.HANDLE_CSV_DATA_START:
       return handleCSVDataLoading(state, action)
+
+    case constant.GET_IP_DETAIL_INFO:
+        return getIpDetailsInfo(state, action)
       
     
     default:

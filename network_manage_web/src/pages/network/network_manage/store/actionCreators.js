@@ -130,24 +130,6 @@ export const exportNetworkMoadlCancel = () => ({
   type: constant.NETWORK_EXPORT_CANCEL,
 }) 
 
-
-// export const getNetworkIpDetailsInfo = (id) => {
-//   return (dispatch) => {
-//     http.get(`/api/networks_manage/get_network_ip_details/?id=${id}`)
-//       .then((res) => {
-//         console.log("res:", res.result)
-//         // dispatch({
-//         //   type: constant.NETWORK_EXPORT,
-//         //   value: res.result
-//         // })
-//       })
-//       .catch(function (error) {
-//         console.log(error);
-//       });
-//   }
-// }
-
-
 export const getNetworkIpDetailsInfo = (id, pagination) => {
   var pageSize = pagination.pageSize
   var currentPage = pagination.current
@@ -159,9 +141,40 @@ export const getNetworkIpDetailsInfo = (id, pagination) => {
     http.get(`/api/networks_manage/get_network_ip_details/?id=${id}&current_page=${currentPage}&page_size=${pageSize}&ip_status=${ipStatusFilter}&ip_type=${ipTypeFilter}&columnKey=${columnKeySorter}&order=${orderSorter}`)
       .then((res) => {
         console.log("res:", res)
-        // res["page_size"] = pageSize
-        // res["current_page"] = currentPage
+        res["page_size"] = pageSize
+        res["current_page"] = currentPage
         // dispatch(getNetworkDetails(res)) 
+        dispatch({
+          type: constant.GET_IP_DETAIL_INFO,
+          value: res
+        })
+    })
+    .catch(function (error) {
+    console.log(error);
+    });
+  }
+}
+
+export const handleIpDetailsTableChange  = (pagination, filters, sorter, id) => {
+  var pageSize = pagination.pageSize
+  var currentPage = pagination.current
+  var ipStatusFilter = filters.ip_status
+  var ipTypeFilter = filters.ip_type
+  var columnKeySorter = null
+  var orderSorter = null
+  if(sorter.hasOwnProperty('columnKey')){
+    columnKeySorter = sorter.columnKey
+    orderSorter = sorter.order
+  }
+  return (dispatch) => {
+    http.get(`/api/networks_manage/get_network_ip_details/?id=${id}&current_page=${currentPage}&page_size=${pageSize}&ip_status=${ipStatusFilter}&ip_type=${ipTypeFilter}&columnKey=${columnKeySorter}&order=${orderSorter}`)
+      .then((res) => {
+        res["page_size"] = pageSize
+        res["current_page"] = currentPage
+        dispatch({
+          type: constant.GET_IP_DETAIL_INFO,
+          value: res
+        })
     })
     .catch(function (error) {
     console.log(error);

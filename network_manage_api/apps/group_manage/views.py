@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from group_manage.models import NetworkGroup
 from django.http import HttpResponse
 from group_manage.models import NetworkGroup
 import json
@@ -42,7 +40,6 @@ def get_group_to_infos(request):
 
 	data["status"] = "success"
 	data["result"] = result
-
 	return HttpResponse(json.dumps(data), content_type="application/json")
 
 

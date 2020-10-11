@@ -3,11 +3,10 @@ import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
-import { Table, Button, Input,  Pagination, Layout, Space } from 'antd';
-import BuildDiviceQueryForm from './BuildNetwrokQueryFrom'
+import { Table, Button, Input,  Pagination, Layout, Space, Row, Col } from 'antd';
+import BuildDiviceQueryForm from './build_network_query_modal'
 import {weeks_obj} from '../../../libs/constant'
-
-const { Content } = Layout;
+import GroupManage from '../group_manage'
 
 class NetworkQueryList extends Component{
   render(){
@@ -16,7 +15,7 @@ class NetworkQueryList extends Component{
         title: '网络地址',
         dataIndex: 'network',
         key: 'network',
-        render: (text, record) => <Link to={'/network/network_details/'+record.key}>{text}</Link> //record是对象
+        render: (text, record) => <Link to={'/network/network_manage/'+record.network.replace("/", "$")}>{text}</Link> //record是对象
       },
       {
         title: 'TCP探测端口',
@@ -94,34 +93,40 @@ class NetworkQueryList extends Component{
     totalNetworks,
     networkQueryInfos,
     selectedRowKeys,
+    selectGroupName
   } = this.props
-  // console.log("selectedRowKeys:", selectedRowKeys)
+  console.log("selectGroupName:", selectGroupName)
   const rowSelection = {
     selectedRowKeys,
     onChange: this.onSelectChange,
   };
 
   return(
-      <Content>
+
+    <Row>
+      <Col span={3}>
+        <GroupManage />
+      </Col>
+      <Col>
         <div style={{marginTop: '10px', marginLeft: '10px', marginBottom: '10px'}}>
-              <Button style={{ marginLeft: '10px' }} type='primary' onClick={this.props.handleBuildNetworkQuery}>新建</Button>
-              {
-                selectedRowKeys.length !== 0 ? 
-                <Fragment>
-                  <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleDeleteNetworkQuery(selectedRowKeys)}>删除</Button>
-                  <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleStartNetworkQuery(selectedRowKeys)}>启动</Button>
-                </Fragment>
-                :
-                <Fragment>
-                  <Button disabled style={{ marginLeft: '10px' }}>编辑</Button>
-                  <Button  disabled style={{ marginLeft: '10px' }} >启动</Button>
-                </Fragment>
-              }
-               <Input.Search
-                placeholder="输入需要搜索IP"
-                enterButton="搜索"
-                style={{ marginLeft: '20px', width: 200, }}
-              />
+          <Button style={{ marginLeft: '10px' }} type='primary' onClick={() => this.props.handleBuildNetworkQuery(selectGroupName)}>新建</Button>
+          {
+            selectedRowKeys.length !== 0 ? 
+            <Fragment>
+              <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleDeleteNetworkQuery(selectedRowKeys)}>删除</Button>
+              <Button  style={{ marginLeft: '10px' }} onClick={ () => this.props.handleStartNetworkQuery(selectedRowKeys)}>启动</Button>
+            </Fragment>
+            :
+            <Fragment>
+              <Button disabled style={{ marginLeft: '10px' }}>编辑</Button>
+              <Button  disabled style={{ marginLeft: '10px' }} >启动</Button>
+            </Fragment>
+          }
+          <Input.Search
+            placeholder="输入需要搜索IP"
+            enterButton="搜索"
+            style={{ marginLeft: '20px', width: 200, }}
+          />
         </div>
         {
           this.props.BuildNetworkQueryVisible && <BuildDiviceQueryForm/> //通过newBuiltDeviceVisible得值得变化，重新加载组件
@@ -147,7 +152,9 @@ class NetworkQueryList extends Component{
           pageSizeOptions={['30', '50', '100']}
           />
         </div>
-        </Content>
+      </Col>
+    </Row>
+      
       )
     }
     componentWillReceiveProps(prevProps) {
@@ -172,11 +179,13 @@ const mapState = (state) => ({
   networkQueryInfos: state.getIn(['networkQuery', 'networkQueryInfos']),
   totalNetworks: state.getIn(['networkQuery', 'totalNetworks']),
   selectedRowKeys: state.getIn(['networkQuery', 'selectedRowKeys']),
+  selectGroupName: state.getIn(['groupManage', 'selectGroupName']),
 })
 
 const mapDispatch = (dispatch) =>({
-  handleBuildNetworkQuery(){
-    dispatch(actionCreators.handleBuildNetworkQuery())
+  handleBuildNetworkQuery(selectGroup){
+    // console.log("selectGroup:", selectGroup)
+    dispatch(actionCreators.handleBuildNetworkQuery(selectGroup))
   },
   getAllNetworkQueryInfo(CurrentPage, PageSize){
     dispatch(actionCreators.getAllNetworkQueryInfo(CurrentPage, PageSize))

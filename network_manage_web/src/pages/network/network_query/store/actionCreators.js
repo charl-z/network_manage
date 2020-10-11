@@ -1,14 +1,43 @@
 import * as constant from './actionTypes'
 import http from '../../../../libs/http';
 
-export const handleBuildNetworkQuery = () => ({
-    type: constant.HANDLE_NETWORK_QUERY_BUILD,
-  })
 
-  export const getSelectQuery = (selectedRowKeys) => ({
-    type: constant.SELECT_NETWORK_QUERY_LIST,
-    value: selectedRowKeys
-  })
+export const handleBuildNetworkQuery = (selectGroup) => {
+  return (dispatch) => {
+    http.get('/api/group_manage/get_all_group_name/')
+    .then((res) => {
+      console.log("res:", res)
+      dispatch({
+        type: constant.HANDLE_NETWORK_QUERY_BUILD,
+        value: res.result
+      })
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+    if(selectGroup){
+      http.get(`/api/group_manage/get_group_to_infos/?group=${selectGroup}`)
+        .then((res) => {
+          dispatch({
+            type: constant.HANDLE_SELECT_GROUP_CHANGE,
+            value: res.result.networks
+          }) 
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }
+    }
+
+    
+
+}
+
+export const getSelectQuery = (selectedRowKeys) => ({
+  type: constant.SELECT_NETWORK_QUERY_LIST,
+  value: selectedRowKeys
+})
 
 export const handleNetworkQueryCancel = () => ({
   type: constant.HANDLE_NETWORK_QUERY_CANCEL
@@ -19,7 +48,7 @@ export const handleNetworkQuerySubmitData = (data) => ({
   value: data
 })
 export const handleNetworkQuerySubmit = (form, values, editShow) => {
-  values.networks = values.networks.replace(/\n/g, " ")
+  // values.networks = values.networks.replace(/\n/g, " ")
   values.tcp_query_ports = values.tcp_query_ports.replace(/\n/g, ",")
   values.udp_query_ports = values.udp_query_ports.replace(/\n/g, ",")
   if(!editShow){
@@ -254,3 +283,19 @@ export const handleConsoleInfoSubmit = (values) => {
     type: constant.HANDLE_EDIT_NETWORK_QUERY,
     value: data
   })
+
+  export const selectGroupChange = (data) => {
+    return (dispatch) => {
+      http.get(`/api/group_manage/get_group_to_infos/?group=${data}`)
+        .then((res) => {
+          console.log("res:", res.result.networks)
+          dispatch({
+            type: constant.HANDLE_SELECT_GROUP_CHANGE,
+            value: res.result.networks
+          }) 
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
+  }

@@ -17,10 +17,8 @@ class GroupManage extends Component{
 
   render(){
     const {treeData, selectGroupName} = this.props;
-    // console.log("selectGroupName:", selectGroupName)
 
     const onSelect = (selectedKeys, info) => {
-      // console.log('selected', selectedKeys, info.node.title);
       this.props.handleGroupSelect(info.node.title)
     };
     const onRightClick = (info) => {
@@ -91,7 +89,6 @@ const mapDispatch = (dispatch) =>({
     dispatch(actionCreators.getAllGroupInfo())
   },
   handleGroupSelect(selectGroup){
-    // console.log("selectGroup:",selectGroup )
     dispatch(actionCreators.handleGroupSelect(selectGroup))
   },
   handleBuildGroup(){

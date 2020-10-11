@@ -31,7 +31,9 @@ const defaultState = fromJS({
   SelectTimeList: List([0]),
   NetworkQueryEditTimeSelect: {},
   NetworkQueryEditShow: false, // 设备探测是否是编辑状态
-  NetworkQueryEditContent: ''
+  NetworkQueryEditContent: '',
+  allGroupName: [], 
+  groupToNetworks: []  // 分组下面对应的网络
 })
 
 const handleProtocolChange = (state, action) => {
@@ -112,6 +114,7 @@ const handleBuildNetworkQuery = (state, action) => {
     'BuildNetworkQueryVisible': true,
     'NetworkQueryEditShow': false,
     'DeivceQueryEditTimeSelect': '',
+    'allGroupName': action.value, 
     'SelectTimeList': List([0]),
   })
 }
@@ -119,7 +122,9 @@ const handleBuildNetworkQuery = (state, action) => {
 const handleNetworkQueryCancel = (state, action) => {
   return state.merge({
     'BuildNetworkQueryVisible': false,
-    'getCheckNetworkQueryInputIpsInfo': ''
+    'getCheckNetworkQueryInputIpsInfo': '',
+    'groupToNetworks': []
+
   })
 }
 
@@ -252,6 +257,12 @@ const handleEditNetworkQuery = (state, action) => {
   })
 }; 
 
+const handleSelectGroupChange = (state, action) => {
+    return state.merge({
+      'groupToNetworks': action.value,
+    })
+  }; 
+
 export default (state = defaultState, action) => {
   switch (action.type) {
     case constant.HANDLE_NETWORK_QUERY_BUILD:
@@ -288,6 +299,8 @@ export default (state = defaultState, action) => {
       return handleDeleteModel(state, action)
     case constant.HANDLE_EDIT_NETWORK_QUERY:
       return handleEditNetworkQuery(state, action)
+    case constant.HANDLE_SELECT_GROUP_CHANGE:
+        return handleSelectGroupChange(state, action)
     default:
       return state
   }

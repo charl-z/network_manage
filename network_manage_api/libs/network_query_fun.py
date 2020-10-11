@@ -8,7 +8,7 @@ import logging
 import yaml
 import threading
 import datetime
-from libs.utils import connect_postgresql_db, close_db_connection
+from libs.utils import connect_postgresql_db, get_mac_manufacturer, close_db_connection
 from network_query.models import NetworkQueryDetails
 from libs.utils import get_conf_handle
 
@@ -33,21 +33,6 @@ class NetworkQuery(object):
 		self.conn_psql = connect_postgresql_db()
 		self.cur_psql = self.conn_psql.cursor()
 
-
-	def get_mac_manufacturer(self, mac):
-		"""
-		:param mac: 00:00:00:02:fe:3a
-		:return: Apple, Inc.
-		"""
-		mac_pre = "-".join(mac.split(":")[:3])
-		sql = "select manufacturer from mac_manufacturer where mac_pre='{0}';".format(mac_pre)
-		self.cur_psql.execute(sql)
-
-		manufacturer_info = self.cur_psql.fetchall()
-		if not manufacturer_info:
-			return ""
-		return manufacturer_info[0][0]
-
 	def exec_port_scan(self, ip, tcp_ports='', udp_ports='', network=''):
 		scan_result = dict()
 		if tcp_ports:
@@ -64,7 +49,7 @@ class NetworkQuery(object):
 			scan_result["scan_mac"] = mac_address
 
 			if mac_address:
-				scan_result["scan_mac_product"] = self.get_mac_manufacturer(mac_address)
+				scan_result["scan_mac_product"] = get_mac_manufacturer(mac_address)
 			else:
 				scan_result["scan_mac_product"] = ''
 
@@ -133,15 +118,18 @@ class NetworkQuery(object):
 			except Exception as e:
 				pass
 
-			if r.llen(redis_network_info) == 0:
-				logging.info("网络探测任务执行完成：{0}".format(redis_network_info))
-				sql = "select count(1) from network_query_result where network = '{0}'".format(network)
-				self.cur_psql.execute(sql)
-				online_ip_num = int(self.cur_psql.fetchall()[0][0])
-				sql = "update network_query_task SET online_ip_num={0}, query_status=2 where network='{1}';".format(online_ip_num, network)
-				self.cur_psql.execute(sql)
-				self.conn_psql.commit()
-				break
+			try:
+				if r.llen(redis_network_info) == 0:
+					logging.info("网络探测任务执行完成：{0}".format(redis_network_info))
+					sql = "select count(1) from network_query_result where network = '{0}'".format(network)
+					self.cur_psql.execute(sql)
+					online_ip_num = int(self.cur_psql.fetchall()[0][0])
+					sql = "update network_query_task SET online_ip_num={0}, query_status=2 where network='{1}';".format(online_ip_num, network)
+					self.cur_psql.execute(sql)
+					# self.conn_psql.commit()
+					break
+			finally:
+				close_db_connection(self.conn_psql)
 
 
 
