@@ -281,17 +281,13 @@ def patch_export_networks(request):
 def get_network_ip_details(request):
 	data = dict()
 	network = request.GET.get("id").replace("$", "/")
-	print("network_info:", network)
 	network_info = Networks.objects.get(network=network)
-	print("network_info:", network_info)
 	page_size = int(request.GET.get("page_size"))
 	current_page = int(request.GET.get("current_page"))
 	ip_status = request.GET.get("ip_status")
 	ip_type = request.GET.get("ip_type")
 	column_key = request.GET.get("columnKey")
 	order = request.GET.get("order")
-
-	print(page_size, current_page, ip_status, ip_type, column_key, order)
 
 	result = []
 	network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
