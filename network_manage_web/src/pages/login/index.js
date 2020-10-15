@@ -15,7 +15,6 @@ class LoginIndex extends React.Component {
   }
 
 
-
   handleSubmit = (value) => {
     this.setState({loading: true});
     http.post('/api/account/login/', value)
