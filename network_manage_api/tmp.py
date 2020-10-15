@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
+from django.utils.deprecation import MiddlewareMixin
 
-import base64
 
-test = "DHCP使用率"
-test = test.encode()
-print(test)
-test_encode = base64.b64encode(test)
-print(test_encode)
+class M1(MiddlewareMixin):
+	def process_request(self, request):
+		print('M1.request')
 
-test_decode = base64.urlsafe_b64decode(test_encode)
-#
-print(test_decode)
-print(test_decode.decode('utf-8'))
+	def process_view(self, request, callback, callback_args, callback_kwargs):
+		print("M1.process_view")
+
+	def process_response(self, request, response):
+		print('M1.response')
+		return response

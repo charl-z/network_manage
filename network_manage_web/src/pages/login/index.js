@@ -1,19 +1,9 @@
-/**
- * Copyright (c) OpenSpug Organization. https://github.com/openspug/spug
- * Copyright (c) <spug.dev@gmail.com>
- * Released under the AGPL-3.0 License.
- */
 import React from 'react';
 import {Form, Input, Icon, Button, Tabs, Modal} from 'antd';
 import styles from './login.module.css';
 import history from 'libs/history';
 import {http, updatePermissions} from 'libs';
 import logo from './logo-spug-txt.png';
-// import envStore from 'pages/config/environment/store';
-// import appStore from 'pages/config/app/store';
-// import requestStore from 'pages/deploy/request/store';
-// import execStore from 'pages/exec/task/store';
-// import hostStore from 'pages/host/store';
 
 class LoginIndex extends React.Component {
   constructor(props) {
@@ -24,46 +14,35 @@ class LoginIndex extends React.Component {
     }
   }
 
-  // componentDidMount() {
-  //   envStore.records = [];
-  //   appStore.records = [];
-  //   requestStore.records = [];
-  //   requestStore.deploys = [];
-  //   hostStore.records = [];
-  //   execStore.hosts = [];
-  // }
+
 
   handleSubmit = (value) => {
-
-    console.log("value:", value)
-
-    this.props.form.validateFields((err, formData) => {
-      if (!err) {
-        this.setState({loading: true});
-        formData['type'] = this.state.loginType;
-        http.post('/api/account/login/', formData)
-          .then(data => {
-            if (!data['has_real_ip']) {
-              Modal.warning({
-                title: '安全警告',
-                className: styles.tips,
-                content: <div>
-                  未能获取到客户端的真实IP，无法提供基于请求来源IP的合法性验证，详细信息请参考
-                  <a target="_blank" href="https://spug.dev" rel="noopener noreferrer">官方文档</a>。
-                </div>,
-                onOk: () => this.doLogin(data)
-              })
-            } else {
-              this.doLogin(data)
-            }
-          }, () => this.setState({loading: false}))
+    this.setState({loading: true});
+    http.post('/api/account/login/', value)
+    .then(data => {
+      if (!data['has_real_ip']){
+        Modal.warning({
+          title: '安全警告',
+          className: styles.tips,
+          content: <div>
+            未能获取到客户端的真实IP，无法提供基于请求来源IP的合法性验证，请注意！
+          </div>,
+          onOk: () => this.doLogin(data)
+           })
+        }else{
+            this.doLogin(data)
+        }
       }
+      
+    )
+    .catch(function (error) {
+      console.log(error);
     })
-  };
+    this.setState({loading: false});
+    };
 
   doLogin = (data) => {
     localStorage.setItem('token', data['access_token']);
-    localStorage.setItem('nickname', data['nickname']);
     localStorage.setItem('is_supper', data['is_supper']);
     localStorage.setItem('permissions', JSON.stringify(data['permissions']));
     localStorage.setItem('host_perms', JSON.stringify(data['host_perms']));
@@ -84,7 +63,7 @@ class LoginIndex extends React.Component {
         </div>
         <div className={styles.formContainer}>
           <Form onFinish={this.handleSubmit} >
-            <Form.Item className={styles.formItem} name="user">
+            <Form.Item className={styles.formItem} name="username">
               <Input
                 size="large"
                 autoComplete="off"

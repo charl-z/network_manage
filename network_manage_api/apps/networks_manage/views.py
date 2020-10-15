@@ -2,7 +2,7 @@ from django.http import HttpResponse
 import json
 from libs.IPy import checkNetwork, IP
 from libs.utils import insert_query_data, get_mac_manufacturer, convert_device_hostname_interface
-from libs.tool import json_encoder, ipv4_to_num, num_to_ipv4
+from libs.tool import json_encoder, ipv4_to_num, num_to_ipv4, json_response
 from django.core.paginator import Paginator
 from networks_manage.models import Networks, IpDetailsInfo
 from group_manage.models import NetworkGroup
@@ -73,8 +73,8 @@ def build_network(request):
 			NetworkQueryList.objects.filter(network=network).delete()
 
 		data["status"] = "success"
-
-	return HttpResponse(json.dumps(data), content_type="application/json")
+	return json_response(data)
+	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_all_networks(request):
@@ -134,7 +134,8 @@ def get_all_networks(request):
 
 	data["result"] = result
 	data["status"] = "success"
-	return HttpResponse(json.dumps(data), content_type="application/json")
+	return json_response(data)
+	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def patch_import_networks(request):
@@ -171,7 +172,8 @@ def patch_import_networks(request):
 				if not (set(network_csv_header).issubset(fieldnames)):
 					data["status"] = "fail"
 					data["result"] = "导入字段名称有误，请检查！"
-					return HttpResponse(json.dumps(data), content_type="application/json")
+					return json_response(data)
+					# return HttpResponse(json.dumps(data), content_type="application/json")
 
 				unvalid_info = []
 				network_to_group = dict()
@@ -201,7 +203,8 @@ def patch_import_networks(request):
 				if unvalid_info:
 					data["status"] = "fail"
 					data["result"] = "，".join(unvalid_info) + "，请检查！"
-					return HttpResponse(json.dumps(data), content_type="application/json")
+					return json_response(data)
+					# return HttpResponse(json.dumps(data), content_type="application/json")
 				else:
 					for group_name, networks in network_to_group.items():
 						network_group_info = NetworkGroup.objects.get(name=group_name)
@@ -218,12 +221,14 @@ def patch_import_networks(request):
 						Networks.objects.bulk_create(insert_to_networks)
 						NetworkGroup.objects.filter(name=group_name).update(networks=str(network_group_networks).replace("'", '"'))
 			data["status"] = "success"
-			return HttpResponse(json.dumps(data), content_type="application/json")
+			return json_response(data)
+			# return HttpResponse(json.dumps(data), content_type="application/json")
 		except Exception as e:
 			print(e)
 			data["status"] = "fail"
 			data["result"] = "未知错误，请检查！"
-			return HttpResponse(json.dumps(data), content_type="application/json")
+			return json_response(data)
+			# return HttpResponse(json.dumps(data), content_type="application/json")
 		finally:
 			os.popen("rm -rf {0} {1}".format(filename, new_filename))
 
@@ -275,7 +280,8 @@ def patch_export_networks(request):
 
 	data["result"] = result
 	data["status"] = "success"
-	return HttpResponse(json.dumps(data), content_type="application/json")
+	return json_response(data)
+	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_network_ip_details(request):
@@ -332,7 +338,8 @@ def get_network_ip_details(request):
 		data['result'] = result
 		data['total_ips'] = network_details.count()
 		data["status"] = "success"
-		return HttpResponse(json.dumps(data), content_type="application/json")
+		return json_response(data)
+		# return HttpResponse(json.dumps(data), content_type="application/json")
 	elif ip_status == "0":
 			ips = IP(network_info.network)
 			ip_start = str(ips.net())
@@ -427,7 +434,8 @@ def get_network_ip_details(request):
 			data['result'] = result
 			data['total_ips'] = len(offline_ip)
 			data["status"] = "success"
-			return HttpResponse(json.dumps(data, cls=json_encoder), content_type="application/json")
+			return json_response(data)
+			# return HttpResponse(json.dumps(data, cls=json_encoder), content_type="application/json")
 
 	else:
 		network_details = IpDetailsInfo.objects.filter(network=network_info.network)
@@ -516,7 +524,8 @@ def get_network_ip_details(request):
 		data['result'] = result
 		data['total_ips'] = total_ips
 		data["status"] = "success"
-		return HttpResponse(json.dumps(data, cls=json_encoder), content_type="application/json")
+		return json_response(data)
+		# return HttpResponse(json.dumps(data, cls=json_encoder), content_type="application/json")
 
 
 

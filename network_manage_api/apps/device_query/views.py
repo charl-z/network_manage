@@ -7,7 +7,7 @@ import datetime
 from libs.ssh import SSH
 from libs.IPy import IP
 from libs.utils import analysis_cron_time
-from libs.tool import check_ip, ipv4_to_num
+from libs.tool import check_ip, ipv4_to_num, json_response
 from libs import device_query_fun
 from libs.utils import get_conf_handle
 conf_data = get_conf_handle()
@@ -64,7 +64,8 @@ def get_device_query_info(request):
     data['data'] = result
     data['total_device'] = total_device
     data["status"] = "success"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def check_user_password(request):
@@ -95,7 +96,8 @@ def check_user_password(request):
         except socket.error as err:
             data["status"] = "fail"
             data["result"] = u"连接超时，请重试或关闭！"
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        return json_response(data)
+        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_console_info(request):
@@ -109,7 +111,8 @@ def get_console_info(request):
 
     data = dict()
     data["status"] = "success"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def del_device_query(request):
@@ -160,7 +163,8 @@ def del_device_query(request):
 
             QueryDevice.objects.filter(id=id).delete()
         data["status"] = "success"
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        return json_response(data)
+        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def add_device_query(request):
@@ -203,7 +207,8 @@ def add_device_query(request):
         else:
             data["status"] = "success"
             data["data"] = unvalid_ip
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        return json_response(data)
+        # return HttpResponse(json.dumps(data), content_type="application/json")
     if request.method == "PUT":
         data = dict()
         post_data = json.loads(str(request.body, encoding='utf-8'))
@@ -229,8 +234,8 @@ def add_device_query(request):
             crontab_task_dict["{0} {1} {2}".format(device_ip, port, community)] = crontab_task.replace("'", '"')
             add_crontab_task_to_redis(crontab_task_dict, conf_data["DEVICE_QUETY_CRONTAB_HASH"])
         data["status"] = "success"
-
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        return json_response(data)
+        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def add_device_query_to_cache(request):
@@ -252,8 +257,8 @@ def add_device_query_to_cache(request):
             QueryDevice.objects.filter(snmp_host=device_ip).update(query_status=1, last_mod_time=datetime.datetime.now())
 
         data["status"] = "success"
-
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        return json_response(data)
+        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def exec_device_query_task(request):
@@ -416,7 +421,8 @@ def exec_device_query_task(request):
                     "status": "fail",
                 }
                 QueryDevice.objects.filter(snmp_host=ip).update(query_status=4, last_mod_time=datetime.datetime.now())
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        return json_response(data)
+        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_details(request, parameter):
@@ -448,7 +454,8 @@ def get_device_details(request, parameter):
         result.append(tmp_data)
     data['result'] = result
     data["status"] = "success"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_port_macs(request, parameter):
@@ -469,7 +476,8 @@ def get_device_port_macs(request, parameter):
         result.append(tmp_data)
     data['result'] = result
     data["status"] = "success"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_port_arp(request, parameter):
@@ -492,7 +500,8 @@ def get_device_port_arp(request, parameter):
         result.append(tmp_data)
     data['result'] = result
     data["status"] = "success"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_query_crontab_task(request, parameter):
@@ -515,7 +524,8 @@ def get_device_query_crontab_task(request, parameter):
             logging.error(e)
     data["status"] = "success"
     data['result'] = result
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_to_networks(request):
@@ -536,7 +546,8 @@ def get_device_to_networks(request):
 
     data['result'] = result
     data["status"] = "success"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def handle_networks_set(request):
@@ -561,7 +572,8 @@ def handle_networks_set(request):
     NetworkGroup.objects.filter(name=group).update(networks=str(network_group_networks).replace("'", '"'))
 
     data["status"] = "success"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return json_response(data)
+    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 

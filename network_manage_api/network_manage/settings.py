@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import sys
-
+import re
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
@@ -47,20 +47,29 @@ INSTALLED_APPS = [
     'device_query',
     'network_query',
     'group_manage',
-    'networks_manage'
+    'networks_manage',
+    'account'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # 按顺序
-    'django.middleware.common.CommonMiddleware',
+    'libs.middleware.AuthenticationMiddleware'
 ]
+# MIDDLEWARE = [
+#     'django.middleware.security.SecurityMiddleware',
+#     # 'django.contrib.sessions.middleware.SessionMiddleware',
+#     'django.middleware.common.CommonMiddleware',
+#     'libs.middleware.AuthenticationMiddleware'
+#     # 'libs.middleware.HandleExceptionMiddleware',
+#     # 'django.middleware.csrf.CsrfViewMiddleware',
+#     # 'django.contrib.auth.middleware.AuthenticationMiddleware',
+#     # 'django.contrib.messages.middleware.MessageMiddleware',
+#     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#     'corsheaders.middleware.CorsMiddleware',  # 按顺序
+#     # 'django.middleware.common.CommonMiddleware',
+# ]
 CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = 'network_manage.urls'
 
@@ -208,3 +217,11 @@ if not os.path.exists(LOG_DIR):
 
 # 终端过期时间，最好小于等于 CUSTOM_SESSION_EXIPRY_TIME
 CUSTOM_TERMINAL_EXIPRY_TIME = 60 * 15      # 秒
+
+# 用户登陆过期时间
+LOGIN_EXIPRY_TIME = 5 * 60
+
+AUTHENTICATION_EXCLUDES = (
+    '/account/login/',
+    re.compile('/apis/.*'),
+)

@@ -1,8 +1,3 @@
-/**
- * Copyright (c) OpenSpug Organization. https://github.com/openspug/spug
- * Copyright (c) <spug.dev@gmail.com>
- * Released under the AGPL-3.0 License.
- */
 import http from 'axios'
 import history from './history'
 import {message} from 'antd';
@@ -10,9 +5,7 @@ import {message} from 'antd';
 // response处理
 function handleResponse(response) {
   let result;
-  console.log("response:", response)
   if (response.status === 401) {
-    return Promise.resolve(response.data.data)
     result = '会话过期，请重新登录';
     if (history.location.pathname !== '/') {
       history.push('/', {from: history.location})
@@ -20,11 +13,10 @@ function handleResponse(response) {
       return Promise.reject()
     }
   } else if (response.status === 200) {
-    // console.log("----------response", response)
     if (response.data.error) {
       result = response.data.error
     } else if (response.hasOwnProperty('data')) {
-      return Promise.resolve(response.data)
+      return Promise.resolve(response.data.data)
     } else if (response.headers['content-type'] === 'application/octet-stream') {
       return Promise.resolve(response)
     } else {
