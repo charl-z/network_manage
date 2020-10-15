@@ -33,6 +33,12 @@ $python_path/python manage.py makemigrations
 $python_path/python manage.py migrate
 $python_path/python $base_path/libs/insert_mac_db.py
 
+# 新增默认用户 admin/admin
+now_time=$(date "+%Y-%m-%d %H:%M:%S")
+sql="insert into users(username, password_hash, type, is_supper, is_active, access_token, last_login, last_ip, created_at) values('admin', 'pbkdf2_sha256\$100000\$Cc0Pvi7tFnBr\$OOssQODpzJUFBMMb18Qwv3PB6JuHzQsGvYPwbzKvdUA=', 'default', 't', 't', '', '', '', '$now_time');"
+echo $sql
+echo `psql -U postgres -p 5430 -d device_query -c "$sql"`
+
 cat /var/spool/cron/root | grep "service_monitor.sh"
 if [ $? -ne 0 ];then
 	# Todo
