@@ -25,11 +25,12 @@ class AuthenticationMiddleware(MiddlewareMixin):
             return None
         if any(x.match(request.path) for x in settings.AUTHENTICATION_EXCLUDES if hasattr(x, 'match')):
             return None
+        print("request.META:", request.META)
         access_token = request.META.get('HTTP_X_TOKEN') or request.GET.get('x-token')
         if access_token and len(access_token) == 32:
-            x_real_ip = request.META.get('REMOTE_ADDR', '')
+            # x_real_ip = request.META.get('REMOTE_ADDR', '')
             user = User.objects.filter(access_token=access_token).first()
-            if user and x_real_ip == user.last_ip and user.token_expired >= time.time() and user.is_active:
+            if user and user.token_expired >= time.time() and user.is_active:
                 request.user = user
                 if request.path != '/notify/':
                     user.token_expired = time.time() + settings.LOGIN_EXIPRY_TIME

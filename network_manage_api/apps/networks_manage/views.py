@@ -74,7 +74,6 @@ def build_network(request):
 
 		data["status"] = "success"
 	return json_response(data)
-	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_all_networks(request):

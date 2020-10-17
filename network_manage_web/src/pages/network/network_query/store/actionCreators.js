@@ -30,8 +30,6 @@ export const handleBuildNetworkQuery = (selectGroup) => {
       }
     }
 
-    
-
 }
 
 export const getSelectQuery = (selectedRowKeys) => ({

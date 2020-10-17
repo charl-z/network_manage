@@ -126,6 +126,8 @@ class NetworkQuery(object):
 					online_ip_num = int(self.cur_psql.fetchall()[0][0])
 					sql = "update network_query_task SET online_ip_num={0}, query_status=2 where network='{1}';".format(online_ip_num, network)
 					self.cur_psql.execute(sql)
+					# 更新网络管理中，IP详细信息
+
 					# self.conn_psql.commit()
 					break
 			finally:

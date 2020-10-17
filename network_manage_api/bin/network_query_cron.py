@@ -23,7 +23,10 @@ r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
 def call_exec_network_query(network):
 	payload = {"network": network}
 	requests.adapters.DEFAULT_RETRIES = 5  # 增加重连次数
-	requests.post('http://127.0.0.1:8000/network_query/exec_network_query_task/', data=payload)
+	headers = {
+		"X-Token": "122345555",
+	}
+	requests.post('http://127.0.0.1:8000/network_query/exec_network_query_task/', data=payload, headers=headers)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from group_manage.models import NetworkGroup
+from libs.tool import json_response
 import json
 # Create your views here.
 
@@ -12,7 +13,8 @@ def get_all_group_name(request):
 	result.insert(0, "")
 	data["result"] = result
 	data["status"] = "success"
-	return HttpResponse(json.dumps(data), content_type="application/json")
+	return json_response(data)
+	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def parent_array_to_dig(parent_array, name_dict):
@@ -40,7 +42,8 @@ def get_group_to_infos(request):
 
 	data["status"] = "success"
 	data["result"] = result
-	return HttpResponse(json.dumps(data), content_type="application/json")
+	return json_response(data)
+	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def new_build_group(request):
@@ -53,7 +56,8 @@ def new_build_group(request):
 		if NetworkGroup.objects.filter(name=group_name):
 			data["status"] = "fail"
 			data['result'] = "分组已存在"
-			return HttpResponse(json.dumps(data), content_type="application/json")
+			return json_response(data)
+			# return HttpResponse(json.dumps(data), content_type="application/json")
 
 		if not parent_group_name:
 			NetworkGroup.objects.create(name=group_name, parent_array=[], haschild=False)
@@ -63,14 +67,16 @@ def new_build_group(request):
 			if len(parent_array) >= 4:
 				data["status"] = "fail"
 				data['result'] = "分组最大支持5级"
-				return HttpResponse(json.dumps(data), content_type="application/json")
+				return json_response(data)
+				# return HttpResponse(json.dumps(data), content_type="application/json")
 
 			NetworkGroup.objects.filter(name=parent_group_name).update(haschild=True)
 			parent_array.append(parent_group_name)
 			NetworkGroup.objects.create(name=group_name, parent_array=str(parent_array).replace("'", '"'), haschild=False)
 
 		data["status"] = "success"
-		return HttpResponse(json.dumps(data), content_type="application/json")
+		return json_response(data)
+		# return HttpResponse(json.dumps(data), content_type="application/json")
 	if request.method == "PUT":
 		post_data = json.loads(str(request.body, encoding='utf-8'))
 		current_group = post_data.get('group_name')
@@ -78,12 +84,14 @@ def new_build_group(request):
 
 		if pre_group == current_group:
 			data["status"] = "success"
-			return HttpResponse(json.dumps(data), content_type="application/json")
+			return json_response(data)
+			# return HttpResponse(json.dumps(data), content_type="application/json")
 
 		if NetworkGroup.objects.filter(name=current_group):
 			data["status"] = "fail"
 			data['result'] = "分组已存在"
-			return HttpResponse(json.dumps(data), content_type="application/json")
+			return json_response(data)
+			# return HttpResponse(json.dumps(data), content_type="application/json")
 
 		group_infos = NetworkGroup.objects.filter(parent_array__icontains='"'+pre_group+'"')  # 修改所有parent_array信息
 		for group in group_infos:
@@ -93,7 +101,8 @@ def new_build_group(request):
 		NetworkGroup.objects.filter(name=pre_group).update(name=current_group)
 
 		data["status"] = "success"
-		return HttpResponse(json.dumps(data), content_type="application/json")
+		return json_response(data)
+		# return HttpResponse(json.dumps(data), content_type="application/json")
 	if request.method == "DELETE":
 		# print(request.body)
 		post_data = json.loads(str(request.body, encoding='utf-8'))
@@ -101,7 +110,8 @@ def new_build_group(request):
 		NetworkGroup.objects.filter(parent_array__icontains='"' + group_name + '"').delete()
 		NetworkGroup.objects.filter(name=group_name).delete()
 		data["status"] = "success"
-		return HttpResponse(json.dumps(data), content_type="application/json")
+		return json_response(data)
+		# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_network_group_info(request):
@@ -155,5 +165,7 @@ def get_network_group_info(request):
 
 	data["status"] = "success"
 	data["result"] = result
+	return json_response(data)
+	# return HttpResponse(json.dumps(data), content_type="application/json")
 
-	return HttpResponse(json.dumps(data), content_type="application/json")
+	
