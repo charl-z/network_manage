@@ -133,6 +133,7 @@ def del_device_query(request):
             device_ip = device_info.snmp_host
             device_snmp_port = device_info.snmp_port
             device_snmp_group = device_info.snmp_group
+            device_hostname = device_info.device_hostname
 
             # 删除snmpqueryresult表中探测数据数据
             SnmpQueryResult.objects.filter(snmp_host_int=ipv4_to_num(device_ip)).delete()
@@ -151,10 +152,45 @@ def del_device_query(request):
                     network_to_device_interface.remove(network_to_device_interface[device_ip_index])
 
                     NetworkToDevice.objects.filter(network=network_to_device.network).update(
-                        device_ip=str(network_to_device_ip).replace("'", '"'),
-                        device_hostname=str(network_to_device_hostname).replace("'", '"'),
-                        interface=str(network_to_device_interface).replace("'", '"'),
+                        device_ip=json.dumps(network_to_device_ip),
+                        device_hostname=json.dumps(network_to_device_hostname),
+                        interface=json.dumps(network_to_device_interface)
+
                     )
+
+            device_host_detail = "{0}/{1}".format(device_ip, device_hostname)
+            # 删除设备探测的arp地址表
+            device_query_arp_table_info = DeviceArpTable.objects.filter(
+                host_and_port__icontains='"'+device_host_detail+'"'
+            )
+            for arp_table in device_query_arp_table_info:
+                host_and_port = json.loads(arp_table.host_and_port)
+                if len(host_and_port) == 1:
+                    arp_table.delete()
+                else:
+                    host_and_port.pop(device_host_detail)
+                    DeviceArpTable.objects.filter(ip=arp_table.ip).update(
+                        host_and_port=json.dumps(host_and_port)
+                    )
+            # 删除设备探测的mac地址表
+            device_query_mac_table_info = DeviceMacTable.objects.filter(
+                host_and_port__icontains='"'+device_host_detail+'"'
+            )
+            for mac_table in device_query_mac_table_info:
+                host_and_port = json.loads(mac_table.host_and_port)
+                if len(host_and_port) == 1:
+                    arp_table.delete()
+                else:
+                    host_and_port.pop(device_host_detail)
+                    DeviceMacTable.filter(mac=mac_table.mac).update(
+                        host_and_port=json.dumps(host_and_port)
+                    )
+
+
+
+
+            print("device_query_arp_table_info:", device_query_arp_table_info)
+
 
             # 批量删除探测任务时候，redis缓存以及该设备相关的探测记录也要对应的删除
             device_infos = "{0} {1} {2}".format(device_ip, device_snmp_port, device_snmp_group)
@@ -164,9 +200,10 @@ def del_device_query(request):
 
 
             QueryDevice.objects.filter(id=id).delete()
+
+
         data["status"] = "success"
         return json_response(data)
-        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def add_device_query(request):
