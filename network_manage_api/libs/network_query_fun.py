@@ -10,6 +10,7 @@ import threading
 import datetime
 from libs.utils import connect_postgresql_db, get_mac_manufacturer, close_db_connection
 from network_query.models import NetworkQueryDetails
+from networks_manage.models import Networks, IpDetailsInfo
 from libs.utils import get_conf_handle
 
 conf_data = get_conf_handle()
@@ -127,8 +128,45 @@ class NetworkQuery(object):
 					sql = "update network_query_task SET online_ip_num={0}, query_status=2 where network='{1}';".format(online_ip_num, network)
 					self.cur_psql.execute(sql)
 					# 更新网络管理中，IP详细信息
+					ip_detail_info_ips = IpDetailsInfo.objects.filter(network=network).values_list('ip', flat=True)
+					network_query_result = NetworkQueryDetails.objects.filter(network=network).values_list('ip', flat=True)
 
-					# self.conn_psql.commit()
+					query_result_mix_ip_detail = set(network_query_result) & set(ip_detail_info_ips)
+					print("query_result_mix_ip_detail:", query_result_mix_ip_detail)
+					for ip in query_result_mix_ip_detail:
+						network_query_result_info = NetworkQueryDetails.objects.filter(ip=ip).first()
+						if network_query_result_info.scan_mac:
+							IpDetailsInfo.objects.filter(ip=ip).update(
+								query_mac=network_query_result_info.scan_mac,
+								hostname=network_query_result_info.hostname,
+								tcp_port_list=network_query_result_info.tcp_port_list,
+								udp_port_list=network_query_result_info.tcp_port_list,
+								query_time=network_query_result_info.query_time
+							)
+						else:
+							IpDetailsInfo.objects.filter(ip=ip).update(
+								hostname=network_query_result_info.hostname,
+								tcp_port_list=network_query_result_info.tcp_port_list,
+								udp_port_list=network_query_result_info.tcp_port_list,
+								query_time=network_query_result_info.query_time
+							)
+					query_result_diff_ip_detail = set(network_query_result).difference(set(ip_detail_info_ips))
+					print("query_result_diff_ip_detail:", query_result_diff_ip_detail)
+					insert_ip_detail_info = []
+					for ip in query_result_diff_ip_detail:
+						network_query_result_info = NetworkQueryDetails.objects.filter(ip=ip).first()
+						insert_ip_detail_info.append(IpDetailsInfo(
+							ip=ip,
+							network=network,
+							query_mac=network_query_result_info.scan_mac,
+							hostname=network_query_result_info.hostname,
+							tcp_port_list=network_query_result_info.tcp_port_list,
+							udp_port_list=network_query_result_info.tcp_port_list,
+							query_time=network_query_result_info.query_time,
+							ip_status=1,
+							ip_type=0
+						))
+					IpDetailsInfo.objects.bulk_create(insert_ip_detail_info)
 					break
 			finally:
 				close_db_connection(self.conn_psql)

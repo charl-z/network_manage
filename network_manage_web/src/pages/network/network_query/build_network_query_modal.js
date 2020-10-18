@@ -36,7 +36,7 @@ const  BuildNetworkQueryForm = (props) => {
     groupToNetworks
          } = props
 
-    console.log("groupToNetworks:", groupToNetworks, allGroupName, selectGroupName) 
+    // console.log("groupToNetworks:", groupToNetworks, allGroupName, selectGroupName) 
   // allGroupName.splice(0, 1)
   const [form] = Form.useForm();
 

@@ -10,7 +10,7 @@ import requests
 import time
 import redis
 import threading
-from libs.utils import get_conf_handle
+from libs.utils import get_conf_handle, connect_postgresql_db, close_db_connection
 
 conf_data = get_conf_handle()
 r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
@@ -21,12 +21,12 @@ r = redis.Redis(host=conf_data['REDIS_CONF']['host'],
 
 
 def call_exec_network_query(network):
-	payload = {"network": network}
-	requests.adapters.DEFAULT_RETRIES = 5  # 增加重连次数
-	headers = {
-		"X-Token": "122345555",
-	}
-	requests.post('http://127.0.0.1:8000/network_query/exec_network_query_task/', data=payload, headers=headers)
+	try:
+		payload = {"network": network}
+		requests.adapters.DEFAULT_RETRIES = 5  # 增加重连次数
+		requests.post('http://127.0.0.1:8000/network_query/exec_network_query_task/', data=payload)
+	finally:
+		pass
 
 
 if __name__ == "__main__":

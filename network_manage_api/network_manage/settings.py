@@ -223,5 +223,7 @@ LOGIN_EXIPRY_TIME = 5 * 60
 
 AUTHENTICATION_EXCLUDES = (
     '/account/login/',
+    '/network_query/exec_network_query_task/',
+    '/device_query/exec_device_query_task/',
     re.compile('/apis/.*'),
 )

@@ -19,8 +19,10 @@ import logging
 import redis
 import socket
 from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable, NetworkToDevice, DeviceMacTable, DeviceArpTable
-from networks_manage.models import Networks
+# from networks_manage.models import Networks
+from libs.utils import insert_query_data
 from group_manage.models import NetworkGroup
+from networks_manage.models import Networks, IpDetailsInfo
 logger = logging.getLogger('django')
 
 
@@ -261,6 +263,29 @@ def add_device_query_to_cache(request):
         # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
+def insert_device_query_table(ip_detail_info_queryset, ip, network, query_mac, device_hostname_interface):
+    """
+    插入设备探测数据到ip_detail_info表中
+    :return:
+    """
+    if ip_detail_info_queryset:
+        ip_detail_info_queryset.update(
+            device_hostname_interface=device_hostname_interface,
+            query_mac=query_mac,
+            ip_status=1,
+            query_time=datetime.datetime.now()
+        )
+    else:
+        IpDetailsInfo.objects.create(
+            device_hostname_interface=device_hostname_interface,
+            query_mac=query_mac,
+            ip_status=1,
+            query_time=datetime.datetime.now(),
+            ip=ip,
+            network=network
+        )
+
+
 def exec_device_query_task(request):
     """执行设备探测任务"""
     if request.method == "POST":
@@ -372,24 +397,36 @@ def exec_device_query_task(request):
                     for ip_to_mac in ip_to_macs:
                         ip_to_mac = ip_to_mac.split(' ')
                         arp_ip, arp_mac = ip_to_mac[0], ip_to_mac[1]
+
                         device_arp_table = DeviceArpTable.objects.filter(ip=arp_ip)
+                        ip_details_info = IpDetailsInfo.objects.filter(ip=arp_ip)
+
                         if not device_arp_table:
-                            DeviceArpTable.objects.create(ip=arp_ip, mac=arp_mac, host_and_port=json.dumps(
-                                {device_host_detail: [interface_name]}), network=network, query_time=datetime.datetime.now())
+                            host_and_port = json.dumps({device_host_detail: [interface_name]})
+                            DeviceArpTable.objects.create(
+                                ip=arp_ip,
+                                mac=arp_mac,
+                                host_and_port=host_and_port,
+                                network=network,
+                                query_time=datetime.datetime.now()
+                            )
                         else:
                             device_arp_table_host_and_port = json.loads(device_arp_table[0].host_and_port)
-
                             if device_host_detail in device_arp_table_host_and_port.keys() and interface_name not in\
                                     device_arp_table_host_and_port[device_host_detail]:
                                 device_arp_table_host_and_port[device_host_detail].append(interface_name)
                             else:
                                 device_arp_table_host_and_port[device_host_detail] = [interface_name]
-
+                            host_and_port = json.dumps(device_arp_table_host_and_port)
                             DeviceArpTable.objects.filter(ip=arp_ip).update(
                                 network=network,
-                                host_and_port=json.dumps(device_arp_table_host_and_port),
+                                host_and_port=host_and_port,
                                 mac=arp_mac,
-                                query_time=datetime.datetime.now())
+                                query_time=datetime.datetime.now()
+                            )
+                        # 如果网络管理里面存在该网络，才会去执行更新操作
+                        if Networks.objects.filter(network=network):
+                            insert_device_query_table(ip_details_info, arp_ip, network, arp_mac, host_and_port)
 
                 """写入路由表信息到数据库"""
                 device_ip_route_tables = device_object.package_ip_route_table()
@@ -564,12 +601,18 @@ def handle_networks_set(request):
             ip_total=IP(network).len(),
             query_time=datetime.datetime.now())
         )
+        # 插入设备探测数据到ip_detail_info表，可以开启一个线程单独执行，待测试
+        insert_query_data(network)
     Networks.objects.bulk_create(insert_to_networks)
 
     network_group_info = NetworkGroup.objects.get(name=group)
     network_group_networks = json.loads(network_group_info.networks)
     network_group_networks.extend(networks)
     NetworkGroup.objects.filter(name=group).update(networks=str(network_group_networks).replace("'", '"'))
+
+
+
+
 
     data["status"] = "success"
     return json_response(data)

@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^get_tcp_ports_details/(.+)/$', get_tcp_ports_details),
     url(r'^get_udp_ports_details/(.+)/$', get_udp_ports_details),
     url(r'^network_query_crontab_task/', get_network_query_crontab_task),
+    url(r'^get_groups_to_networks/', get_groups_to_networks),
 
 ]
 

@@ -107,7 +107,7 @@ class NetworkQueryList extends Component{
       <Col span={3}>
         <GroupManage />
       </Col>
-      <Col>
+      <Col span={21}>
         <div style={{marginTop: '10px', marginLeft: '10px', marginBottom: '10px'}}>
           <Button style={{ marginLeft: '10px' }} type='primary' onClick={() => this.props.handleBuildNetworkQuery(selectGroupName)}>新建</Button>
           {

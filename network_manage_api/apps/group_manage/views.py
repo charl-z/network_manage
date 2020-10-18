@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from group_manage.models import NetworkGroup
 from libs.tool import json_response
 import json
@@ -14,7 +13,6 @@ def get_all_group_name(request):
 	data["result"] = result
 	data["status"] = "success"
 	return json_response(data)
-	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def parent_array_to_dig(parent_array, name_dict):

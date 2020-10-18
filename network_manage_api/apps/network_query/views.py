@@ -1,10 +1,9 @@
-from django.http import HttpResponse
 from django.core.paginator import Paginator
 import json
-from libs.IPy import checkNetwork, IP
-from libs.tool import json_encoder, ipv4_to_num, num_to_ipv4, json_response
-from libs.network_query_fun import NetworkQuery
+from libs.IPy import IP
+from libs.tool import json_response
 from network_query.models import NetworkQueryList, NetworkQueryDetails
+from group_manage.models import NetworkGroup
 import datetime
 import redis
 import threading
@@ -220,8 +219,9 @@ def del_network_query(request):
 			r.hdel(conf_data['NETWORK_QUETY_CRONTAB_HASH'], network_scan_redis_info)
 			r.delete(network_scan_redis_info)
 			logging.info("redis哈希表中的定时任务同步删除：{0}".format(network_scan_redis_info))
-
+			# 删除网络探测任务列表
 			NetworkQueryList.objects.filter(id=id).delete()
+
 		data["status"] = "success"
 		return json_response(data)
 		# return HttpResponse(json.dumps(data), content_type="application/json")
@@ -289,5 +289,20 @@ def get_network_query_crontab_task(request):
 	return json_response(data)
 
 
+def get_groups_to_networks(request):
+	"""
+	获取分组对应的网络
+	"""
+	group = request.GET.get("group")
+	group_info = NetworkGroup.objects.get(name=group)
+	network_group_networks = json.loads(group_info.networks)
 
+	# 获取已经存在的设备探测任务网络
+	network_query_task_info = NetworkQueryList.objects.values_list('network', flat=True)
+	networks = list(set(network_group_networks).difference(set(network_query_task_info))) # 提出已经存在的设备探测任务网络
+
+	data = dict()
+	data["status"] = "success"
+	data["result"] = networks
+	return json_response(data)
 

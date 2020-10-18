@@ -6,7 +6,7 @@ export const handleBuildNetworkQuery = (selectGroup) => {
   return (dispatch) => {
     http.get('/api/group_manage/get_all_group_name/')
     .then((res) => {
-      console.log("res:", res)
+      // console.log("res:", res)
       dispatch({
         type: constant.HANDLE_NETWORK_QUERY_BUILD,
         value: res.result
@@ -17,11 +17,11 @@ export const handleBuildNetworkQuery = (selectGroup) => {
     });
 
     if(selectGroup){
-      http.get(`/api/group_manage/get_group_to_infos/?group=${selectGroup}`)
+      http.get(`/api/network_query/get_groups_to_networks/?group=${selectGroup}`)
         .then((res) => {
           dispatch({
             type: constant.HANDLE_SELECT_GROUP_CHANGE,
-            value: res.result.networks
+            value: res.result
           }) 
         })
         .catch(function (error) {
@@ -29,8 +29,9 @@ export const handleBuildNetworkQuery = (selectGroup) => {
         });
       }
     }
-
 }
+
+
 
 export const getSelectQuery = (selectedRowKeys) => ({
   type: constant.SELECT_NETWORK_QUERY_LIST,
@@ -45,6 +46,7 @@ export const handleNetworkQuerySubmitData = (data) => ({
   type: constant.HANDLE_NEWORK_QUERY_SUBMIT,
   value: data
 })
+
 export const handleNetworkQuerySubmit = (form, values, editShow) => {
   // values.networks = values.networks.replace(/\n/g, " ")
   values.tcp_query_ports = values.tcp_query_ports.replace(/\n/g, ",")
@@ -53,7 +55,6 @@ export const handleNetworkQuerySubmit = (form, values, editShow) => {
     return (dispatch) => {
       http.post('/api/network_query/add_network_query/', values)
         .then((res) => {
-          // console.log("res:", res)
           res["form"] = form
           dispatch(handleNetworkQuerySubmitData(res)) 
       })
@@ -74,7 +75,6 @@ export const handleNetworkQuerySubmit = (form, values, editShow) => {
     }
   }
   }
-  
 
 export const handleGetAllNetworkQueryInfo = (data) => ({
   type: constant.HANDLE_GET_ALL_NETWORK_QUERY_INFO,
@@ -93,7 +93,6 @@ export const getAllNetworkQueryInfo = (currentPage, pageSize) => {
     });
   }
 }
-
 
 export const handleDeleteNetworkQuery = (values) => {
   // 传递的values是一个数组类型
@@ -284,12 +283,12 @@ export const handleConsoleInfoSubmit = (values) => {
 
   export const selectGroupChange = (data) => {
     return (dispatch) => {
-      http.get(`/api/group_manage/get_group_to_infos/?group=${data}`)
+      http.get(`/api/network_query/get_groups_to_networks/?group=${data}`)
         .then((res) => {
-          console.log("res:", res.result.networks)
+          // console.log("res:", res.result.networks)
           dispatch({
             type: constant.HANDLE_SELECT_GROUP_CHANGE,
-            value: res.result.networks
+            value: res.result
           }) 
       })
       .catch(function (error) {
