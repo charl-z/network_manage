@@ -19,7 +19,7 @@ import logging
 import redis
 import socket
 from device_query.models import SnmpQueryResult, QueryDevice, SnmpQueryIpRouteTable, NetworkToDevice, DeviceMacTable, DeviceArpTable
-# from networks_manage.models import Networks
+from network_query.models import NetworkQueryDetails
 from libs.utils import insert_query_data
 from group_manage.models import NetworkGroup
 from networks_manage.models import Networks, IpDetailsInfo
@@ -67,7 +67,6 @@ def get_device_query_info(request):
     data['total_device'] = total_device
     data["status"] = "success"
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def check_user_password(request):
@@ -99,7 +98,6 @@ def check_user_password(request):
             data["status"] = "fail"
             data["result"] = u"连接超时，请重试或关闭！"
         return json_response(data)
-        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_console_info(request):
@@ -114,7 +112,95 @@ def get_console_info(request):
     data = dict()
     data["status"] = "success"
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def del_network_to_device(device_ip):
+    """删除network_to_device表中探测设备为device_ip的内容"""
+    network_to_device_infos = NetworkToDevice.objects.filter(device_ip__icontains='"'+device_ip+'"')
+    for network_to_device in network_to_device_infos:
+        network_to_device_ip = json.loads(network_to_device.device_ip)
+        if len(network_to_device_ip) == 1:
+            network_to_device.delete()
+        else:
+            network_to_device_hostname = json.loads(network_to_device.device_hostname)
+            network_to_device_interface = json.loads(network_to_device.interface)
+            device_ip_index = network_to_device_ip.index(device_ip)
+            network_to_device_ip.remove(network_to_device_ip[device_ip_index])
+            network_to_device_hostname.remove(network_to_device_hostname[device_ip_index])
+            network_to_device_interface.remove(network_to_device_interface[device_ip_index])
+
+            NetworkToDevice.objects.filter(network=network_to_device.network).update(
+                device_ip=json.dumps(network_to_device_ip),
+                device_hostname=json.dumps(network_to_device_hostname),
+                interface=json.dumps(network_to_device_interface)
+            )
+
+
+def del_device_query_arp_table(device_host_detail):
+    """
+    删除设备探测的arp地址表host_and_port相关数据
+    """
+    device_query_arp_table_info = DeviceArpTable.objects.filter(
+        host_and_port__icontains='"' + device_host_detail + '"'
+    )
+    for arp_table in device_query_arp_table_info:
+        host_and_port = json.loads(arp_table.host_and_port)
+        if len(host_and_port) == 1:
+            arp_table.delete()
+        else:
+            host_and_port.pop(device_host_detail)
+            DeviceArpTable.objects.filter(ip=arp_table.ip).update(
+                host_and_port=json.dumps(host_and_port)
+            )
+
+
+def del_device_query_mac_table(device_host_detail):
+    """
+    删除设备探测的mac地址表host_and_port相关数据
+    """
+    device_query_mac_table_info = DeviceMacTable.objects.filter(
+        host_and_port__icontains='"' + device_host_detail + '"'
+    )
+    for mac_table in device_query_mac_table_info:
+        host_and_port = json.loads(mac_table.host_and_port)
+        if len(host_and_port) == 1:
+            mac_table.delete()
+        else:
+            host_and_port.pop(device_host_detail)
+            DeviceMacTable.objects.filter(mac=mac_table.mac).update(
+                host_and_port=json.dumps(host_and_port)
+            )
+
+
+def del_ip_detail_info(device_host_detail):
+    """
+    删除网络管理中ip地址详细信息中设备探测相关信息
+    """
+    ip_detail_infos = IpDetailsInfo.objects.filter(
+        device_hostname_interface__icontains='"' + device_host_detail + '"'
+    )
+    for ip_info in ip_detail_infos:
+        device_hostname_interface = json.loads(ip_info.device_hostname_interface)
+        if len(device_hostname_interface) != 1:
+            device_hostname_interface.pop(device_host_detail)
+            IpDetailsInfo.objects.filter(ip=ip_info.ip).update(
+                device_hostname_interface=json.dumps(device_hostname_interface)
+            )
+        elif ip_info.source_network_query and len(device_hostname_interface) == 1:
+            network_query_result = NetworkQueryDetails.objects.filter(ip=ip_info.ip).first()
+            if network_query_result and network_query_result.scan_mac:
+                IpDetailsInfo.objects.filter(ip=ip_info.ip).update(
+                    device_hostname_interface=''
+                )
+            else:
+                IpDetailsInfo.objects.filter(ip=ip_info.ip).update(
+                    device_hostname_interface='',
+                    query_mac=''
+                )
+        elif not ip_info.source_network_query and len(device_hostname_interface) == 1:
+            IpDetailsInfo.objects.filter(ip=ip_info.ip).delete()
+
+
 
 
 def del_device_query(request):
@@ -137,60 +223,6 @@ def del_device_query(request):
 
             # 删除snmpqueryresult表中探测数据数据
             SnmpQueryResult.objects.filter(snmp_host_int=ipv4_to_num(device_ip)).delete()
-            # 删除network_to_device表中的探测数据
-            network_to_device_infos = NetworkToDevice.objects.filter(device_ip__icontains='"'+device_ip+'"')
-            for network_to_device in network_to_device_infos:
-                network_to_device_ip = json.loads(network_to_device.device_ip)
-                if len(network_to_device_ip) == 1:
-                    network_to_device.delete()
-                else:
-                    network_to_device_hostname = json.loads(network_to_device.device_hostname)
-                    network_to_device_interface = json.loads(network_to_device.interface)
-                    device_ip_index = network_to_device_ip.index(device_ip)
-                    network_to_device_ip.remove(network_to_device_ip[device_ip_index])
-                    network_to_device_hostname.remove(network_to_device_hostname[device_ip_index])
-                    network_to_device_interface.remove(network_to_device_interface[device_ip_index])
-
-                    NetworkToDevice.objects.filter(network=network_to_device.network).update(
-                        device_ip=json.dumps(network_to_device_ip),
-                        device_hostname=json.dumps(network_to_device_hostname),
-                        interface=json.dumps(network_to_device_interface)
-
-                    )
-
-            device_host_detail = "{0}/{1}".format(device_ip, device_hostname)
-            # 删除设备探测的arp地址表
-            device_query_arp_table_info = DeviceArpTable.objects.filter(
-                host_and_port__icontains='"'+device_host_detail+'"'
-            )
-            for arp_table in device_query_arp_table_info:
-                host_and_port = json.loads(arp_table.host_and_port)
-                if len(host_and_port) == 1:
-                    arp_table.delete()
-                else:
-                    host_and_port.pop(device_host_detail)
-                    DeviceArpTable.objects.filter(ip=arp_table.ip).update(
-                        host_and_port=json.dumps(host_and_port)
-                    )
-            # 删除设备探测的mac地址表
-            device_query_mac_table_info = DeviceMacTable.objects.filter(
-                host_and_port__icontains='"'+device_host_detail+'"'
-            )
-            for mac_table in device_query_mac_table_info:
-                host_and_port = json.loads(mac_table.host_and_port)
-                if len(host_and_port) == 1:
-                    arp_table.delete()
-                else:
-                    host_and_port.pop(device_host_detail)
-                    DeviceMacTable.filter(mac=mac_table.mac).update(
-                        host_and_port=json.dumps(host_and_port)
-                    )
-
-
-
-
-            print("device_query_arp_table_info:", device_query_arp_table_info)
-
 
             # 批量删除探测任务时候，redis缓存以及该设备相关的探测记录也要对应的删除
             device_infos = "{0} {1} {2}".format(device_ip, device_snmp_port, device_snmp_group)
@@ -198,9 +230,20 @@ def del_device_query(request):
             # Todo 删除设备探测任务时候，需要将redis哈希表中的定时任务同步删除
             r.hdel(conf_data['DEVICE_QUETY_CRONTAB_HASH'], device_infos)
 
+            # 删除network_to_device表中的探测数据
+            del_network_to_device(device_ip)
 
+            device_host_detail = "{0}/{1}".format(device_ip, device_hostname)
+            # 删除设备探测的arp地址表
+            del_device_query_arp_table(device_host_detail)
+            # 删除设备探测的mac地址表
+            del_device_query_mac_table(device_host_detail)
+
+            # 删除网络管理中ip地址详细信息中设备探测相关信息
+            del_ip_detail_info(device_host_detail)
+
+            # 删除设备探测任务记录
             QueryDevice.objects.filter(id=id).delete()
-
 
         data["status"] = "success"
         return json_response(data)
@@ -217,7 +260,7 @@ def add_device_query(request):
         logger.info("ip:{0}, port:{1}, community:{2}".format(ips, port, community))
         ips = ips.split(" ")
         unvalid_ip = []
-        crontab_task = ''
+        crontab_task = []
         auto_enable = False
         if post_data["crontab_task"] == "on":
             auto_enable = True
@@ -236,18 +279,17 @@ def add_device_query(request):
                     snmp_group=community,
                     query_status=0,
                     auto_enable=auto_enable,
-                    crontab_time=crontab_task.replace("'", '"')
+                    crontab_time=json.dumps(crontab_task)
                 )
                 if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
                     crontab_task_dict = dict()
-                    crontab_task_dict["{0} {1} {2}".format(ip, port, community)] = crontab_task.replace("'", '"')
+                    crontab_task_dict["{0} {1} {2}".format(ip, port, community)] = json.dumps(crontab_task)
                     add_crontab_task_to_redis(crontab_task_dict, conf_data["NETWORK_QUETY_CRONTAB_HASH"])
             data["status"] = "success"
         else:
             data["status"] = "success"
             data["data"] = unvalid_ip
         return json_response(data)
-        # return HttpResponse(json.dumps(data), content_type="application/json")
     if request.method == "PUT":
         data = dict()
         post_data = json.loads(str(request.body, encoding='utf-8'))
@@ -265,12 +307,12 @@ def add_device_query(request):
                             snmp_group=community,
                             query_status=0,
                             auto_enable=auto_enable,
-                            crontab_time=crontab_task.replace("'", '"'),
+                            crontab_time=json.dumps(crontab_task),
                             )
         # todo 如果定时任务开启，则要更新redis哈希表中的定时任务数据
         if auto_enable:
             crontab_task_dict = dict()
-            crontab_task_dict["{0} {1} {2}".format(device_ip, port, community)] = crontab_task.replace("'", '"')
+            crontab_task_dict["{0} {1} {2}".format(device_ip, port, community)] = json.dumps(crontab_task)
             add_crontab_task_to_redis(crontab_task_dict, conf_data["DEVICE_QUETY_CRONTAB_HASH"])
         data["status"] = "success"
         return json_response(data)
@@ -297,7 +339,6 @@ def add_device_query_to_cache(request):
 
         data["status"] = "success"
         return json_response(data)
-        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def insert_device_query_table(ip_detail_info_queryset, ip, network, query_mac, device_hostname_interface):
@@ -310,6 +351,7 @@ def insert_device_query_table(ip_detail_info_queryset, ip, network, query_mac, d
             device_hostname_interface=device_hostname_interface,
             query_mac=query_mac,
             ip_status=1,
+            source_device_query='t',
             query_time=datetime.datetime.now()
         )
     else:
@@ -319,6 +361,7 @@ def insert_device_query_table(ip_detail_info_queryset, ip, network, query_mac, d
             ip_status=1,
             query_time=datetime.datetime.now(),
             ip=ip,
+            source_device_query='t',
             network=network
         )
 
@@ -349,6 +392,7 @@ def exec_device_query_task(request):
         else:
             try:
                 QueryDevice.objects.filter(snmp_host=ip).update(query_status=6, last_mod_time=datetime.datetime.now())
+                logging.info("开始执行设备探测任务,ip:{0}, port:{1}, community:{2}".format(ip, port, community))
                 device_object = device_query_fun.deviceQuery(community, ip, port)
                 results = device_object.get_all_infos()
                 """
@@ -356,9 +400,15 @@ def exec_device_query_task(request):
                 要先删除前一次设备探测的数据，涉及到的表包括：SnmpQueryResult，SnmpQueryIpRouteTable，DeviceMacTable，NetworkToDevice
                 待完成
                 """
+                query_device = QueryDevice.objects.filter(snmp_host=ip).first()
                 SnmpQueryResult.objects.filter(snmp_host=ip).delete()
+                device_host_detail = "{0}/{1}".format(ip, query_device.device_hostname)
+                del_network_to_device(ip)
+                del_device_query_arp_table(device_host_detail)
+                del_device_query_mac_table(device_host_detail)
+                del_ip_detail_info(device_host_detail)
 
-                logging.info("开始执行设备探测任务,ip:{0}, port:{1}, community:{2}".format(ip, port, community))
+                # 开始设备探测相关的表中插入数据
                 device_host_name = device_object.device_name
                 device_manufacturer_info = device_object.enterprise_code
                 ip_num = ipv4_to_num(ip)
@@ -381,18 +431,18 @@ def exec_device_query_task(request):
                                 network_to_device_hostname.append(device_host_name)
                                 network_to_device_interface.append(interface_name)
                                 network_to_device_info.update(
-                                                    device_ip=str(network_to_device_ip).replace("'", '"'),
-                                                    device_hostname=str(network_to_device_hostname).replace("'", '"'),
-                                                    interface=str(network_to_device_interface).replace("'", '"')
+                                    device_ip=json.dumps(network_to_device_ip),
+                                    device_hostname=json.dumps(network_to_device_hostname),
+                                    interface=json.dumps(network_to_device_interface)
                                 )
                         else:
                             if IP(network).prefixlen() != 32:
                                 NetworkToDevice.objects.create(
-                                                        network=network,
-                                                        device_ip=str([ip]).replace("'", '"'),
-                                                        device_hostname=str([device_host_name]).replace("'", '"'),
-                                                        interface=str([interface_name]).replace("'", '"')
-                                                               )
+                                    network=network,
+                                    device_ip=json.dumps([ip]),
+                                    device_hostname=json.dumps([device_host_name]),
+                                    interface=json.dumps([interface_name])
+                                )
 
                     result_db = {
                         "snmp_host": ip,
@@ -402,8 +452,8 @@ def exec_device_query_task(request):
                         "if_descrs": result["if_descrs"],
                         "if_operstatus": result["status"],
                         "if_ip_setup": network_info,
-                        "arp_infos": str(result["arp_infos"]).replace("'", '"'),
-                        "brige_macs": str(result["brige_macs"]).replace("'", '"'),
+                        "arp_infos": json.dumps(result["arp_infos"]),
+                        "brige_macs": json.dumps(result["brige_macs"]),
                         "if_index": result["index"],
                         "last_mod_time": datetime.datetime.now()
                     }
@@ -481,7 +531,7 @@ def exec_device_query_task(request):
                     device_hostname=device_host_name,
                     device_manufacturer_info=device_manufacturer_info,
                     query_status=2,
-                    networks=str(networks).replace("'", '"'),
+                    networks=json.dumps(networks),
                     last_mod_time=datetime.datetime.now()
                         )
                 data = {
@@ -496,7 +546,6 @@ def exec_device_query_task(request):
                 }
                 QueryDevice.objects.filter(snmp_host=ip).update(query_status=4, last_mod_time=datetime.datetime.now())
         return json_response(data)
-        # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_details(request, parameter):
@@ -522,14 +571,14 @@ def get_device_details(request, parameter):
         tmp_data["port_setup"] = port_info.if_ip_setup
         tmp_data["port_index"] = port_info.if_index
         tmp_data["port_desc"] = port_info.if_descrs
-        tmp_data["brige_macs"] = port_info.brige_macs.replace("'", '"')
-        tmp_data["arp_table"] = port_info.arp_infos.replace("'", '"')
+        tmp_data["brige_macs"] = port_info.brige_macs
+        tmp_data["arp_table"] = port_info.arp_infos
 
         result.append(tmp_data)
     data['result'] = result
     data["status"] = "success"
+    # print("data:", data)
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_port_macs(request, parameter):
@@ -538,8 +587,8 @@ def get_device_port_macs(request, parameter):
     """
     port_info = SnmpQueryResult.objects.get(id=parameter)
     if_name = port_info.if_name
-    macs = port_info.brige_macs.replace("'", '"')
-    macs = json.loads(macs)
+    # macs = port_info.brige_macs.replace("'", '"')
+    macs = json.loads(port_info.brige_macs)
     data = dict()
     result = []
     for mac in macs:
@@ -551,7 +600,6 @@ def get_device_port_macs(request, parameter):
     data['result'] = result
     data["status"] = "success"
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_port_arp(request, parameter):
@@ -560,8 +608,8 @@ def get_device_port_arp(request, parameter):
     """
     port_info = SnmpQueryResult.objects.get(id=parameter)
     if_name = port_info.if_name
-    arp_infos = port_info.arp_infos.replace("'", '"')
-    arp_infos = json.loads(arp_infos)
+    # arp_infos = port_info.arp_infos.replace("'", '"')
+    arp_infos = json.loads(port_info.arp_infos)
     data = dict()
     result = []
     for arp_info in arp_infos:
@@ -575,7 +623,6 @@ def get_device_port_arp(request, parameter):
     data['result'] = result
     data["status"] = "success"
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_query_crontab_task(request, parameter):
@@ -599,7 +646,6 @@ def get_device_query_crontab_task(request, parameter):
     data["status"] = "success"
     data['result'] = result
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_device_to_networks(request):
@@ -621,7 +667,6 @@ def get_device_to_networks(request):
     data['result'] = result
     data["status"] = "success"
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def handle_networks_set(request):
@@ -645,15 +690,10 @@ def handle_networks_set(request):
     network_group_info = NetworkGroup.objects.get(name=group)
     network_group_networks = json.loads(network_group_info.networks)
     network_group_networks.extend(networks)
-    NetworkGroup.objects.filter(name=group).update(networks=str(network_group_networks).replace("'", '"'))
-
-
-
-
+    NetworkGroup.objects.filter(name=group).update(networks=json.dumps(network_group_networks))
 
     data["status"] = "success"
     return json_response(data)
-    # return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 

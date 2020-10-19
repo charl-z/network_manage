@@ -134,7 +134,6 @@ def get_all_networks(request):
 	data["result"] = result
 	data["status"] = "success"
 	return json_response(data)
-	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def patch_import_networks(request):
@@ -218,7 +217,7 @@ def patch_import_networks(request):
 								query_time=datetime.datetime.now())
 							)
 						Networks.objects.bulk_create(insert_to_networks)
-						NetworkGroup.objects.filter(name=group_name).update(networks=str(network_group_networks).replace("'", '"'))
+						NetworkGroup.objects.filter(name=group_name).update(networks=json.dumps(network_group_networks))
 			data["status"] = "success"
 			return json_response(data)
 			# return HttpResponse(json.dumps(data), content_type="application/json")
@@ -338,7 +337,6 @@ def get_network_ip_details(request):
 		data['total_ips'] = network_details.count()
 		data["status"] = "success"
 		return json_response(data)
-		# return HttpResponse(json.dumps(data), content_type="application/json")
 	elif ip_status == "0":
 			ips = IP(network_info.network)
 			ip_start = str(ips.net())
@@ -524,7 +522,6 @@ def get_network_ip_details(request):
 		data['total_ips'] = total_ips
 		data["status"] = "success"
 		return json_response(data)
-		# return HttpResponse(json.dumps(data, cls=json_encoder), content_type="application/json")
 
 
 

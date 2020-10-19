@@ -6,7 +6,6 @@ export const handleBuildNetworkQuery = (selectGroup) => {
   return (dispatch) => {
     http.get('/api/group_manage/get_all_group_name/')
     .then((res) => {
-      // console.log("res:", res)
       dispatch({
         type: constant.HANDLE_NETWORK_QUERY_BUILD,
         value: res.result

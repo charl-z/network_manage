@@ -127,12 +127,11 @@ class NetworkQuery(object):
 					online_ip_num = int(self.cur_psql.fetchall()[0][0])
 					sql = "update network_query_task SET online_ip_num={0}, query_status=2 where network='{1}';".format(online_ip_num, network)
 					self.cur_psql.execute(sql)
-					# 更新网络管理中，IP详细信息
+					# 网络探测完成后，更新网络管理中，IP详细信息
 					ip_detail_info_ips = IpDetailsInfo.objects.filter(network=network).values_list('ip', flat=True)
 					network_query_result = NetworkQueryDetails.objects.filter(network=network).values_list('ip', flat=True)
 
 					query_result_mix_ip_detail = set(network_query_result) & set(ip_detail_info_ips)
-					print("query_result_mix_ip_detail:", query_result_mix_ip_detail)
 					for ip in query_result_mix_ip_detail:
 						network_query_result_info = NetworkQueryDetails.objects.filter(ip=ip).first()
 						if network_query_result_info.scan_mac:
@@ -141,18 +140,20 @@ class NetworkQuery(object):
 								hostname=network_query_result_info.hostname,
 								tcp_port_list=network_query_result_info.tcp_port_list,
 								udp_port_list=network_query_result_info.tcp_port_list,
-								query_time=network_query_result_info.query_time
+								query_time=network_query_result_info.query_time,
+								source_network_query='t',
 							)
 						else:
 							IpDetailsInfo.objects.filter(ip=ip).update(
 								hostname=network_query_result_info.hostname,
 								tcp_port_list=network_query_result_info.tcp_port_list,
 								udp_port_list=network_query_result_info.tcp_port_list,
-								query_time=network_query_result_info.query_time
+								query_time=network_query_result_info.query_time,
+								source_network_query='t',
 							)
 					query_result_diff_ip_detail = set(network_query_result).difference(set(ip_detail_info_ips))
-					print("query_result_diff_ip_detail:", query_result_diff_ip_detail)
 					insert_ip_detail_info = []
+
 					for ip in query_result_diff_ip_detail:
 						network_query_result_info = NetworkQueryDetails.objects.filter(ip=ip).first()
 						insert_ip_detail_info.append(IpDetailsInfo(
@@ -164,13 +165,13 @@ class NetworkQuery(object):
 							udp_port_list=network_query_result_info.tcp_port_list,
 							query_time=network_query_result_info.query_time,
 							ip_status=1,
+							source_network_query='t',
 							ip_type=0
 						))
 					IpDetailsInfo.objects.bulk_create(insert_ip_detail_info)
 					break
 			finally:
 				close_db_connection(self.conn_psql)
-
 
 
 if __name__ == "__main__":

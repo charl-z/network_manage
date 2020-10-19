@@ -42,7 +42,8 @@ class IpDetailsInfo(models.Model):
     hostname = models.CharField(verbose_name=u'MAC地址', max_length=60, default='')
     ip_status = models.SmallIntegerField(verbose_name=u'IP地址状态', choices=IP_STATUS, default=0)
     ip_type = models.SmallIntegerField(verbose_name=u'IP地址类型', choices=IP_TYPE, default=0)
-    # is_conflict = models.BooleanField(verbose_name=u'是否冲突', default=False)
+    source_device_query = models.BooleanField(verbose_name=u'来自设备探测', default=False)
+    source_network_query = models.BooleanField(verbose_name=u'来自网络探测', default=False)
     query_time = models.DateTimeField(verbose_name=u'最新探测时间', default=datetime.now())
     created_time = models.DateTimeField(verbose_name=u'创建时间', default=datetime.now())
 

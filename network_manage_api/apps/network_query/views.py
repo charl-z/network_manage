@@ -2,8 +2,10 @@ from django.core.paginator import Paginator
 import json
 from libs.IPy import IP
 from libs.tool import json_response
+from libs.network_query_fun import NetworkQuery
 from network_query.models import NetworkQueryList, NetworkQueryDetails
 from group_manage.models import NetworkGroup
+from networks_manage.models import IpDetailsInfo
 import datetime
 import redis
 import threading
@@ -61,7 +63,6 @@ def get_network_query_info(request):
 	data['total_network'] = total_networks
 	data["status"] = "success"
 	return json_response(data)
-	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def add_network_query(request):
@@ -95,7 +96,7 @@ def add_network_query(request):
 				unvalid_network.append("非法UDP扫描端口")
 
 		auto_enable = False
-		crontab_task = ''
+		crontab_task = []
 		if crontab_task_status == "on":
 			auto_enable = True
 			crontab_task = analysis_cron_time(post_data)
@@ -106,15 +107,14 @@ def add_network_query(request):
 				tcp_query_ports=tcp_query_ports,
 				udp_query_ports=udp_query_ports,
 				auto_enable=auto_enable,
-				crontab_task=crontab_task.replace("'", '"')
+				crontab_task=json.dumps(crontab_task)
 			)
 			if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
 				crontab_task_dict = dict()
-				crontab_task_dict["{0}&{1}&{2}".format(network, tcp_query_ports, udp_query_ports)] = crontab_task.replace("'", '"')
+				crontab_task_dict["{0}&{1}&{2}".format(network, tcp_query_ports, udp_query_ports)] = json.dumps(crontab_task)
 				add_crontab_task_to_redis(crontab_task_dict, conf_data["NETWORK_QUETY_CRONTAB_HASH"])
 		data["status"] = "success"
 		return json_response(data)
-		# return HttpResponse(json.dumps(data), content_type="application/json")
 	if request.method == "PUT":
 		data = dict()
 		post_data = json.loads(str(request.body, encoding='utf-8'))
@@ -128,20 +128,18 @@ def add_network_query(request):
 			auto_enable = True
 			crontab_task = analysis_cron_time(post_data)
 		NetworkQueryList.objects.filter(network=network).update(
-																tcp_query_ports=tcp_query_ports,
-																udp_query_ports=udp_query_ports,
-																auto_enable=auto_enable,
-																crontab_task=crontab_task.replace("'", '"')
+			tcp_query_ports=tcp_query_ports,
+			udp_query_ports=udp_query_ports,
+			auto_enable=auto_enable,
+			crontab_task=json.dumps(crontab_task)
 																)
 
 		if auto_enable:  # 如果定时任务开启，则要更新redis哈希表中的定时任务数据
 			crontab_task_dict = dict()
-			crontab_task_dict["{0}&{1}&{2}".format(network, tcp_query_ports, udp_query_ports)] = crontab_task.replace(
-				"'", '"')
+			crontab_task_dict["{0}&{1}&{2}".format(network, tcp_query_ports, udp_query_ports)] = json.dumps(crontab_task)
 			add_crontab_task_to_redis(crontab_task_dict, conf_data["NETWORK_QUETY_CRONTAB_HASH"])
 		data["status"] = "success"
 		return json_response(data)
-		# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def add_network_query_to_cache(request):
@@ -165,10 +163,9 @@ def add_network_query_to_cache(request):
 				r.rpush(network_scan_redis_info, ip)  # 将网络中的每个IP地址的探测信息也加入redis环境，key值为network_scan_redis_info
 			r.rpush(conf_data['NETWORK_QUERY_QUEUE'], network_scan_redis_info)
 
-
 			NetworkQueryList.objects.filter(network=network).update(
-																query_status=4,
-																query_time=datetime.datetime.now()
+				query_status=4,
+				query_time=datetime.datetime.now()
 																)
 
 		data["status"] = "success"
@@ -181,13 +178,34 @@ def exec_network_query_task(request):
 		redis_network_info = request.POST.get("network")
 		redis_network_info_list = redis_network_info.split("&")
 		network = redis_network_info_list[0]
+
+		# 删除网络管理中ip地址详细信息中网络探测相关信息
+		del_network_ip_detail_info(network)
 		NetworkQueryDetails.objects.filter(network=network).delete()  # 在执行网络探测前，先删除网络探测的数据
+
 		network_scan = NetworkQuery()
 		logging.info("执行网络探测任务：{0}".format(redis_network_info))
 		t = threading.Thread(target=network_scan.exec_redis_task, args=(redis_network_info,))
 		t.start()
 		data["status"] = "success"
 		return json_response(data)
+
+
+def del_network_ip_detail_info(network):
+	"""
+	删除网络管理中ip地址详细信息中网络探测相关信息
+	"""
+	ip_detail_info = IpDetailsInfo.objects.filter(network=network)
+	for ip_info in ip_detail_info:
+		if ip_info.source_device_query and ip_info.source_network_query:
+			IpDetailsInfo.objects.filter(ip=ip_info.ip).update(
+				tcp_port_list='',
+				udp_port_list='',
+				hostname=''
+			)
+		elif not ip_info.source_device_query and ip_info.source_network_query:
+			print("ip_info.ip:", ip_info.ip)
+			IpDetailsInfo.objects.filter(ip=ip_info.ip).delete()
 
 
 def del_network_query(request):
@@ -222,14 +240,17 @@ def del_network_query(request):
 			# 删除网络探测任务列表
 			NetworkQueryList.objects.filter(id=id).delete()
 
+			# 删除网络管理中ip地址详细信息中网络探测相关信息
+			del_network_ip_detail_info(network)
+
+
 		data["status"] = "success"
 		return json_response(data)
-		# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_tcp_ports_details(request, parameter):
 	ip_details = NetworkQueryDetails.objects.filter(ip=parameter)
-	tcp_port_info = json.loads(ip_details[0].tcp_port_list.replace("'", '"'))
+	tcp_port_info = json.loads(ip_details[0].tcp_port_list)
 	result = []
 	for port_info in tcp_port_info:
 		port_info_dict = dict()
@@ -248,7 +269,7 @@ def get_tcp_ports_details(request, parameter):
 
 def get_udp_ports_details(request, parameter):
 	ip_details = NetworkQueryDetails.objects.filter(ip=parameter)
-	udp_port_info = json.loads(ip_details[0].udp_port_list.replace("'", '"'))
+	udp_port_info = json.loads(ip_details[0].udp_port_list)
 	result = []
 	for port_info in udp_port_info:
 		port_info_dict = dict()
@@ -293,7 +314,12 @@ def get_groups_to_networks(request):
 	"""
 	获取分组对应的网络
 	"""
+	data = dict()
 	group = request.GET.get("group")
+	if not group:
+		data["status"] = "success"
+		data["result"] = []
+		return json_response(data)
 	group_info = NetworkGroup.objects.get(name=group)
 	network_group_networks = json.loads(group_info.networks)
 
@@ -301,7 +327,6 @@ def get_groups_to_networks(request):
 	network_query_task_info = NetworkQueryList.objects.values_list('network', flat=True)
 	networks = list(set(network_group_networks).difference(set(network_query_task_info))) # 提出已经存在的设备探测任务网络
 
-	data = dict()
 	data["status"] = "success"
 	data["result"] = networks
 	return json_response(data)

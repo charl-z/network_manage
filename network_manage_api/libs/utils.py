@@ -180,7 +180,7 @@ def analysis_cron_time(cron):
 			hour = cron.get("hour_" + str(i))
 			hour = hour.split(":")
 			result[i] = "{0} {1} * * {2}".format(hour[1], hour[0], weeks[week])
-	return str(list(result.values()))
+	return list(result.values())
 
 
 def convert_device_hostname_interface(interface):
@@ -236,6 +236,8 @@ def insert_query_data(network):
 			'ip_status': 1,
 			'ip_type': 0,
 			'manual_mac': '',
+			'source_device_query': 't',
+			'source_network_query': 'f',
 			'created_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		}
 		padding_network_query = [
@@ -245,6 +247,9 @@ def insert_query_data(network):
 			padding_data['ip_status'],
 			padding_data['ip_type'],
 			padding_data['manual_mac'],
+			padding_data['source_device_query'],
+			padding_data['source_network_query'],
+
 			padding_data['created_time'],
 		]
 
@@ -258,7 +263,18 @@ def insert_query_data(network):
 			ip_detail_info.append(network)
 			arp_ips_difference_query_info.append(tuple(ip_detail_info))
 
-		SQL = "INSERT INTO ip_detail_info(ip, query_mac, device_hostname_interface, tcp_port_list, udp_port_list, hostname, ip_status, ip_type, manual_mac, created_time, query_time, network) VALUES "
+		SQL = "INSERT INTO ip_detail_info(" \
+		      "ip, " \
+		      "query_mac, " \
+		      "device_hostname_interface, " \
+		      "tcp_port_list, " \
+		      "udp_port_list, hostname, " \
+		      "ip_status, ip_type, manual_mac, " \
+		      "source_device_query, " \
+		      "source_network_query, " \
+		      "created_time, " \
+		      "query_time, " \
+		      "network) VALUES "
 		if arp_ips_difference_query_info:
 			for i in arp_ips_difference_query_info:
 				SQL += str(i) + ","

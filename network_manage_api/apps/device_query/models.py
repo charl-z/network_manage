@@ -81,7 +81,7 @@ class DeviceArpTable(models.Model):
     ip = models.GenericIPAddressField(verbose_name=u'IP地址', max_length=30, blank=False, unique=True)
     network = models.GenericIPAddressField(verbose_name=u'网络', max_length=30, blank=False)
     mac = models.CharField(verbose_name=u'mac地址', max_length=20, default='')
-    host_and_port = models.TextField(verbose_name=u'IP地址所对应的主机名和端口', default='[]')
+    host_and_port = models.TextField(verbose_name=u'IP地址所对应的主机名和端口', default='')
     query_time = models.DateTimeField(verbose_name=u'最新探测时间', default=datetime.now())
 
     def __str__(self):
@@ -96,7 +96,7 @@ class DeviceArpTable(models.Model):
 class DeviceMacTable(models.Model):
     mac = models.CharField(verbose_name=u'mac地址', max_length=20, unique=True, default='')
     # ip = models.TextField(verbose_name=u'IP地址', default='[]')  # 一个mac可能对应多个IP地址
-    host_and_port = models.TextField(verbose_name=u'mac地址所对应的主机名和端口', default='[]')
+    host_and_port = models.TextField(verbose_name=u'mac地址所对应的主机名和端口', default='')
     query_time = models.DateTimeField(verbose_name=u'最新探测时间', default=datetime.now())
 
     def __str__(self):

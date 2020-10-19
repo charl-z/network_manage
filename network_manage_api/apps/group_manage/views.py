@@ -70,7 +70,7 @@ def new_build_group(request):
 
 			NetworkGroup.objects.filter(name=parent_group_name).update(haschild=True)
 			parent_array.append(parent_group_name)
-			NetworkGroup.objects.create(name=group_name, parent_array=str(parent_array).replace("'", '"'), haschild=False)
+			NetworkGroup.objects.create(name=group_name, parent_array=json.dumps(parent_array), haschild=False)
 
 		data["status"] = "success"
 		return json_response(data)
@@ -95,12 +95,11 @@ def new_build_group(request):
 		for group in group_infos:
 			parent_array = json.loads(group.parent_array)
 			parent_array[parent_array.index(pre_group)] = current_group
-			NetworkGroup.objects.filter(name=group.name).update(parent_array=str(parent_array).replace("'", '"'))
+			NetworkGroup.objects.filter(name=group.name).update(parent_array=json.dumps(parent_array))
 		NetworkGroup.objects.filter(name=pre_group).update(name=current_group)
 
 		data["status"] = "success"
 		return json_response(data)
-		# return HttpResponse(json.dumps(data), content_type="application/json")
 	if request.method == "DELETE":
 		# print(request.body)
 		post_data = json.loads(str(request.body, encoding='utf-8'))
@@ -109,7 +108,6 @@ def new_build_group(request):
 		NetworkGroup.objects.filter(name=group_name).delete()
 		data["status"] = "success"
 		return json_response(data)
-		# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def get_network_group_info(request):
@@ -164,6 +162,5 @@ def get_network_group_info(request):
 	data["status"] = "success"
 	data["result"] = result
 	return json_response(data)
-	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 	
