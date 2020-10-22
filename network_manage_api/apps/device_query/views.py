@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse
 from libs.utils import add_crontab_task_to_redis
 from django.core.paginator import Paginator
 import datetime
-
 from libs.ssh import SSH
 from libs.IPy import IP
 from libs.utils import analysis_cron_time

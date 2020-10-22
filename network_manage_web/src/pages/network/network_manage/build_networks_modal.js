@@ -1,8 +1,8 @@
-import React, { Component, Fragment} from 'react'
+import React from 'react'
 import { actionCreators } from './store'
 import { connect } from "react-redux";
 import 'antd/dist/antd.css';
-import { Button, Modal, Input, Form,InputNumber, Alert, Select, Space, Layout, Radio } from 'antd';
+import { Button, Modal, Input, Form, Select} from 'antd';
 
 
 const layout = {

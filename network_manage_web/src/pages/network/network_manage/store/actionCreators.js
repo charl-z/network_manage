@@ -140,10 +140,8 @@ export const getNetworkIpDetailsInfo = (id, pagination) => {
   return (dispatch) => {
     http.get(`/api/networks_manage/get_network_ip_details/?id=${id}&current_page=${currentPage}&page_size=${pageSize}&ip_status=${ipStatusFilter}&ip_type=${ipTypeFilter}&columnKey=${columnKeySorter}&order=${orderSorter}`)
       .then((res) => {
-        console.log("res:", res)
         res["page_size"] = pageSize
         res["current_page"] = currentPage
-        // dispatch(getNetworkDetails(res)) 
         dispatch({
           type: constant.GET_IP_DETAIL_INFO,
           value: res
@@ -174,6 +172,34 @@ export const handleIpDetailsTableChange  = (pagination, filters, sorter, id) => 
         dispatch({
           type: constant.GET_IP_DETAIL_INFO,
           value: res
+        })
+    })
+    .catch(function (error) {
+    console.log(error);
+    });
+  }
+}
+
+export const handleIpDetailSelected = (selectRows) =>({
+  type: constant.IP_DETAILS_SELECTED,
+  value: selectRows
+}) 
+
+export const handleEidtIpDetail = () =>({
+  type: constant.EDIT_IP_DETAIL,
+}) 
+
+export const handleEditIpDetailModalCancel = () =>({
+  type: constant.EDIT_IP_DETAIL_CANCEL,
+}) 
+
+
+export const handleEditIpDetailSubmit = (value) => {
+  return (dispatch) => {
+    http.patch('/api/networks_manage/edit_ip_details/', value)
+      .then((res) => {
+        dispatch({
+          type: constant.EDIT_IP_DETAIL_SUBMIT,
         })
     })
     .catch(function (error) {

@@ -1,8 +1,9 @@
-from django.http import HttpResponse
 import json
+from django.views.generic import View
 from libs.IPy import checkNetwork, IP
 from libs.utils import insert_query_data, get_mac_manufacturer, convert_device_hostname_interface
-from libs.tool import json_encoder, ipv4_to_num, num_to_ipv4, json_response
+from libs.tool import ipv4_to_num, num_to_ipv4, json_response, is_valid_mac
+from libs.parser import JsonParser, Argument
 from django.core.paginator import Paginator
 from networks_manage.models import Networks, IpDetailsInfo
 from group_manage.models import NetworkGroup
@@ -171,7 +172,6 @@ def patch_import_networks(request):
 					data["status"] = "fail"
 					data["result"] = "导入字段名称有误，请检查！"
 					return json_response(data)
-					# return HttpResponse(json.dumps(data), content_type="application/json")
 
 				unvalid_info = []
 				network_to_group = dict()
@@ -220,13 +220,11 @@ def patch_import_networks(request):
 						NetworkGroup.objects.filter(name=group_name).update(networks=json.dumps(network_group_networks))
 			data["status"] = "success"
 			return json_response(data)
-			# return HttpResponse(json.dumps(data), content_type="application/json")
 		except Exception as e:
 			print(e)
 			data["status"] = "fail"
 			data["result"] = "未知错误，请检查！"
 			return json_response(data)
-			# return HttpResponse(json.dumps(data), content_type="application/json")
 		finally:
 			os.popen("rm -rf {0} {1}".format(filename, new_filename))
 
@@ -279,7 +277,47 @@ def patch_export_networks(request):
 	data["result"] = result
 	data["status"] = "success"
 	return json_response(data)
-	# return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+class EidtIpDetails(View):
+	def patch(self, request):
+		data = dict()
+		form, error = JsonParser(
+			Argument('ip', required=True),
+			Argument('network', required=True),
+			Argument('type', required=True),
+			Argument('mac', required=True),
+		).parse(request.body, True)
+		if error is None:
+			# 校验mac地址
+			if is_valid_mac(form.mac):
+				mac = form.mac.upper()
+				ip_detail_info = IpDetailsInfo.objects.filter(ip=form.ip).first()
+				if ip_detail_info:
+					if ip_detail_info.query_mac and mac != ip_detail_info.query_mac:
+						IpDetailsInfo.objects.filter(ip=form.ip).update(
+							ip_type=2,
+							manual_mac=mac,
+						)
+					else:
+						IpDetailsInfo.objects.filter(ip=form.ip).update(
+							ip_type=1,
+							manual_mac=mac,
+						)
+				else:
+					IpDetailsInfo.objects.create(
+						ip=form.ip,
+						network=form.network,
+						manual_mac=mac,
+						ip_type=1,
+					)
+
+				data["status"] = "success"
+			else:
+				data["status"] = "fail"
+			return json_response(data)
+
+		return json_response(error=error)
 
 
 def get_network_ip_details(request):
@@ -311,13 +349,16 @@ def get_network_ip_details(request):
 			ip_info["network"] = query.network
 			ip_info["ip_status"] = query.get_ip_status_display()
 			ip_info["query_mac"] = query.query_mac
+			ip_info["query_mac_product"] = get_mac_manufacturer(query.query_mac)
+
+			ip_info["manual_mac"] = query.manual_mac
+			ip_info["manual_mac_product"] = get_mac_manufacturer(query.manual_mac)
 
 			device_hostname_interface = query.device_hostname_interface
 			if device_hostname_interface:
 				device_hostname_interface = convert_device_hostname_interface(json.loads(device_hostname_interface))
 			ip_info["device_hostname_interface"] = device_hostname_interface
 
-			ip_info["manual_mac"] = query.manual_mac
 			ip_info["ip_type"] = query.get_ip_type_display()
 			ip_info["hostname"] = query.hostname
 
@@ -362,9 +403,11 @@ def get_network_ip_details(request):
 				ip_info["network"] = query.network
 				ip_info["ip_status"] = query.get_ip_status_display()
 				ip_info["query_mac"] = query.query_mac
-				# ip_info["scan_mac_product"] = query.scan_mac_product
-				ip_info["device_hostname_interface"] = query.device_hostname_interface
+				ip_info["query_mac_product"] = get_mac_manufacturer(query.query_mac)
 				ip_info["manual_mac"] = query.manual_mac
+				ip_info["manual_mac_product"] = get_mac_manufacturer(query.manual_mac)
+
+				ip_info["device_hostname_interface"] = query.device_hostname_interface
 				ip_info["ip_type"] = query.get_ip_type_display()
 				ip_info["hostname"] = query.hostname
 
@@ -480,12 +523,15 @@ def get_network_ip_details(request):
 
 				scan_ip_infos["device_hostname_interface"] = device_hostname_interface
 				scan_ip_infos["ip_status"] = scan_ips_info[ip]["ip_status"]
+
 				query_mac = scan_ips_info[ip]["query_mac"]
 				scan_ip_infos["query_mac"] = query_mac
 				scan_ip_infos["query_mac_product"] = get_mac_manufacturer(query_mac)
+
 				manual_mac = scan_ips_info[ip]["manual_mac"]
 				scan_ip_infos["manual_mac"] = manual_mac
 				scan_ip_infos["manual_mac_product"] = get_mac_manufacturer(manual_mac)
+
 				scan_ip_infos["ip_type"] = scan_ips_info[ip]["ip_type"]
 				scan_ip_infos["hostname"] = scan_ips_info[ip]["hostname"]
 

@@ -31,7 +31,6 @@ export const handleBuildNetworkQuery = (selectGroup) => {
 }
 
 
-
 export const getSelectQuery = (selectedRowKeys) => ({
   type: constant.SELECT_NETWORK_QUERY_LIST,
   value: selectedRowKeys

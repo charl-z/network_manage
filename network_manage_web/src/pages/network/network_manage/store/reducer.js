@@ -1,5 +1,6 @@
 import { fromJS, Map  } from 'immutable'
 import * as constant from './actionTypes'
+import { PAGE_SIZE_OPTION } from '../../../../libs/functools'
 
 const defaultState = fromJS({
   allGroupName: [],
@@ -13,12 +14,17 @@ const defaultState = fromJS({
   importNeworkErrorMessages: '',
   importNetworLoading: false,
   ipDetailInfos: [],
+  ipDetailSelectedRows: [],
+  freshFlag: false,  //页面内容更新后的，标志位
+
   iPDetailsPagination: Map({
     showSizeChanger: true,
     current: 1,
     pageSize: 30,
-    total: 0
+    total: 0,
+    pageSizeOptions: PAGE_SIZE_OPTION,
   }),
+  EditIpDetailModalVisible: false,
 })
 
 const handleBuildNetworks = (state, action) => {
@@ -66,7 +72,6 @@ const deleteNetworkMoadlCancel = (state, action) => {
 }
 
 const handleExportNetworks = (state, action) => {
-  // console.log("action:", action)
   return state.merge({
     'exportNetworkModalVisible': true,
     'exportNetworkData': action.value
@@ -74,14 +79,12 @@ const handleExportNetworks = (state, action) => {
 }
 
 const handleImportNetworks = (state, action) => {
-  // console.log("action:", action)
   return state.merge({
     'importNetworkModalVisible': true,
   })
 }
 
 const handleImportNetworksCancel = (state, action) => {
-  // console.log("action:", action)
   return state.merge({
     'importNetworkModalVisible': false,
   })
@@ -114,7 +117,6 @@ const handleCSVDataLoading = (state, action) => {
   })
 }
  
-
 const getIpDetailsInfo  = (state, action) => {
   var iPDetailsPagination = state.getIn(['iPDetailsPagination']).toObject()
   iPDetailsPagination['total'] = action.value.total_ips  
@@ -126,6 +128,31 @@ const getIpDetailsInfo  = (state, action) => {
   })
 };
 
+const handleIpDetailSelected = (state, action) => {
+  return state.merge({
+    'ipDetailSelectedRows': action.value
+  })
+}
+
+const handleEidtIpDetail = (state, action) => {
+  return state.merge({
+    'EditIpDetailModalVisible': true
+  })
+}
+
+const handleEditIpDetailModalCancel = (state, action) => {
+  return state.merge({
+    'EditIpDetailModalVisible': false
+  })
+}
+
+const handleEditIpDetailSubmit = (state, action) => {
+  var freshFlag = state.getIn(['freshFlag'])
+  return state.merge({
+    'freshFlag': !freshFlag,
+    'EditIpDetailModalVisible': false
+  })
+}
 
 export default (state = defaultState, action) => {
   switch (action.type) {
@@ -153,11 +180,16 @@ export default (state = defaultState, action) => {
       return handleCSVData(state, action)
     case constant.HANDLE_CSV_DATA_START:
       return handleCSVDataLoading(state, action)
-
+    case constant.IP_DETAILS_SELECTED:
+      return handleIpDetailSelected(state, action)
     case constant.GET_IP_DETAIL_INFO:
-        return getIpDetailsInfo(state, action)
-      
-    
+      return getIpDetailsInfo(state, action)
+    case constant.EDIT_IP_DETAIL:
+      return handleEidtIpDetail(state, action)
+    case constant.EDIT_IP_DETAIL_CANCEL:
+      return handleEditIpDetailModalCancel(state, action)
+    case constant.EDIT_IP_DETAIL_SUBMIT:
+      return handleEditIpDetailSubmit(state, action)
     default:
       return state
   }

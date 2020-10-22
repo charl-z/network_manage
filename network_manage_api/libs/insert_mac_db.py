@@ -48,7 +48,7 @@ def insert_mac_manufacturer_to_table(conn):
 				mac = mac.split("(hex)")
 				mac_pre = mac[0].strip()
 				company = mac[1].strip().replace("'", "''")
-				sql += "('{0}','{1}'),".format(mac_pre, company)
+				sql += "('{0}','{1}'),".format(mac_pre.upper(), company)
 		sql = sql[:-1]
 		sql += ";"
 		cur.execute(sql)

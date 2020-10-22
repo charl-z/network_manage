@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^patch_import_networks/', patch_import_networks),
     url(r'^patch_export_networks/', patch_export_networks),
     url(r'^get_network_ip_details/', get_network_ip_details),
+    url(r'^edit_ip_details/', EidtIpDetails.as_view())
 ]
 
 

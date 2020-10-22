@@ -3,11 +3,12 @@ import { actionCreators } from './store'
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
-import { Table, Button, Space} from 'antd';
+import { Table, Button, Space, Tooltip } from 'antd';
+import EditIpDetailModal from './edit_ip_detail_modal'
+import { PAGE_SIZE_OPTION } from '../../../libs/functools'
 
 
-const pageSizeOptions = [30, 100, 500]
-
+// const pageSizeOptions = [30, 100, 500]
 
 class IpDetails extends Component{
   render(){
@@ -161,13 +162,31 @@ class IpDetails extends Component{
       },
     ];
 
-    const { ipDetailInfos, iPDetailsPagination } = this.props
+    const { ipDetailInfos, iPDetailsPagination, ipDetailSelectedRows, EditIpDetailModalVisible } = this.props
+    const rowSelection = {
+      onSelect: this.onSelect,
+    };
 
-    iPDetailsPagination["pageSizeOptions"] = pageSizeOptions
     iPDetailsPagination["showTotal"] = () => `总共${iPDetailsPagination.total}条`
     return(
       <Fragment>
+        <Space style={{marginBottom: '5px', marginLeft: '10px'}}>
+          {
+            ipDetailSelectedRows.length === 1 ?
+            <Button type='primary' onClick={this.props.handleEidtIpDetail}>编辑</Button>
+              :
+            <Fragment>
+              <Button disabled>编辑</Button>
+            </Fragment>
+          }
+        <Tooltip title="只会删除收到配置的MAC">
+          <Button disabled>删除</Button>
+        </Tooltip>
+          <Button type='primary'>转手动</Button>
+          <Button type='primary'>解决冲突</Button>
+        </Space>
         <Table 
+        rowSelection={rowSelection}
           columns={columns}
           dataSource={ipDetailInfos} 
           bordered
@@ -175,23 +194,38 @@ class IpDetails extends Component{
           pagination={ iPDetailsPagination }
           onChange={(pagination, filters, sorter) => this.props.handleIpDetailsTableChange(pagination, filters, sorter, this.props.match.params.id)}
         />
+        { EditIpDetailModalVisible && <EditIpDetailModal/>}
       </Fragment>
     )
   }
   componentDidMount(){
     this.props.getNetworkIpDetailsInfo(this.props.match.params.id);
   }
+
+  componentWillReceiveProps(prevProps) {
+    if(this.props.freshFlag !== prevProps.freshFlag){
+      this.props.getNetworkIpDetailsInfo(this.props.match.params.id);
+      }
+    };
+  
+  onSelect = (record, selected, selectedRows, nativeEvent) => {
+    console.log("selectedRows:", selectedRows)
+    this.props.handleIpDetailSelected(selectedRows)
+  }
 }
 
 const mapState = (state) => ({
   ipDetailInfos: state.getIn(['networkManage', 'ipDetailInfos']),
   iPDetailsPagination: state.getIn(['networkManage', 'iPDetailsPagination']).toObject(),
+  ipDetailSelectedRows: state.getIn(['networkManage', 'ipDetailSelectedRows']),
+  EditIpDetailModalVisible: state.getIn(['networkManage', 'EditIpDetailModalVisible']),
+  freshFlag: state.getIn(['networkManage', 'freshFlag']),
 })
 
 const mapDispatch = (dispatch) =>({
   getNetworkIpDetailsInfo(id){
     var NetworkQueryDetailsPagination = {
-      "pageSize": pageSizeOptions[0],
+      "pageSize": PAGE_SIZE_OPTION[0],
       "current": 1
     }
       dispatch(actionCreators.getNetworkIpDetailsInfo(id, NetworkQueryDetailsPagination))
@@ -199,6 +233,12 @@ const mapDispatch = (dispatch) =>({
   handleIpDetailsTableChange(pagination, filters, sorter, id){
      dispatch(actionCreators.handleIpDetailsTableChange(pagination, filters, sorter, id))
     },
+  handleIpDetailSelected(selectedRows){
+    dispatch(actionCreators.handleIpDetailSelected(selectedRows))
+    },
+  handleEidtIpDetail(){
+    dispatch(actionCreators.handleEidtIpDetail())
+      },
   })
 
 export default connect(mapState, mapDispatch)(IpDetails)

@@ -102,7 +102,6 @@ class NetworkQueryList extends Component{
   };
 
   return(
-
     <Row>
       <Col span={3}>
         <GroupManage />

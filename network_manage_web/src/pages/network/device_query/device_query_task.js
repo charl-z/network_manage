@@ -171,7 +171,7 @@ class DeviceQueryList extends Component{
           </div>
          </Fragment> 
       )
-    }
+  }
   componentWillReceiveProps(prevProps) {
     if(prevProps.checkDeviceQueryInputIps){
       this.props.getAllDeviceQueryInfo(this.props.deviceQueryCurrentPage, this.props.deviceQueryPageSize);
@@ -181,7 +181,7 @@ class DeviceQueryList extends Component{
     // console.log("ids:", ids)
     this.props.getSelectQuery(ids)
     };
-  
+
   componentDidMount(){
     this.props.getAllDeviceQueryInfo(this.props.deviceQueryCurrentPage, this.props.deviceQueryPageSize);
   }

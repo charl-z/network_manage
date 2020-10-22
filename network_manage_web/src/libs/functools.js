@@ -1,13 +1,10 @@
-/**
- * Copyright (c) OpenSpug Organization. https://github.com/openspug/spug
- * Copyright (c) <spug.dev@gmail.com>
- * Released under the AGPL-3.0 License.
- */
 let Permission = {
   isSuper: false,
   hostPerms: [],
   permissions: []
 };
+
+export const PAGE_SIZE_OPTION = [30, 100, 300]
 
 export function updatePermissions(isSupper, hostPerms, data) {
   Permission.isSuper = isSupper;
@@ -31,6 +28,21 @@ export function hasPermission(strCode) {
 export function hasHostPermission(id) {
   const {isSuper, hostPerms} = Permission;
   return isSuper || hostPerms.includes(id)
+}
+
+// 判断MAC地址合法
+export function ValidateMacAddress(macaddr)
+{
+   var reg1 = /^[A-Fa-f0-9]{1,2}\-[A-Fa-f0-9]{1,2}\-[A-Fa-f0-9]{1,2}\-[A-Fa-f0-9]{1,2}\-[A-Fa-f0-9]{1,2}\-[A-Fa-f0-9]{1,2}$/;
+   var reg2 = /^[A-Fa-f0-9]{1,2}\:[A-Fa-f0-9]{1,2}\:[A-Fa-f0-9]{1,2}\:[A-Fa-f0-9]{1,2}\:[A-Fa-f0-9]{1,2}\:[A-Fa-f0-9]{1,2}$/;
+
+   if (reg1.test(macaddr)) {
+      return true;
+   } else if (reg2.test(macaddr)) {
+      return true;
+   } else {
+      return false;
+   }
 }
 
 // 清理输入的命令中包含的\r符号

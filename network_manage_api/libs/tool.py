@@ -90,6 +90,14 @@ def check_ip(ip_addr):
         return False
 
 
+def is_valid_mac(mac):
+    if re.match(r"^\s*([0-9a-fA-F]{2,2}:){5,5}[0-9a-fA-F]{2,2}\s*$", mac):
+        return True
+    elif re.match(r"^\s*([0-9a-fA-F]{2,2}-){5,5}[0-9a-fA-F]{2,2}\s*$", mac):
+        return True
+    return False
+
+
 class json_encoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
