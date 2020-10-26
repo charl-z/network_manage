@@ -180,6 +180,7 @@ export const handleIpDetailsTableChange  = (pagination, filters, sorter, id) => 
   }
 }
 
+
 export const handleIpDetailSelected = (selectRows) =>({
   type: constant.IP_DETAILS_SELECTED,
   value: selectRows

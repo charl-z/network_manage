@@ -79,6 +79,16 @@ class IpDetails extends Component{
           { text: '手动地址', value: '1' },
           { text: '冲突地址', value: '2' },
         ],
+        render (text, record) {
+          if(text === '冲突地址'){
+            return(<div style={{backgroundColor:'#DC143C'}}>{text}</div>)
+          }else if(text === '手动地址'){
+            return(<div style={{backgroundColor:'#3CB371'}}>{text}</div>)    
+          }else{
+            return(<div>{text}</div>)
+          }
+
+        }
       },
       {
         title: '扫描设备接口',
@@ -162,7 +172,15 @@ class IpDetails extends Component{
       },
     ];
 
-    const { ipDetailInfos, iPDetailsPagination, ipDetailSelectedRows, EditIpDetailModalVisible } = this.props
+    const { 
+      ipDetailInfos, 
+      iPDetailsPagination, 
+      ipDetailSelectedRows, 
+      EditIpDetailModalVisible, 
+      isResolveConflict,
+      isConvertToManual
+    } = this.props
+    console.log("isConvertToManual:", isConvertToManual)
     const rowSelection = {
       onSelect: this.onSelect,
     };
@@ -179,11 +197,22 @@ class IpDetails extends Component{
               <Button disabled>编辑</Button>
             </Fragment>
           }
-        <Tooltip title="只会删除收到配置的MAC">
-          <Button disabled>删除</Button>
-        </Tooltip>
-          <Button type='primary'>转手动</Button>
-          <Button type='primary'>解决冲突</Button>
+          <Tooltip title="只会删除收到配置的MAC">
+            <Button disabled>删除</Button>
+          </Tooltip>
+          {
+            isConvertToManual ?
+            <Button type='primary'>转手动</Button>
+            :
+            <Button disabled>转手动</Button>
+          }
+          {
+            isResolveConflict ? 
+            <Button type='primary' onClick={this.props.ResolveConflict}>解决冲突</Button>
+            :
+            <Button disabled>解决冲突</Button>
+          }
+          
         </Space>
         <Table 
         rowSelection={rowSelection}
@@ -209,7 +238,6 @@ class IpDetails extends Component{
     };
   
   onSelect = (record, selected, selectedRows, nativeEvent) => {
-    console.log("selectedRows:", selectedRows)
     this.props.handleIpDetailSelected(selectedRows)
   }
 }
@@ -220,6 +248,8 @@ const mapState = (state) => ({
   ipDetailSelectedRows: state.getIn(['networkManage', 'ipDetailSelectedRows']),
   EditIpDetailModalVisible: state.getIn(['networkManage', 'EditIpDetailModalVisible']),
   freshFlag: state.getIn(['networkManage', 'freshFlag']),
+  isResolveConflict: state.getIn(['networkManage', 'isResolveConflict']),
+  isConvertToManual: state.getIn(['networkManage', 'isConvertToManual']),
 })
 
 const mapDispatch = (dispatch) =>({
@@ -231,6 +261,7 @@ const mapDispatch = (dispatch) =>({
       dispatch(actionCreators.getNetworkIpDetailsInfo(id, NetworkQueryDetailsPagination))
     },
   handleIpDetailsTableChange(pagination, filters, sorter, id){
+    console.log(pagination, filters, sorter, id)
      dispatch(actionCreators.handleIpDetailsTableChange(pagination, filters, sorter, id))
     },
   handleIpDetailSelected(selectedRows){
@@ -238,7 +269,10 @@ const mapDispatch = (dispatch) =>({
     },
   handleEidtIpDetail(){
     dispatch(actionCreators.handleEidtIpDetail())
-      },
+    },
+  ResolveConflict(){
+
+    }
   })
 
 export default connect(mapState, mapDispatch)(IpDetails)

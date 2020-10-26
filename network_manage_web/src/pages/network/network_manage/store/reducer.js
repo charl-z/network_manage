@@ -16,7 +16,8 @@ const defaultState = fromJS({
   ipDetailInfos: [],
   ipDetailSelectedRows: [],
   freshFlag: false,  //页面内容更新后的，标志位
-
+  isResolveConflict: false,
+  isConvertToManual: false,
   iPDetailsPagination: Map({
     showSizeChanger: true,
     current: 1,
@@ -128,9 +129,32 @@ const getIpDetailsInfo  = (state, action) => {
   })
 };
 
+
+function isAllConflictAddress(data) {
+  for(var i=0; i<data.length; i++){
+    if(data[i].ip_type !== "冲突地址"){
+      return false
+	  }
+  }
+  return true
+}
+
+function isAllMauAddress(data) {
+  for(var i=0; i<data.length; i++){
+    if(data[i].ip_type !== "未管理" || data[i].query_mac === '' || data[i].manual_mac !== ''){
+      return false
+	  }
+  }
+  return true
+}
+
 const handleIpDetailSelected = (state, action) => {
+  console.log("action:", action)
+  
   return state.merge({
-    'ipDetailSelectedRows': action.value
+    'ipDetailSelectedRows': action.value,
+    'isResolveConflict': isAllConflictAddress(action.value),
+    'isConvertToManual': isAllMauAddress(action.value)
   })
 }
 
