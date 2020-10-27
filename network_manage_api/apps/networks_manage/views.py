@@ -279,6 +279,19 @@ def patch_export_networks(request):
 	return json_response(data)
 
 
+def resolve_ip_conflict(request):
+	data = dict()
+	ip_details = json.loads(str(request.body, encoding='utf-8'))
+	for ip_detail_dict in ip_details:
+		print(ip_detail_dict['ip'])
+		IpDetailsInfo.objects.filter(ip=ip_detail_dict['ip']).update(
+			manual_mac=ip_detail_dict['query_mac'],
+			ip_type=1
+		)
+	data["status"] = "success"
+	return json_response(data)
+
+
 class EidtIpDetails(View):
 	def patch(self, request):
 		data = dict()
@@ -316,7 +329,6 @@ class EidtIpDetails(View):
 			else:
 				data["status"] = "fail"
 			return json_response(data)
-
 		return json_response(error=error)
 
 

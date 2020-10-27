@@ -16,8 +16,15 @@ const defaultState = fromJS({
   ipDetailInfos: [],
   ipDetailSelectedRows: [],
   freshFlag: false,  //页面内容更新后的，标志位
+  ipDetailFilter: Map({
+    ipStatusFilter: null,
+    ipTypeFilter: null,
+    columnKeySorter: null,
+    orderSorter: null
+  }),
   isResolveConflict: false,
   isConvertToManual: false,
+  ResolveIpConflictModalVisible: false,
   iPDetailsPagination: Map({
     showSizeChanger: true,
     current: 1,
@@ -119,10 +126,17 @@ const handleCSVDataLoading = (state, action) => {
 }
  
 const getIpDetailsInfo  = (state, action) => {
+  console.log("action:", action)
+  
   var iPDetailsPagination = state.getIn(['iPDetailsPagination']).toObject()
+  var ipDetailFilter = state.getIn(['ipDetailFilter']).toObject()
   iPDetailsPagination['total'] = action.value.total_ips  
   iPDetailsPagination['current'] = action.value.current_page
   iPDetailsPagination['pageSize'] = action.value.page_size
+
+
+
+  
   return state.merge({
     'ipDetailInfos': action.value.result,
     'iPDetailsPagination': Map(iPDetailsPagination)
@@ -149,8 +163,6 @@ function isAllMauAddress(data) {
 }
 
 const handleIpDetailSelected = (state, action) => {
-  console.log("action:", action)
-  
   return state.merge({
     'ipDetailSelectedRows': action.value,
     'isResolveConflict': isAllConflictAddress(action.value),
@@ -174,7 +186,20 @@ const handleEditIpDetailSubmit = (state, action) => {
   var freshFlag = state.getIn(['freshFlag'])
   return state.merge({
     'freshFlag': !freshFlag,
-    'EditIpDetailModalVisible': false
+    'EditIpDetailModalVisible': false,
+    'ResolveIpConflictModalVisible': false
+  })
+}
+
+const handleResolveConflict = (state, action) => {
+  return state.merge({
+    'ResolveIpConflictModalVisible': true
+  })
+}
+
+const handleResolveConflictCancel =  (state, action) => {
+  return state.merge({
+    'ResolveIpConflictModalVisible': false
   })
 }
 
@@ -212,8 +237,13 @@ export default (state = defaultState, action) => {
       return handleEidtIpDetail(state, action)
     case constant.EDIT_IP_DETAIL_CANCEL:
       return handleEditIpDetailModalCancel(state, action)
-    case constant.EDIT_IP_DETAIL_SUBMIT:
+    case constant.FRESH_IP_DETAIL:
       return handleEditIpDetailSubmit(state, action)
+    case constant.RESOLVE_IP_DETAIL_CONFLICT:
+      return handleResolveConflict(state, action)
+    case constant.RESOLVE_IP_CONFLICT_CANCEL:
+      return handleResolveConflictCancel(state, action)
+
     default:
       return state
   }

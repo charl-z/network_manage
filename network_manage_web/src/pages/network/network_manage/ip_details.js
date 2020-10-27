@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
 import { Table, Button, Space, Tooltip } from 'antd';
 import EditIpDetailModal from './edit_ip_detail_modal'
+import ResloveIpDeatail from  './reslove_ip_conflict'
 import { PAGE_SIZE_OPTION } from '../../../libs/functools'
 
 
@@ -178,9 +179,9 @@ class IpDetails extends Component{
       ipDetailSelectedRows, 
       EditIpDetailModalVisible, 
       isResolveConflict,
-      isConvertToManual
+      isConvertToManual,
+      ResolveIpConflictModalVisible
     } = this.props
-    console.log("isConvertToManual:", isConvertToManual)
     const rowSelection = {
       onSelect: this.onSelect,
     };
@@ -208,7 +209,7 @@ class IpDetails extends Component{
           }
           {
             isResolveConflict ? 
-            <Button type='primary' onClick={this.props.ResolveConflict}>解决冲突</Button>
+            <Button type='primary' onClick={this.props.handleResolveConflict}>解决冲突</Button>
             :
             <Button disabled>解决冲突</Button>
           }
@@ -224,16 +225,17 @@ class IpDetails extends Component{
           onChange={(pagination, filters, sorter) => this.props.handleIpDetailsTableChange(pagination, filters, sorter, this.props.match.params.id)}
         />
         { EditIpDetailModalVisible && <EditIpDetailModal/>}
+        { ResolveIpConflictModalVisible && <ResloveIpDeatail />}
       </Fragment>
     )
   }
   componentDidMount(){
-    this.props.getNetworkIpDetailsInfo(this.props.match.params.id);
+    this.props.getNetworkIpDetailsInfo(this.props.match.params.id, this.props.ipDetailFilter);
   }
 
   componentWillReceiveProps(prevProps) {
     if(this.props.freshFlag !== prevProps.freshFlag){
-      this.props.getNetworkIpDetailsInfo(this.props.match.params.id);
+      this.props.getNetworkIpDetailsInfo(this.props.match.params.id, this.props.ipDetailFilter);
       }
     };
   
@@ -245,11 +247,13 @@ class IpDetails extends Component{
 const mapState = (state) => ({
   ipDetailInfos: state.getIn(['networkManage', 'ipDetailInfos']),
   iPDetailsPagination: state.getIn(['networkManage', 'iPDetailsPagination']).toObject(),
+  ipDetailFilter: state.getIn(['networkManage', 'ipDetailFilter']).toObject(),
   ipDetailSelectedRows: state.getIn(['networkManage', 'ipDetailSelectedRows']),
   EditIpDetailModalVisible: state.getIn(['networkManage', 'EditIpDetailModalVisible']),
   freshFlag: state.getIn(['networkManage', 'freshFlag']),
   isResolveConflict: state.getIn(['networkManage', 'isResolveConflict']),
   isConvertToManual: state.getIn(['networkManage', 'isConvertToManual']),
+  ResolveIpConflictModalVisible: state.getIn(['networkManage', 'ResolveIpConflictModalVisible']),
 })
 
 const mapDispatch = (dispatch) =>({
@@ -270,8 +274,8 @@ const mapDispatch = (dispatch) =>({
   handleEidtIpDetail(){
     dispatch(actionCreators.handleEidtIpDetail())
     },
-  ResolveConflict(){
-
+  handleResolveConflict(){
+  dispatch(actionCreators.handleResolveConflict())
     }
   })
 
