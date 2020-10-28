@@ -20,11 +20,14 @@ const defaultState = fromJS({
     ipStatusFilter: null,
     ipTypeFilter: null,
     columnKeySorter: null,
-    orderSorter: null
+    orderSorter: null,
+    pageSize: 30,
+    currentPage: 1,
   }),
   isResolveConflict: false,
   isConvertToManual: false,
   ResolveIpConflictModalVisible: false,
+  ConvertToManualModalVisible: false,
   iPDetailsPagination: Map({
     showSizeChanger: true,
     current: 1,
@@ -126,25 +129,25 @@ const handleCSVDataLoading = (state, action) => {
 }
  
 const getIpDetailsInfo  = (state, action) => {
-  console.log("action:", action)
-  
   var iPDetailsPagination = state.getIn(['iPDetailsPagination']).toObject()
-  var ipDetailFilter = state.getIn(['ipDetailFilter']).toObject()
+
   iPDetailsPagination['total'] = action.value.total_ips  
-  iPDetailsPagination['current'] = action.value.current_page
-  iPDetailsPagination['pageSize'] = action.value.page_size
+  iPDetailsPagination['current'] = action.value.ip_filter.currentPage
+  iPDetailsPagination['pageSize'] = action.value.ip_filter.pageSize
 
-
-
-  
   return state.merge({
     'ipDetailInfos': action.value.result,
-    'iPDetailsPagination': Map(iPDetailsPagination)
+    'iPDetailsPagination': Map(iPDetailsPagination),
+    'ipDetailFilter': Map(action.value.ip_filter)
   })
 };
 
 
 function isAllConflictAddress(data) {
+  if(data.length === 0){
+    return false
+  }
+  console.log("data:", data)
   for(var i=0; i<data.length; i++){
     if(data[i].ip_type !== "冲突地址"){
       return false
@@ -154,6 +157,9 @@ function isAllConflictAddress(data) {
 }
 
 function isAllMauAddress(data) {
+  if(data.length === 0){
+    return false
+  }
   for(var i=0; i<data.length; i++){
     if(data[i].ip_type !== "未管理" || data[i].query_mac === '' || data[i].manual_mac !== ''){
       return false
@@ -187,7 +193,12 @@ const handleEditIpDetailSubmit = (state, action) => {
   return state.merge({
     'freshFlag': !freshFlag,
     'EditIpDetailModalVisible': false,
-    'ResolveIpConflictModalVisible': false
+    'ResolveIpConflictModalVisible': false,
+    'ConvertToManualModalVisible': false,
+    'ipDetailSelectedRows': false,
+    'isResolveConflict': false,
+    'isConvertToManual': false
+    
   })
 }
 
@@ -197,9 +208,21 @@ const handleResolveConflict = (state, action) => {
   })
 }
 
-const handleResolveConflictCancel =  (state, action) => {
+const handleResolveConflictCancel = (state, action) => {
   return state.merge({
     'ResolveIpConflictModalVisible': false
+  })
+}
+
+const handleConvertToManual = (state, action) => {
+  return state.merge({
+    'ConvertToManualModalVisible': true
+  })
+}
+
+const convertIpManualCancel = (state, action) => {
+  return state.merge({
+    'ConvertToManualModalVisible': false
   })
 }
 
@@ -243,6 +266,10 @@ export default (state = defaultState, action) => {
       return handleResolveConflict(state, action)
     case constant.RESOLVE_IP_CONFLICT_CANCEL:
       return handleResolveConflictCancel(state, action)
+    case constant.CONVERT_TO_MANUAL:
+      return handleConvertToManual(state, action)
+    case constant.CONVERT_IP_MANUAL_CANCEL:
+      return convertIpManualCancel(state, action)
 
     default:
       return state

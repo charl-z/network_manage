@@ -1,5 +1,6 @@
 import json
 from django.views.generic import View
+from django.db.models import Q
 from libs.IPy import checkNetwork, IP
 from libs.utils import insert_query_data, get_mac_manufacturer, convert_device_hostname_interface
 from libs.tool import ipv4_to_num, num_to_ipv4, json_response, is_valid_mac
@@ -283,7 +284,18 @@ def resolve_ip_conflict(request):
 	data = dict()
 	ip_details = json.loads(str(request.body, encoding='utf-8'))
 	for ip_detail_dict in ip_details:
-		print(ip_detail_dict['ip'])
+		IpDetailsInfo.objects.filter(ip=ip_detail_dict['ip']).update(
+			manual_mac=ip_detail_dict['query_mac'],
+			ip_type=1
+		)
+	data["status"] = "success"
+	return json_response(data)
+
+
+def convert_ip_manual(request):
+	data = dict()
+	ip_details = json.loads(str(request.body, encoding='utf-8'))
+	for ip_detail_dict in ip_details:
 		IpDetailsInfo.objects.filter(ip=ip_detail_dict['ip']).update(
 			manual_mac=ip_detail_dict['query_mac'],
 			ip_type=1
@@ -343,6 +355,8 @@ def get_network_ip_details(request):
 	column_key = request.GET.get("columnKey")
 	order = request.GET.get("order")
 
+	print("ip_type:", ip_type, type(ip_type), "ip_status:", ip_status)
+
 	result = []
 	network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
 
@@ -352,6 +366,9 @@ def get_network_ip_details(request):
 				network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by('-ip')
 			elif order == 'ascend':
 				network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by('ip')
+
+		print("network_details:", network_details, page_size, current_page)
+
 		paginator = Paginator(network_details, page_size)
 		ips_page = paginator.page(current_page)
 		for query in ips_page:
@@ -487,79 +504,28 @@ def get_network_ip_details(request):
 			data['total_ips'] = len(offline_ip)
 			data["status"] = "success"
 			return json_response(data)
-			# return HttpResponse(json.dumps(data, cls=json_encoder), content_type="application/json")
 
 	else:
-		network_details = IpDetailsInfo.objects.filter(network=network_info.network)
-		scan_ips_info = dict()
-		for query in network_details:
-			ip_info = dict()
-
-			ip_info["network"] = query.network
-			ip_info["ip_status"] = query.get_ip_status_display()
-			ip_info["query_mac"] = query.query_mac
-			ip_info["device_hostname_interface"] = query.device_hostname_interface
-			ip_info["manual_mac"] = query.manual_mac
-			ip_info["ip_type"] = query.get_ip_type_display()
-			ip_info["hostname"] = query.hostname
-
-			ip_info["tcp_port_list"] = query.tcp_port_list
-			ip_info["udp_port_list"] = query.udp_port_list
-
-			ip_info["query_time"] = query.query_time
-
-			scan_ips_info[query.ip] = ip_info
+		result = []
 
 		ips = list(IP(network_info.network))
+		total_ips = len(ips)
+
 		if column_key == "ip":
 			if order == 'descend':
 				ips.sort(reverse=True)
 			elif order == 'ascend':
 				ips.sort(reverse=False)
-		scan_ips = list(scan_ips_info.keys())
 
-		result = []
-		total_ips = len(ips)
-		current_page = current_page - 1
-		for ip in ips[current_page*page_size : current_page*page_size+page_size]:
-			ip = str(ip)
-			scan_ip_infos = dict()
-			if ip in scan_ips:
-				scan_ip_infos["key"] = ip
-				scan_ip_infos["ip"] = ip
-				scan_ip_infos["network"] = scan_ips_info[ip]["network"]
+		if ip_type == "3":
+			current_page = current_page - 1
+			network_details = IpDetailsInfo.objects.filter(network=network_info.network)
+			use_ips = network_details.values_list('ip', flat=True)
+			no_use_ips = list(set(ips).difference(set(use_ips)))
 
-				device_hostname_interface = scan_ips_info[ip]["device_hostname_interface"]
-				if device_hostname_interface:
-					device_hostname_interface = convert_device_hostname_interface(json.loads(device_hostname_interface))
-
-				scan_ip_infos["device_hostname_interface"] = device_hostname_interface
-				scan_ip_infos["ip_status"] = scan_ips_info[ip]["ip_status"]
-
-				query_mac = scan_ips_info[ip]["query_mac"]
-				scan_ip_infos["query_mac"] = query_mac
-				scan_ip_infos["query_mac_product"] = get_mac_manufacturer(query_mac)
-
-				manual_mac = scan_ips_info[ip]["manual_mac"]
-				scan_ip_infos["manual_mac"] = manual_mac
-				scan_ip_infos["manual_mac_product"] = get_mac_manufacturer(manual_mac)
-
-				scan_ip_infos["ip_type"] = scan_ips_info[ip]["ip_type"]
-				scan_ip_infos["hostname"] = scan_ips_info[ip]["hostname"]
-
-				tcp_port_list = scan_ips_info[ip]["tcp_port_list"]
-				if tcp_port_list:
-					tcp_port_list = json.loads(tcp_port_list)
-				scan_ip_infos["tcp_port_list"] = tcp_port_list
-
-				udp_port_list = scan_ips_info[ip]["udp_port_list"]
-				if udp_port_list:
-					udp_port_list = json.loads(udp_port_list)
-				scan_ip_infos["udp_port_list"] = udp_port_list
-
-				scan_ip_infos["query_time"] = scan_ips_info[ip]["query_time"]
-
-			else:
+			for ip in no_use_ips[current_page * page_size: current_page * page_size + page_size]:
+				ip = str(ip)
+				scan_ip_infos = dict()
 				scan_ip_infos["key"] = ip
 				scan_ip_infos["ip"] = ip
 				scan_ip_infos["network"] = network_info.network
@@ -575,11 +541,182 @@ def get_network_ip_details(request):
 				scan_ip_infos["udp_port_list"] = ""
 				scan_ip_infos["query_time"] = network_info.query_time
 
-			result.append(scan_ip_infos)
-		data['result'] = result
-		data['total_ips'] = total_ips
-		data["status"] = "success"
-		return json_response(data)
+				result.append(scan_ip_infos)
+
+			data['result'] = result
+			data['total_ips'] = total_ips
+			data["status"] = "success"
+			return json_response(data)
+
+		elif ip_type == 'null' or '3' in ip_type:
+			if ip_type == '0,1,2,3' or ip_type == 'null' :
+				network_details = IpDetailsInfo.objects.filter(network=network_info.network)
+			else:
+				ip_type = ip_type.split(",")
+				ip_type.remove('3')
+				if len(ip_type) == 1:
+					network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_type=ip_type[0])
+				elif len(ip_type) == 2:
+					network_details = IpDetailsInfo.objects.filter(
+						Q(network=network_info.network),
+						Q(ip_type=ip_type[0]) | Q(ip_type=ip_type[1]))
+				elif len(ip_type) == 3:
+					network_details = IpDetailsInfo.objects.filter(
+						Q(network=network_info.network),
+						Q(ip_type=ip_type[0]) | Q(ip_type=ip_type[1]) | Q(ip_type=ip_type[2]))
+
+
+			scan_ips_info = dict()
+			for query in network_details:
+				ip_info = dict()
+				ip_info["network"] = query.network
+				ip_info["ip_status"] = query.get_ip_status_display()
+				ip_info["query_mac"] = query.query_mac
+				ip_info["device_hostname_interface"] = query.device_hostname_interface
+				ip_info["manual_mac"] = query.manual_mac
+				ip_info["ip_type"] = query.get_ip_type_display()
+				ip_info["hostname"] = query.hostname
+
+				ip_info["tcp_port_list"] = query.tcp_port_list
+				ip_info["udp_port_list"] = query.udp_port_list
+
+				ip_info["query_time"] = query.query_time
+
+				scan_ips_info[query.ip] = ip_info
+
+			scan_ips = list(scan_ips_info.keys())
+
+			for ip in ips[current_page*page_size : current_page*page_size+page_size]:
+				ip = str(ip)
+				scan_ip_infos = dict()
+				if ip in scan_ips:
+					scan_ip_infos["key"] = ip
+					scan_ip_infos["ip"] = ip
+					scan_ip_infos["network"] = scan_ips_info[ip]["network"]
+
+					device_hostname_interface = scan_ips_info[ip]["device_hostname_interface"]
+					if device_hostname_interface:
+						device_hostname_interface = convert_device_hostname_interface(json.loads(device_hostname_interface))
+
+					scan_ip_infos["device_hostname_interface"] = device_hostname_interface
+					scan_ip_infos["ip_status"] = scan_ips_info[ip]["ip_status"]
+
+					query_mac = scan_ips_info[ip]["query_mac"]
+					scan_ip_infos["query_mac"] = query_mac
+					scan_ip_infos["query_mac_product"] = get_mac_manufacturer(query_mac)
+
+					manual_mac = scan_ips_info[ip]["manual_mac"]
+					scan_ip_infos["manual_mac"] = manual_mac
+					scan_ip_infos["manual_mac_product"] = get_mac_manufacturer(manual_mac)
+
+					scan_ip_infos["ip_type"] = scan_ips_info[ip]["ip_type"]
+					scan_ip_infos["hostname"] = scan_ips_info[ip]["hostname"]
+
+					tcp_port_list = scan_ips_info[ip]["tcp_port_list"]
+					if tcp_port_list:
+						tcp_port_list = json.loads(tcp_port_list)
+					scan_ip_infos["tcp_port_list"] = tcp_port_list
+
+					udp_port_list = scan_ips_info[ip]["udp_port_list"]
+					if udp_port_list:
+						udp_port_list = json.loads(udp_port_list)
+					scan_ip_infos["udp_port_list"] = udp_port_list
+
+					scan_ip_infos["query_time"] = scan_ips_info[ip]["query_time"]
+
+				else:
+					scan_ip_infos["key"] = ip
+					scan_ip_infos["ip"] = ip
+					scan_ip_infos["network"] = network_info.network
+					scan_ip_infos["device_hostname_interface"] = ""
+					scan_ip_infos["manual_mac"] = ""
+					scan_ip_infos["manual_mac_product"] = ""
+					scan_ip_infos["ip_status"] = "离线"
+					scan_ip_infos["query_mac"] = ""
+					scan_ip_infos["query_mac_product"] = ""
+					scan_ip_infos["ip_type"] = "未使用"
+					scan_ip_infos["hostname"] = ""
+					scan_ip_infos["tcp_port_list"] = ""
+					scan_ip_infos["udp_port_list"] = ""
+					scan_ip_infos["query_time"] = network_info.query_time
+
+				result.append(scan_ip_infos)
+			data['result'] = result
+			data['total_ips'] = total_ips
+			data["status"] = "success"
+			return json_response(data)
+
+		elif '3' not in ip_type:
+			ip_type = ip_type.split(",")
+
+			if column_key == "ip":
+				if order == 'descend':
+					network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by(
+						'-ip')
+				elif order == 'ascend':
+					network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_status=1).order_by(
+						'ip')
+
+			if len(ip_type) == 1:
+				network_details = IpDetailsInfo.objects.filter(network=network_info.network, ip_type=ip_type[0])
+			elif len(ip_type) == 2:
+				network_details = IpDetailsInfo.objects.filter(
+					Q(network=network_info.network),
+					Q(ip_type=ip_type[0]) | Q(ip_type=ip_type[1]))
+			elif len(ip_type) == 3:
+				network_details = IpDetailsInfo.objects.filter(
+					Q(network=network_info.network),
+					Q(ip_type=ip_type[0]) | Q(ip_type=ip_type[1]) | Q(ip_type=ip_type[2]))
+
+			if column_key == "ip":
+				if order == 'descend':
+					network_details = network_details.order_by(
+						'-ip')
+				elif order == 'ascend':
+					network_details = network_details.order_by(
+						'ip')
+			print("network_details:", network_details, page_size, current_page)
+			paginator = Paginator(network_details, page_size)
+			ips_page = paginator.page(current_page)
+			for query in ips_page:
+				ip_info = dict()
+				ip_info["key"] = query.ip
+				ip_info["ip"] = query.ip
+				ip_info["network"] = query.network
+				ip_info["ip_status"] = query.get_ip_status_display()
+				ip_info["query_mac"] = query.query_mac
+				ip_info["query_mac_product"] = get_mac_manufacturer(query.query_mac)
+
+				ip_info["manual_mac"] = query.manual_mac
+				ip_info["manual_mac_product"] = get_mac_manufacturer(query.manual_mac)
+
+				device_hostname_interface = query.device_hostname_interface
+				if device_hostname_interface:
+					device_hostname_interface = convert_device_hostname_interface(json.loads(device_hostname_interface))
+				ip_info["device_hostname_interface"] = device_hostname_interface
+
+				ip_info["ip_type"] = query.get_ip_type_display()
+				ip_info["hostname"] = query.hostname
+
+				tcp_port_list = query.tcp_port_list
+				if tcp_port_list:
+					tcp_port_list = json.loads(tcp_port_list)
+				ip_info["tcp_port_list"] = tcp_port_list
+
+				udp_port_list = query.udp_port_list
+				if udp_port_list:
+					udp_port_list = json.loads(udp_port_list)
+				ip_info["udp_port_list"] = udp_port_list
+
+				ip_info["query_time"] = query.query_time.strftime("%Y-%m-%d %H:%M:%S")
+				result.append(ip_info)
+			data['result'] = result
+			data['total_ips'] = network_details.count()
+			data["status"] = "success"
+			return json_response(data)
+
+
+
 
 
 

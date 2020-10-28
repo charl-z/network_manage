@@ -129,18 +129,17 @@ export const exportNetworkMoadlCancel = () => ({
   type: constant.NETWORK_EXPORT_CANCEL,
 }) 
 
-export const getNetworkIpDetailsInfo = (id, pagination) => {
-  var pageSize = pagination.pageSize
-  var currentPage = pagination.current
-  var ipStatusFilter = null
-  var ipTypeFilter = null
-  var columnKeySorter = null
-  var orderSorter = null
+export const getNetworkIpDetailsInfo = (id, ipDetailFilter) => {
+  // var pageSize = pagination.pageSize
+  // var currentPage = pagination.current
+  // var ipStatusFilter = null
+  // var ipTypeFilter = null
+  // var columnKeySorter = null
+  // var orderSorter = null
   return (dispatch) => {
-    http.get(`/api/networks_manage/get_network_ip_details/?id=${id}&current_page=${currentPage}&page_size=${pageSize}&ip_status=${ipStatusFilter}&ip_type=${ipTypeFilter}&columnKey=${columnKeySorter}&order=${orderSorter}`)
+    http.get(`/api/networks_manage/get_network_ip_details/?id=${id}&current_page=${ipDetailFilter['currentPage']}&page_size=${ipDetailFilter['pageSize']}&ip_status=${ipDetailFilter['ipStatusFilter']}&ip_type=${ipDetailFilter['ipTypeFilter']}&columnKey=${ipDetailFilter['columnKeySorter']}&order=${ipDetailFilter['orderSorter']}`)
       .then((res) => {
-        res["page_size"] = pageSize
-        res["current_page"] = currentPage
+        res['ip_filter'] = ipDetailFilter
         dispatch({
           type: constant.GET_IP_DETAIL_INFO,
           value: res
@@ -174,8 +173,6 @@ export const handleIpDetailsTableChange  = (pagination, filters, sorter, id) => 
   return (dispatch) => {
     http.get(`/api/networks_manage/get_network_ip_details/?id=${id}&current_page=${ipDetailFilter['currentPage']}&page_size=${ipDetailFilter['pageSize']}&ip_status=${ipDetailFilter['ipStatusFilter']}&ip_type=${ipDetailFilter['ipTypeFilter']}&columnKey=${ipDetailFilter['columnKeySorter']}&order=${ipDetailFilter['orderSorter']}`)
       .then((res) => {
-        // res["page_size"] = pageSize
-        // res["current_page"] = currentPage
         res['ip_filter'] = ipDetailFilter
         dispatch({
           type: constant.GET_IP_DETAIL_INFO,
@@ -202,6 +199,10 @@ export const handleResolveConflict = () => ({
   type: constant.RESOLVE_IP_DETAIL_CONFLICT,
 })
 
+export const handleConvertToManual = () => ({
+  type: constant.CONVERT_TO_MANUAL,
+})
+
 export const handleEditIpDetailModalCancel = () =>({
   type: constant.EDIT_IP_DETAIL_CANCEL,
 }) 
@@ -221,7 +222,7 @@ export const handleEditIpDetailSubmit = (value) => {
   }
 }
 
-export const resloveIpDeatailCancel  = () => ({
+export const resloveIpDeatailCancel = () => ({
   type: constant.RESOLVE_IP_CONFLICT_CANCEL,
 })
 
@@ -238,3 +239,21 @@ export const resloveIpDeataiOk = (value) => {
     });
   }
 }
+
+export const convertIpManualCancel = () => ({
+  type: constant.CONVERT_IP_MANUAL_CANCEL
+}) 
+
+export const convertIpManualOk = (value) => {
+  return (dispatch) => {
+    http.post('/api/networks_manage/convert_ip_manual/', value)
+      .then((res) => {
+        dispatch({
+          type: constant.FRESH_IP_DETAIL,
+        })
+    })
+    .catch(function (error) {
+    console.log(error);
+    });
+  }
+} 

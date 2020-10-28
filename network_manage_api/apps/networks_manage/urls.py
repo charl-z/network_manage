@@ -13,8 +13,7 @@ urlpatterns = [
     url(r'^get_network_ip_details/', get_network_ip_details),
     url(r'^edit_ip_details/', EidtIpDetails.as_view()),
     url(r'^resolve_ip_conflict/', resolve_ip_conflict),
-
-
+    url(r'^convert_ip_manual/', convert_ip_manual),
 ]
 
 

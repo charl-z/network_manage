@@ -41,7 +41,6 @@ def get_group_to_infos(request):
 	data["status"] = "success"
 	data["result"] = result
 	return json_response(data)
-	# return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def new_build_group(request):
@@ -55,7 +54,6 @@ def new_build_group(request):
 			data["status"] = "fail"
 			data['result'] = "分组已存在"
 			return json_response(data)
-			# return HttpResponse(json.dumps(data), content_type="application/json")
 
 		if not parent_group_name:
 			NetworkGroup.objects.create(name=group_name, parent_array=[], haschild=False)

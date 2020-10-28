@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom'
 import 'antd/dist/antd.css';
 import { Table, Button, Space, Tooltip } from 'antd';
 import EditIpDetailModal from './edit_ip_detail_modal'
-import ResloveIpDeatail from  './reslove_ip_conflict'
-import { PAGE_SIZE_OPTION } from '../../../libs/functools'
+import ResloveIpDeatail from  './reslove_ip_conflict_modal'
+import ConvertIpManual from './convert_ip_manual_modal'
 
 
 // const pageSizeOptions = [30, 100, 500]
@@ -79,6 +79,7 @@ class IpDetails extends Component{
           { text: '未管理', value: '0' },
           { text: '手动地址', value: '1' },
           { text: '冲突地址', value: '2' },
+          { text: '未使用', value: '3' },
         ],
         render (text, record) {
           if(text === '冲突地址'){
@@ -182,8 +183,11 @@ class IpDetails extends Component{
       isConvertToManual,
       ResolveIpConflictModalVisible
     } = this.props
+
+    console.log("isConvertToManual:", isConvertToManual)
     const rowSelection = {
-      onSelect: this.onSelect,
+      // onSelect: this.onSelect,
+      onChange: this.onChange
     };
 
     iPDetailsPagination["showTotal"] = () => `总共${iPDetailsPagination.total}条`
@@ -203,7 +207,7 @@ class IpDetails extends Component{
           </Tooltip>
           {
             isConvertToManual ?
-            <Button type='primary'>转手动</Button>
+            <Button type='primary' onClick={this.props.handleConvertToManual}>转手动</Button>
             :
             <Button disabled>转手动</Button>
           }
@@ -216,7 +220,7 @@ class IpDetails extends Component{
           
         </Space>
         <Table 
-        rowSelection={rowSelection}
+          rowSelection={rowSelection}
           columns={columns}
           dataSource={ipDetailInfos} 
           bordered
@@ -226,6 +230,7 @@ class IpDetails extends Component{
         />
         { EditIpDetailModalVisible && <EditIpDetailModal/>}
         { ResolveIpConflictModalVisible && <ResloveIpDeatail />}
+        { this.props.ConvertToManualModalVisible && <ConvertIpManual/>}
       </Fragment>
     )
   }
@@ -238,10 +243,14 @@ class IpDetails extends Component{
       this.props.getNetworkIpDetailsInfo(this.props.match.params.id, this.props.ipDetailFilter);
       }
     };
-  
-  onSelect = (record, selected, selectedRows, nativeEvent) => {
+  onChange = (selectedRowKeys, selectedRows) => {
+    // console.log("selectedRows:selectedRows11:", selectedRowKeys, selectedRows)
     this.props.handleIpDetailSelected(selectedRows)
   }
+  // onSelect = (record, selected, selectedRows, nativeEvent) => {
+  //   console.log("selectedRows:selectedRows:", selectedRows)
+  //   this.props.handleIpDetailSelected(selectedRows)
+  // }
 }
 
 const mapState = (state) => ({
@@ -254,19 +263,15 @@ const mapState = (state) => ({
   isResolveConflict: state.getIn(['networkManage', 'isResolveConflict']),
   isConvertToManual: state.getIn(['networkManage', 'isConvertToManual']),
   ResolveIpConflictModalVisible: state.getIn(['networkManage', 'ResolveIpConflictModalVisible']),
+  ConvertToManualModalVisible: state.getIn(['networkManage', 'ConvertToManualModalVisible']),
 })
 
 const mapDispatch = (dispatch) =>({
-  getNetworkIpDetailsInfo(id){
-    var NetworkQueryDetailsPagination = {
-      "pageSize": PAGE_SIZE_OPTION[0],
-      "current": 1
-    }
-      dispatch(actionCreators.getNetworkIpDetailsInfo(id, NetworkQueryDetailsPagination))
+  getNetworkIpDetailsInfo(id, ipDetailFilter){
+    dispatch(actionCreators.getNetworkIpDetailsInfo(id, ipDetailFilter))
     },
   handleIpDetailsTableChange(pagination, filters, sorter, id){
-    console.log(pagination, filters, sorter, id)
-     dispatch(actionCreators.handleIpDetailsTableChange(pagination, filters, sorter, id))
+    dispatch(actionCreators.handleIpDetailsTableChange(pagination, filters, sorter, id))
     },
   handleIpDetailSelected(selectedRows){
     dispatch(actionCreators.handleIpDetailSelected(selectedRows))
@@ -275,8 +280,11 @@ const mapDispatch = (dispatch) =>({
     dispatch(actionCreators.handleEidtIpDetail())
     },
   handleResolveConflict(){
-  dispatch(actionCreators.handleResolveConflict())
-    }
+    dispatch(actionCreators.handleResolveConflict())
+    },
+  handleConvertToManual(){
+    dispatch(actionCreators.handleConvertToManual())
+    },
   })
 
 export default connect(mapState, mapDispatch)(IpDetails)
