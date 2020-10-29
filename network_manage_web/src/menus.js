@@ -1,5 +1,5 @@
 export default [
-  {icon: 'desktop', title: '工作台', auth: 'home.home.view', path: '/home'},
+  {icon: 'desktop', title: 'DashBoard', auth: 'home.home.view', path: '/home/index'},
   {
     icon: 'code', title: '网络', auth: 'exec.task.do|exec.template.view', child: [
       {title: '网络管理', auth: 'exec.network.manage', path: '/network/network_manage'},
