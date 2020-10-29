@@ -198,7 +198,6 @@ const handleEditIpDetailSubmit = (state, action) => {
     'ipDetailSelectedRows': false,
     'isResolveConflict': false,
     'isConvertToManual': false
-    
   })
 }
 

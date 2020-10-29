@@ -235,7 +235,14 @@ class IpDetails extends Component{
     )
   }
   componentDidMount(){
-    this.props.getNetworkIpDetailsInfo(this.props.match.params.id, this.props.ipDetailFilter);
+    this.props.getNetworkIpDetailsInfo(this.props.match.params.id, {
+      ipStatusFilter: null,
+      ipTypeFilter: null,
+      columnKeySorter: null,
+      orderSorter: null,
+      pageSize: 30,
+      currentPage: 1,
+    });
   }
 
   componentWillReceiveProps(prevProps) {
@@ -244,13 +251,8 @@ class IpDetails extends Component{
       }
     };
   onChange = (selectedRowKeys, selectedRows) => {
-    // console.log("selectedRows:selectedRows11:", selectedRowKeys, selectedRows)
     this.props.handleIpDetailSelected(selectedRows)
   }
-  // onSelect = (record, selected, selectedRows, nativeEvent) => {
-  //   console.log("selectedRows:selectedRows:", selectedRows)
-  //   this.props.handleIpDetailSelected(selectedRows)
-  // }
 }
 
 const mapState = (state) => ({
